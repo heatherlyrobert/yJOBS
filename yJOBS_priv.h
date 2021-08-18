@@ -1,21 +1,22 @@
 /*============================----beg-of-source---============================*/
 /*===[[ HEADER GUARD ]]=======================================================*/
-#ifndef YEXEC_pguard
-#define YEXEC_pguard loaded
+#ifndef YJOBS_pguard
+#define YJOBS_pguard loaded
 
 /*===[[ HEADER ]]=============================================================*/
+/*                      ·········1·········2·········3·········4·········5·········6·········7*/
 /*345678901-12345678901-123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
 
 #define     P_NAME      "yJOBS"
 #define     P_FOCUS     "PS (programming support)"
 #define     P_NICHE     "au (process automation)"
-#define     P_SUBJECT   "process control"
+#define     P_SUBJECT   "job execution and control"
 #define     P_PURPOSE   "shared job control environment"
 
 #define     P_NAMESAKE  "heracles-promachus (leader in battle)"
-#define     P_HERITAGE  "demi-god, the son of zeus and a mortal woman"
-#define     P_IMAGERY   "powerful giant of a man wearing a lion skin and club"
-#define     P_REASON    "great leader in the gigantomachy and chthonic wars"
+#define     P_HERITAGE  "greatest human hero of all time, son of zeus, made into a demigod"
+#define     P_IMAGERY   "massive, athletic, giant of a man wearing a lion skin and club"
+#define     P_REASON    "great olympic leader in the gigantomachy and chthonic wars"
 
 #define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
 
@@ -34,8 +35,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0a"
-#define     P_VERTXT    "initial pull of functionality from yEXEC"
+#define     P_VERNUM    "1.0b"
+#define     P_VERTXT    "add runas, iam, and mode unit testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -45,27 +46,26 @@
 
 
 
-
+/*===[[ CUSTOM HEADERS ]]=====================================================*/
+/*---(always)---------------*/
 #include    <yLOG.h>         /* CUSTOM : heatherly process logging            */
 #include    <yURG.h>         /* CUSTOM : heatherly debugging framework        */
-#include    <yEXEC.h>        /* CUSTOM : heatherly process control            */
+/*---(optional)-------------*/
 #include    <ySTR.h>         /* CUSTOM : heatherly string handling            */
-#include    <yCOLOR_solo.h>  /* CUSTOM : heatherly color constants            */
-#include    <yDLST_solo.h>   /* CUSTOM : heatherly list constants             */
+#include    <yEXEC.h>        /* CUSTOM : heatherly process control            */
 #include    <yREGEX.h>       /* CUSTOM : heatherly regular expressions        */
 
+
+
 /*===[[ PUBLIC HEADERS ]]=====================================================*/
-/*---(big standards)------------*/
+/*---(normal)---------------*/
 #include    <stdio.h>             /* printf, scanf                               */
 #include    <stdlib.h>            /* exit, system, ...                           */
-#include    <sys/unistd.h>        /* fork, execl, getpid, getuid                 */
 #include    <string.h>            /* strcat, strcpy, strlen, ...                 */
+/*---(optional)-------------*/
 #include    <math.h>              /* round                                       */
 #include    <sys/stat.h>          /* fstat, umask                                */
 #include    <dirent.h>
-
-/*---(users)--------------------*/
-#include <unistd.h>                 /* stat(),crpyt()                      */
 
 
 
@@ -171,11 +171,8 @@ char        yjobs_act__checkdir     (cchar *a_dir, int a_perms);
 char        yjobs_act__filter       (cchar *a_name, cchar *a_prefix, int a_muid);
 char        yjobs_act__prepare      (cchar a_pre, cchar a_act, cchar *a_oneline, cchar *a_muser, cchar *a_regex, char *a_prefix, char *a_dir, void *a_assimilate);
 char        yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc);
-char        yjobs_act__mkdir        (void);
-char        yjobs_act__rmdir        (void);
 
 char        yjobs_args__empty       (void);
-char        yjobyjobss__init        (char a_runas, char a_runmode, char *a_runfile);
 char        yjobs_args__single      (char *a_levels, char n);
 char        yjobs_args__clearmode   (char *a_runas, char *a_runmode, char *a_runfile);
 char*       yjobs_args__unit        (char *a_question);

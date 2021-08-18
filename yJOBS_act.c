@@ -251,7 +251,7 @@ yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    DEBUG_INPT  yLOG_point   ("a_act"     , a_act);
    --rce;  IF_CHECK {
       yURG_msg ('>', "%s", a_oneline);
-      yURG_msg ('>', "  option --vcheck, check details of installed job/khronos file");
+      yURG_msg ('>', "  option --vcheck, check details of centrally installed job/khronos file");
    } else IF_AUDIT   {
       yURG_msg ('>', "CHECKING %s ===================================", a_name);
    } else IF_DAEMON  {
@@ -270,18 +270,17 @@ yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    rc = s_assimilate (a_runas, YJOBS_CENTRAL, a_name, NULL, NULL);
    DEBUG_INPT   yLOG_value   ("assimilate", rc);
    --rce;  if (rc < 0) {
-      IF_VCENTRAL  yURG_msg ('>', "FAILED, installed job/khronos file not runable, the reasons are shown above");
+      IF_VCENTRAL  yURG_msg ('>', "FAILED, centrally installed job/khronos file not runable, the reasons are shown above");
       IF_CCENTRAL  yURG_msg_live ();
-      IF_CCHECK    yURG_msg ('>', "FAILED, installed job/khronos file not runable, run --vcheck to identify reasons");
+      IF_CCHECK    yURG_msg ('>', "FAILED, centrally installed job/khronos file not runable, run --vcheck to identify reasons");
       /*> IF_CREVIEW   yURG_msg ('>', "%-30.30s  FAILED, job/khronos file not runable, run --vcheck to identify reasons", a_name);   <*/
       IF_CCENTRAL  yURG_msg_mute ();
       DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   IF_VCENTRAL  yURG_msg ('>', "SUCCESS, installed job/khronos file runable, all lines checked");
+   IF_VCENTRAL  yURG_msg ('>', "SUCCESS, centrally installed job/khronos file runable, all lines checked");
    IF_CCENTRAL  yURG_msg_live ();
-   IF_CCHECK    yURG_msg ('>', "SUCCESS, installed job/khronos file runable, all lines checked");
-   /*> IF_CREVIEW   yURG_msg ('>', "%-30.30s  SUCCESS, installed job/khronos file runable, all lines checked", a_name);   <*/
+   IF_CCHECK    yURG_msg ('>', "SUCCESS, centrally installed job/khronos file runable, all lines checked");
    IF_CCENTRAL  yURG_msg_mute ();
    /*---(footer)-------------------------*/
    if (a_act == ACT_VAUDIT || a_act == ACT_VDAEMON) {
@@ -508,12 +507,12 @@ yJOBS_act_fix           (cchar a_runas, cchar a_act, cchar *a_oneline)
    case IAM_UKHRONOS :
       chown  ("/tmp", 0   , 0   );
       chmod  ("/tmp", 0755);
-      chown  ("/tmp/khronos_test", 0   , 0   );
-      chmod  ("/tmp/khronos_test", 0755);
-      chown  ("/tmp/khronos_test/khronos", 0   , 0   );
-      chmod  ("/tmp/khronos_test/khronos", 0700);
-      system ("rm -f /tmp/khronos_test/khronos/*~");
-      system ("rm -f /tmp/khronos_test/khronos/.*");
+      chown  ("/tmp/yJOBS", 0   , 0   );
+      chmod  ("/tmp/yJOBS", 0755);
+      chown  ("/tmp/yJOBS/khronos", 0   , 0   );
+      chmod  ("/tmp/yJOBS/khronos", 0700);
+      system ("rm -f /tmp/yJOBS/khronos/*~");
+      system ("rm -f /tmp/yJOBS/khronos/.*");
       break;
    }
    return 0;
@@ -822,33 +821,6 @@ yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user
    /*---(trouble)------------------------*/
    if (strstr (a_name, "bad") != NULL)  return -10;
    /*---(complete)-----------------------*/
-   return 0;
-}
-
-char
-yjobs_act__mkdir        (void)
-{
-   switch (g_runas) {
-   case IAM_UKHRONOS :
-      yURG_mkdir ("/tmp/khronos_test/"       , "root"   , "root"  , "0755");
-      yURG_mkdir ("/tmp/khronos_test/khronos", "root"   , "root"  , "0700");
-      yURG_mkdir ("/tmp/khronos_test/root"   , "root"   , "root"  , "0700");
-      yURG_mkdir ("/tmp/khronos_test/member" , "member" , "root"  , "0700");
-      yURG_mkdir ("/tmp/khronos_test/machine", "machine", "root"  , "0700");
-      yURG_mkdir ("/tmp/khronos_test/monkey" , "monkey" , "root"  , "0700");
-      break;
-   }
-   return 0;
-}
-
-char
-yjobs_act__rmdir        (void)
-{
-   switch (g_runas) {
-   case IAM_UKHRONOS :
-      yURG_rmdir ("/tmp/khronos_test/");
-      break;
-   }
    return 0;
 }
 

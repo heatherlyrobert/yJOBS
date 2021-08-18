@@ -206,9 +206,20 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
    /*---(check central audit)------------*/
    --rce;  if (a_loc == YJOBS_CENTRAL) {
       /*---(verify user)--------------------*/
-      strlcpy  (x_user, a_name, LEN_USER);
-      strldchg (x_user, '.', '\0', LEN_USER);
-      strlcpy  (r_fuser, x_user, LEN_USER);
+      switch (a_runas) {
+      case IAM_EOS       : case IAM_UEOS      :
+      case IAM_ASTRAIOS  : case IAM_UASTRAIOS :
+      case IAM_HYPNOS    : case IAM_UHYPNOS   :
+         strcpy (x_user , "root");
+         strcpy (r_fuser, "root");
+         break;
+      case IAM_HERACLES  : case IAM_UHERACLES :
+      case IAM_KHRONOS   : case IAM_UKHRONOS  :
+         strlcpy  (x_user, a_name, LEN_USER);
+         strldchg (x_user, '.', '\0', LEN_USER);
+         strlcpy  (r_fuser, x_user, LEN_USER);
+         break;
+      }
       yURG_msg ('-', "central file prefix is å%sæ", r_fuser);
    }
    DEBUG_INPT   yLOG_info    ("r_fuser"    , r_fuser);
@@ -429,8 +440,8 @@ yJOBS_local_dir         (cchar a_runas, char *a_root, char *a_home)
       strcpy (a_home, "/home/");
       break;
    case IAM_UKHRONOS : case IAM_UEOS : case IAM_UASTRAIOS : case IAM_UHYPNOS : case IAM_UHERACLES :
-      strcpy (a_root, "/tmp/khronos_test/root");
-      strcpy (a_home, "/tmp/khronos_test/");
+      strcpy (a_root, "/tmp/yJOBS/root");
+      strcpy (a_home, "/tmp/yJOBS/");
       break;
    default  :
       yURG_err ('f', "a_runas (%c) is not recognized", a_runas);
@@ -527,19 +538,19 @@ yJOBS_central_dir       (cchar a_runas, cchar *a_name, char *a_dir, char *a_user
       strcpy (a_dir, "/var/spool/khronos/");
       break;
    case IAM_UKHRONOS :
-      strcpy (a_dir, "/tmp/khronos_test/khronos/");
+      strcpy (a_dir, "/tmp/yJOBS/khronos/");
       break;
    case IAM_EOS  : case IAM_ASTRAIOS  : case IAM_HYPNOS  :
       strcpy (a_dir, "/etc/");
       break;
    case IAM_UEOS : case IAM_UASTRAIOS : case IAM_UHYPNOS :
-      strcpy (a_dir, "/tmp/eos_test/etc/");
+      strcpy (a_dir, "/tmp/yJOBS/etc/");
       break;
    case IAM_HERACLES  :
       strcpy (a_dir, "/var/spool/heracles/");
       break;
    case IAM_UHERACLES :
-      strcpy (a_dir, "/tmp/eos_test/heracles/");
+      strcpy (a_dir, "/tmp/yJOBS/heracles/");
       break;
    default  :
       yURG_err ('f', "a_runas (%c) is not recognized", a_runas);
@@ -617,6 +628,56 @@ yJOBS_central            (cchar a_runas, cchar *a_name, char *r_fuser, int *r_fu
    if (r_dir   != NULL)  strlcpy (r_dir, x_center, LEN_PATH);
    rc = yJOBS_central_full (a_runas, x_center, x_file, x_user, x_uid, r_fuser, r_fuid, r_fdesc);
    return rc;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                         unit testing                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___UNITTEST________________o (void) {;};
+
+char
+yJOBS__unit_rmdir       (void)
+{
+   yURG_rmdir ("/tmp/yJOBS/");
+   return 0;
+}
+
+char
+yJOBS__unit_mkdir       (void)
+{
+   /*---(clear test dirs)----------------*/
+   yJOBS__unit_rmdir ();
+   /*---(leave if not unit test)---------*/
+   switch (g_runas) {
+   case IAM_UEOS      : case IAM_UASTRAIOS : case IAM_UHYPNOS   : case IAM_UHERACLES : case IAM_UKHRONOS  :
+      break;
+   default            :
+      return 0;
+      break;
+   }
+   /*---(set up base)--------------------*/
+   yURG_mkdir ("/tmp/yJOBS/"       , "root"   , "root"  , "0755");
+   /*---(set up central)-----------------*/
+   switch (g_runas) {
+   case IAM_UEOS      : case IAM_UASTRAIOS : case IAM_UHYPNOS   :
+      yURG_mkdir ("/tmp/yJOBS/etc"     , "root"   , "root"  , "0700");
+      break;
+   case IAM_UHERACLES :
+      yURG_mkdir ("/tmp/yJOBS/heracles", "root"   , "root"  , "0700");
+      break;
+   case IAM_UKHRONOS  :
+      yURG_mkdir ("/tmp/yJOBS/khronos" , "root"   , "root"  , "0700");
+      break;
+   }
+   /*---(set up locals)------------------*/
+   yURG_mkdir ("/tmp/yJOBS/root"   , "root"   , "root"  , "0700");
+   yURG_mkdir ("/tmp/yJOBS/member" , "member" , "root"  , "0700");
+   yURG_mkdir ("/tmp/yJOBS/machine", "machine", "root"  , "0700");
+   yURG_mkdir ("/tmp/yJOBS/monkey" , "monkey" , "root"  , "0700");
+   /*---(complete)-----------------------*/
+   return 0;
 }
 
 

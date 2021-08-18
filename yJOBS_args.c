@@ -61,6 +61,7 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    { "audit"    , "aèA", "audit central environment and all its files"  , "---", '·' },
    { "fix"      , "füF", "audit central environment and fix issues"     , "---", '·' },
    { "remove"   , "røR", "remove file from central location"            , "·FF", '·' },
+   { "extract"  , "eìE", "extract a central file to local copy"         , "·FF", '·' },
    { "daemon"   , "dëD", "execute specific file in daemon-mode"         , "··-", '·' },
    { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" , "··-", '·' },
    { "normal"   , "nôN", "execute specific file in normal-mode"         , "---", '·' },
@@ -150,7 +151,7 @@ yjobs_args__single      (char *a_levels, char n)
 }
 
 char
-yjobs_args__init        (char a_runas, char a_runmode, char *a_runfile)
+yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
@@ -172,7 +173,8 @@ yjobs_args__init        (char a_runas, char a_runmode, char *a_runfile)
    g_runas   = a_runas;
    g_runmode = a_runmode;
    g_norun   = '-';
-   strcpy (g_runfile, a_runfile);
+   if (a_runfile != NULL) strcpy (g_runfile, a_runfile);
+   else                   strcpy (g_runfile, "");
    DEBUG_PROG  yLOG_info    ("g_silent"  , g_silent);
    DEBUG_PROG  yLOG_info    ("g_confirm" , g_confirm);
    DEBUG_PROG  yLOG_info    ("g_verbose" , g_verbose);
@@ -215,7 +217,7 @@ yJOBS_args_handle       (char *a_runas, char *a_runmode, char *a_runfile, int *i
    --rce;  if (a_arg     == NULL)  return rce;
    /*---(check reload)-------------------*/
    if (strcmp (g_silent, "") == 0) {
-      rc = yjobs_args__init (*a_runas, *a_runmode, a_runfile);
+      rc = yJOBS_args_init (*a_runas, *a_runmode, a_runfile);
    }
    /*---(value defense)------------------*/
    --rce;  if (strlen (a_arg) <= 4) {

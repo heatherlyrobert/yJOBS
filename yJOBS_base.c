@@ -10,7 +10,7 @@
 /*====================------------------------------------====================*/
 static void      o___UTILITY_________________o (void) {;}
 
-char        yJOBS_ver [200] = "";
+static char yJOBS_ver [LEN_HUND] = "";
 
 char*        /*--> return library versioning info --------[ leaf-- [ ------ ]-*/
 yJOBS_version      (void)
@@ -25,7 +25,7 @@ yJOBS_version      (void)
 #else
    strncpy (t, "[unknown    ]", 15);
 #endif
-   snprintf (yJOBS_ver, 100, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
+   snprintf (yJOBS_ver, LEN_HUND, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
    return yJOBS_ver;
 }
 
@@ -37,6 +37,35 @@ yJOBS_version      (void)
 static void      o___IDENTIFY________________o (void) {;};
 
 char
+yJOBS_runas             (char *a_runas, char *a_name)
+{
+   if (a_runas != NULL)  *a_runas = '-';
+   if      (strncmp (a_name, "eos"           ,  3) == 0)    g_runas = IAM_EOS;
+   else if (strncmp (a_name, "/sbin/eos"     ,  9) == 0)    g_runas = IAM_EOS;
+   else if (strcmp  (a_name, "init"              ) == 0)    g_runas = IAM_EOS;
+   else if (strncmp (a_name, "astraios"      ,  8) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strncmp (a_name, "/sbin/astraios", 14) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "shutdown"          ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "halt"              ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "restart"           ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strncmp (a_name, "hypnos"        ,  6) == 0)    g_runas = IAM_HYPNOS;
+   else if (strncmp (a_name, "/sbin/hypnos"  , 12) == 0)    g_runas = IAM_HYPNOS;
+   else if (strncmp (a_name, "heracles"      ,  8) == 0)    g_runas = IAM_HERACLES;
+   else if (strncmp (a_name, "/sbin/heracles", 14) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "H"                 ) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "/sbin/H"           ) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "cron"              ) == 0)    g_runas = IAM_KHRONOS;
+   else if (strcmp  (a_name, "crontab"           ) == 0)    g_runas = IAM_KHRONOS;
+   else if (strncmp (a_name, "khronos"       ,  7) == 0)    g_runas = IAM_KHRONOS;
+   else if (strncmp (a_name, "/sbin/khronos" , 13) == 0)    g_runas = IAM_KHRONOS;
+   else {
+      return -10;
+   }
+   if (a_runas != NULL)  *a_runas = g_runas;
+   return 0;
+}
+
+char
 yJOBS_iam               (char a_iam, char *a_print)
 {
    char        rce         =  -10;
@@ -46,7 +75,7 @@ yJOBS_iam               (char a_iam, char *a_print)
       strlcpy (a_print, "eos-rhododactylos (rosy-fingered dawn)" , LEN_HUND);
       break;
    case IAM_ASTRAIOS  : case IAM_UASTRAIOS :
-      strlcpy (a_print, "astraios-aeolus (sparkling wind father)", LEN_HUND);
+      strlcpy (a_print, "astraios-aeolus (sparkling wind-father)", LEN_HUND);
       break;
    case IAM_HYPNOS    : case IAM_UHYPNOS   :
       strlcpy (a_print, "hypnos-epidotes (giver of sleep)"       , LEN_HUND);
@@ -59,6 +88,7 @@ yJOBS_iam               (char a_iam, char *a_print)
       break;
    default               :
       strlcpy (a_print, "unknown"                                , LEN_HUND);
+      return -10;
       break;
    }
    return 0;
@@ -68,10 +98,11 @@ char
 yJOBS_mode              (char a_mode, char *a_print)
 {
    char        rce         =  -10;
+   char        x_flag      =  '-';
    --rce;  if (a_print == NULL)  return rce;
    switch (a_mode) {
    case ACT_VERSION  :
-      strcpy (a_print, "help");
+      strcpy (a_print, "version");
       break;
    case ACT_HELP     :
       strcpy (a_print, "usage");
@@ -97,6 +128,9 @@ yJOBS_mode              (char a_mode, char *a_print)
    case CASE_REMOVE  :
       strcpy (a_print, "remove");
       break;
+   case CASE_EXTRACT :
+      strcpy (a_print, "extract");
+      break;
    case CASE_DAEMON  :
       strcpy (a_print, "daemon");
       break;
@@ -111,12 +145,17 @@ yJOBS_mode              (char a_mode, char *a_print)
       break;
    default           :
       strcpy (a_print, "unknown");
+      x_flag = 'y';
       break;
    }
    IF_SILENT         strcat (a_print, " (silent)");
    else IF_CONFIRM   strcat (a_print, " (confirm)");
    else IF_VERBOSE   strcat (a_print, " (verbose)");
-   else              strcat (a_print, " (unknown)");
+   else {
+      strcat (a_print, " (unknown)");
+      x_flag = 'y';
+   }
+   if (x_flag == 'y') return -10;
    return 0;
 }
 

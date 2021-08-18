@@ -1,53 +1,6 @@
-/*============================----beg-of-source---============================*/
-/*===[[ PURPOSE ]]============================================================*
-
- *   yEXEC is a set of shared functions providing reliable, consisten, and clean
- *   access to program launching and monitoring services.  its purpose is to
- *   take a complex and foundational capability and provide a shared service
- *   that can be tested, maintained, and documented once to avoid migrations.
- *
- *   keeping with the refactoring motto of "DRY: don't repeat yourself", we will
- *   build this code into a single set of shared functions so that we have a
- *   single, unambiguous, authoritative version of the functions.
- *
- *   yEXEC will focus on...
- *      - very solid logging on all functions (noisy and traceable)
- *      - provide execution output on launches
- *      - simple, defensive job launching
- *      - checking for program completion
- *      - finding jobs by name
- *      - daemonizing programs
- *      - normal signal handling
- *
- *   as always, there are many, stable, accepted, existing programs and
- *   utilities built by better programmers that are likely superior in speed,
- *   size, capability, and reliability; BUT, i would not have learned nearly as
- *   much using them, so i follow the adage...
- *
- *   TO TRULY LEARN> do not seek to follow in the footsteps of the men of old;
- *   seek what they sought ~ Matsuo Basho
- *
- *   the underlying idea is to use this build process to learn new programming
- *   capabilities and put additional pressure on me to improve my standards,
- *   maintenance, and coding environment.  just using programs and ideas does
- *   not lead to understanding -- so get messy ;)
- *
- *   any one who wishes to become a good writer [programmer] should endeavour,
- *   before he allows himself to be tempted by the more showy qualities, to be
- *   direct, simple, brief, vigourous, and lucid -- henry watson fowler (1908)
- *
- *   simplicity is prerequisite for reliability and security
- *
- */
-/*============================================================================*/
-
-
-
 /*===[[ HEADER GUARD ]]=======================================================*/
-#ifndef YEXEC_hguard
-#define YEXEC_hguard loaded
-
-
+#ifndef YJOBS_hguard
+#define YJOBS_hguard loaded
 
 
 
@@ -178,10 +131,15 @@ typedef const  char      cchar;
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+/*---(version)--------------*/
 char*       yJOBS_version           (void);
+/*---(identity)-------------*/
+char        yJOBS_runas             (char *a_runas, char *a_name);
 char        yJOBS_iam               (char a_iam , char *a_print);
 char        yJOBS_mode              (char a_mode, char *a_print);
 /*---(done)-----------------*/
+char        yJOBS__unit_mkdir       (void);
+char        yJOBS__unit_rmdir       (void);
 
 
 
@@ -214,8 +172,15 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_onelin
 /*---(done)-----------------*/
 
 
+
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_file, char *a_user, int a_uid, void *a_assimilate);
+
+
+
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(arguments)------------*/
+char        yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile);
 char        yJOBS_args_handle       (char *a_runas, char *a_runmode, char *a_runfile, int *i, char *a_arg, char *a_next);
 char        yJOBS_final             (int a_uid);
 /*---(checkers)-------------*/
