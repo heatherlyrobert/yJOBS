@@ -20,57 +20,57 @@ yjobs__naming           (uchar *a_name)
    int         c           =    0;
    uchar      *p           = NULL;
    /*---(header)-------------------------*/
-   DEBUG_INPT  yLOG_enter   (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
-   DEBUG_INPT   yLOG_point   ("a_name"    , a_name);
+   DEBUG_YEXEC   yLOG_point   ("a_name"    , a_name);
    --rce;  if (a_name == NULL || strlen (a_name) <= 0) {
       yURG_err ('f', "file name can not be null or empty (blatant error)");
-      DEBUG_INPT   yLOG_note    ("file name can not be null or empty");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("file name can not be null or empty");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_info    ("a_name"    , a_name);
+   DEBUG_YEXEC   yLOG_info    ("a_name"    , a_name);
    yURG_msg ('-', "name å%sæ is not empty/null", a_name);
    /*---(path)---------------------------*/
    p = strchr (a_name, '/');
-   DEBUG_INPT   yLOG_point   ("/"         , p);
+   DEBUG_YEXEC   yLOG_point   ("/"         , p);
    --rce;  if (p != NULL) {
       yURG_err ('f', "file name can not include relative/absolute path (security risk)");
-      DEBUG_INPT   yLOG_note    ("file name can not include relative/absolute path (security risk)");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("file name can not include relative/absolute path (security risk)");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_note    ("cronfile name is path local (pathless)");
+   DEBUG_YEXEC   yLOG_note    ("cronfile name is path local (pathless)");
    yURG_msg ('-', "file name is pathless/local");
    /*---(name quality)-------------------*/
    l = strlen (a_name);
-   DEBUG_INPT   yLOG_value   ("l"         , l);
+   DEBUG_YEXEC   yLOG_value   ("l"         , l);
    --rce;  for (i = 0; i < l; ++i) {
       if (strchr (YSTR_FILES, a_name [i]) == NULL) {
          yURG_err ('f', "file name has an illegal character (%c) at position %d (security risk)", a_name [i], i);
-         DEBUG_INPT   yLOG_complex ("bad char"  , "can not include %c at %d", a_name [i], i);
-         DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+         DEBUG_YEXEC   yLOG_complex ("bad char"  , "can not include %c at %d", a_name [i], i);
+         DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
    }
-   DEBUG_INPT   yLOG_note    ("all name characters are acceptable");
+   DEBUG_YEXEC   yLOG_note    ("all name characters are acceptable");
    yURG_msg ('-', "all the file name characters are legal [A-Za-z0-9_.]");
    /*---(hidden file)--------------------*/
-   DEBUG_INPT   yLOG_char    ("first char", a_name [0]);
+   DEBUG_YEXEC   yLOG_char    ("first char", a_name [0]);
    --rce;  if (a_name [0] == '.') {
       yURG_err ('f', "file can not be a hidden file, lead period (security risk)");
-      DEBUG_INPT   yLOG_note    ("file can not be a hidden file");
-      DEBUG_INPT  yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("file can not be a hidden file");
+      DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "file is not a hidden file, no lead period");
    /*---(exactly one period)-------------*/
    c = strldcnt (a_name, '.', LEN_RECD);
-   DEBUG_INPT   yLOG_value   ("periods"   , c);
+   DEBUG_YEXEC   yLOG_value   ("periods"   , c);
    --rce;  if (c < 1) {
       yURG_err ('f', "file name does not have at least one separator/period (standard)");
-      DEBUG_INPT   yLOG_note    ("name must have exactly one separator/period");
-      DEBUG_INPT  yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("name must have exactly one separator/period");
+      DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "file has at least one separator/period");
@@ -79,21 +79,21 @@ yjobs__naming           (uchar *a_name)
    c = p - a_name;
    --rce;  if (c < 3) {
       yURG_err ('f', "file prefix can not be shorter than 3 characters (illegal)");
-      DEBUG_INPT   yLOG_note    ("prefix too short (< 3 chars)");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("prefix too short (< 3 chars)");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "name prefix is adequate length, >= 3 characters");
    c = l - c - 1;
    --rce;  if (c < 3) {
       yURG_err ('f', "file description can not be shorter than 3 characters (lazy)");
-      DEBUG_INPT   yLOG_note    ("description too short (< 3 chars)");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("description too short (< 3 chars)");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "name description is adequate length, >= 3 characters");
    /*---(complete)-----------------------*/
-   DEBUG_INPT  yLOG_exit    (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -109,68 +109,68 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
    char        x_user      [LEN_PATH]  = "";
    int         l           =    0;
    /*---(header)-------------------------*/
-   DEBUG_INPT  yLOG_enter   (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
    /*---(defaults)-----------------------*/
    --rce;  if (a_home  == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_info    ("a_home"    , a_home);
+   DEBUG_YEXEC   yLOG_info    ("a_home"    , a_home);
    --rce;  if (a_root  == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_info    ("a_root"    , a_root);
+   DEBUG_YEXEC   yLOG_info    ("a_root"    , a_root);
    --rce;  if (a_name  == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_info    ("a_name"    , a_name);
-   DEBUG_INPT  yLOG_point   ("a_muser"   , a_muser);
+   DEBUG_YEXEC   yLOG_info    ("a_name"    , a_name);
+   DEBUG_YEXEC  yLOG_point   ("a_muser"   , a_muser);
    --rce;  if (a_muser == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_INPT   yLOG_info    ("a_muser"   , a_muser);
-   DEBUG_INPT   yLOG_value   ("a_muid"    , a_muid);
-   DEBUG_INPT   yLOG_point   ("r_fuser"   , r_fuser);
+   DEBUG_YEXEC   yLOG_info    ("a_muser"   , a_muser);
+   DEBUG_YEXEC   yLOG_value   ("a_muid"    , a_muid);
+   DEBUG_YEXEC   yLOG_point   ("r_fuser"   , r_fuser);
    --rce;  if (r_fuser == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    strcpy (r_fuser, "");
-   DEBUG_INPT   yLOG_point   ("r_fuid"    , r_fuid);
+   DEBUG_YEXEC   yLOG_point   ("r_fuid"    , r_fuid);
    --rce;  if (r_fuid  == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    *r_fuid  = -1;
    --rce;  if (r_dir   == NULL) {
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    strcpy (r_dir, "");
    /*---(check directory)----------------*/
    p = getcwd (r_dir, LEN_PATH);
-   DEBUG_INPT   yLOG_point   ("getcwd"    , p);
+   DEBUG_YEXEC   yLOG_point   ("getcwd"    , p);
    --rce;  if (p == NULL) {
       yURG_err ('f', "can not obtain current working directory");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    if (a_loc == YJOBS_LOCAL)  strlcat (r_dir, "/", LEN_PATH);
-   DEBUG_INPT   yLOG_info    ("r_dir"     , r_dir);
+   DEBUG_YEXEC   yLOG_info    ("r_dir"     , r_dir);
    yURG_msg ('-', "current working directory is å%sæ", r_dir);
    /*---(check normal install)-----------*/
    --rce;  if (a_loc == YJOBS_LOCAL && a_muid != 0) {
       sprintf (t, "%s%s", a_home, a_muser);
-      DEBUG_INPT   yLOG_info    ("expect"    , t);
+      DEBUG_YEXEC   yLOG_info    ("expect"    , t);
       /*> yURG_msg ('-', "compare to å%sæ", t);                                       <*/
       l = strlen (t);
       if (strncmp (r_dir, t, l) != 0) {
          yURG_err ('f', "user not in or below their own home directory (security risk)");
-         DEBUG_INPT   yLOG_note    ("user not in or below their own home directory");
-         DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+         DEBUG_YEXEC   yLOG_note    ("user not in or below their own home directory");
+         DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
       strlcpy (r_fuser, a_muser, LEN_USER);
@@ -178,27 +178,27 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
    }
    /*---(check root install)-------------*/
    --rce;  if (a_loc == YJOBS_LOCAL && a_muid == 0) {
-      DEBUG_INPT   yLOG_note    ("root user verifying");
+      DEBUG_YEXEC   yLOG_note    ("root user verifying");
       sprintf (t, "%s", a_root);
       l = strlen (t);
-      DEBUG_INPT   yLOG_complex ("cdir"      , "%2d å%sæ vs å%sæ", l, t, r_dir);
+      DEBUG_YEXEC   yLOG_complex ("cdir"      , "%2d å%sæ vs å%sæ", l, t, r_dir);
       if (strncmp (r_dir, t, l) == 0) {
-         DEBUG_INPT   yLOG_note    ("root in root user home directory tree");
+         DEBUG_YEXEC   yLOG_note    ("root in root user home directory tree");
          strlcpy (r_fuser, "root", LEN_USER);
          yURG_msg ('-', "root user file in or below root home directory");
       } else {
          sprintf (t, "%s", a_home);
          l = strlen (t);
          if (strncmp (r_dir, t, l) == 0) {
-            DEBUG_INPT   yLOG_note    ("root in another user home directory tree");
+            DEBUG_YEXEC   yLOG_note    ("root in another user home directory tree");
             strlcpy  (x_user, r_dir + l, LEN_PATH);
             strldchg (x_user, '/', '\0', LEN_PATH);
             strlcpy (r_fuser, x_user, LEN_USER);
             yURG_msg ('-', "root user file in or below %s users home directory", x_user);
          } else {
             yURG_err ('f', "root, but not in or below any valid user home directory (security risk)");
-            DEBUG_INPT   yLOG_note    ("root, but not in or below a valid user home directory");
-            DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+            DEBUG_YEXEC   yLOG_note    ("root, but not in or below a valid user home directory");
+            DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
       }
@@ -222,20 +222,21 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
       }
       yURG_msg ('-', "central file prefix is å%sæ", r_fuser);
    }
-   DEBUG_INPT   yLOG_info    ("r_fuser"    , r_fuser);
+   DEBUG_YEXEC   yLOG_info    ("r_fuser"    , r_fuser);
    /*---(check for registered)-----------*/
    rc = yEXEC_userdata (r_fuser, r_fuid, NULL, NULL, NULL);
-   DEBUG_INPT   yLOG_value   ("userdata"  , rc);
+   DEBUG_YEXEC   yLOG_value   ("userdata"  , rc);
    if (rc < 0) {
       if (a_loc == YJOBS_LOCAL) {
          yURG_err ('f', "user directory not associated with a registered user (security risk)");
       } else {
          yURG_err ('f', "user name prefix å%sæ not registered on system (security risk)", r_fuser);
       }
-      DEBUG_INPT   yLOG_note    ("user is not registered in the system");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("user is not registered in the system");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YEXEC   yLOG_value   ("*r_fuid"   , *r_fuid);
    yURG_msg ('-', "file user is registered with system, %s, uid %d", r_fuser, *r_fuid);
    /*---(name prefix)--------------------*/
    --rce;  if (a_loc == YJOBS_LOCAL) {
@@ -243,7 +244,7 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
       else                                 strcpy (t, "job.");
       if (strncmp (a_name, t, strlen (t)) != 0) {
          yURG_err ('f', "local file name must be prefixed with å%sæ (standard)", t);
-         DEBUG_INPT   yLOG_note    ("name does not begin with khronos/job");
+         DEBUG_YEXEC   yLOG_note    ("name does not begin with khronos/job");
          DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -262,7 +263,7 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
       }
    }
    /*---(complete)-----------------------*/
-   DEBUG_INPT  yLOG_exit    (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -275,7 +276,7 @@ yjobs__stats            (cchar a_loc, cchar *a_dir, uchar *a_name, cchar *a_muse
    char        x_full      [LEN_PATH]  = "";
    tSTAT       s;
    /*---(header)-------------------------*/
-   DEBUG_INPT  yLOG_enter   (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
    /*---(get stats)----------------------*/
    DEBUG_YEXEC  yLOG_info    ("a_dir"     , a_dir);
    DEBUG_YEXEC  yLOG_info    ("a_name"    , a_name);
@@ -285,7 +286,7 @@ yjobs__stats            (cchar a_loc, cchar *a_dir, uchar *a_name, cchar *a_muse
    DEBUG_YEXEC  yLOG_value   ("stat"      , rc);
    --rce;  if (rc < 0) {
       yURG_err ('f', "actual file could not be located in å%sæ", a_dir);
-      DEBUG_INPT   yLOG_note    ("actual file could not be found");
+      DEBUG_YEXEC   yLOG_note    ("actual file could not be found");
       DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -353,17 +354,17 @@ yjobs__stats            (cchar a_loc, cchar *a_dir, uchar *a_name, cchar *a_muse
       yURG_msg ('-', "central owner and group is root");
    }
    /*---(permissions)--------------------*/
-   DEBUG_ENVI   yLOG_value   ("perms"     , s.st_mode & 00777);
+   DEBUG_YEXEC   yLOG_value   ("perms"     , s.st_mode & 00777);
    if  ((s.st_mode & 00777) != 00600)  {
       yURG_err ('f', "file permissions are not owner-only read/write 0600 (security risk)");
-      DEBUG_ENVI   yLOG_note    ("permissions not 0600 (private to user)");
-      DEBUG_ENVI   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_note    ("permissions not 0600 (private to user)");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YEXEC  yLOG_note    ("permissions are 0600 (private)");
    yURG_msg ('-', "file permissions confirmed as owner-only write/read (0600)");
    /*---(complete)-----------------------*/
-   DEBUG_INPT   yLOG_exit    (__FUNCTION__);
+   DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -384,47 +385,52 @@ yJOBS_acceptable_full    (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    char        x_fuser     [LEN_LABEL] = "";
    int         x_fuid      =   -1;
    /*---(header)-------------------------*/
-   DEBUG_INPT  yLOG_enter   (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
    yURG_msg ('>', "local file verification...");
    /*---(defaults)-----------------------*/
+   DEBUG_YEXEC   yLOG_point   ("r_fuid"    , r_fuid);
    if (r_fuser != NULL)  strcpy (r_fuser, "");
    if (r_fuid  != NULL)  *r_fuid = -1;
    if (r_fdesc != NULL)  strcpy (r_fdesc, "");
    if (r_dir   != NULL)  strcpy (r_dir  , "");
    /*---(naming)-------------------------*/
    rc = yjobs__naming (a_name);
-   DEBUG_INPT  yLOG_value   ("naming"    , rc);
+   DEBUG_YEXEC  yLOG_value   ("naming"    , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(verify user)--------------------*/
    rc = yjobs__location (a_runas, YJOBS_LOCAL, a_home, a_root, a_name, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
-   DEBUG_INPT  yLOG_value   ("location"  , rc);
+   DEBUG_YEXEC  yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YEXEC   yLOG_value   ("x_fuid"    , x_fuid);
    /*---(stats)--------------------------*/
    rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_name, a_muser, a_muid, x_fuser, x_fuid);
-   DEBUG_INPT  yLOG_value   ("stats"     , rc);
+   DEBUG_YEXEC  yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(update globals)-----------------*/
    if (r_fuser != NULL)  strlcpy (r_fuser, x_fuser, LEN_USER);
-   if (r_fuid  != NULL)  *r_fuid = x_fuid;
+   if (r_fuid  != NULL) {
+      *r_fuid = x_fuid;
+      DEBUG_YEXEC   yLOG_value   ("*r_fuid"   , *r_fuid);
+   }
    if (r_fdesc != NULL)  strlcpy (r_fdesc, a_name + 8, LEN_DESC);
    if (r_dir   != NULL)  strlcpy (r_dir  , x_cwd, LEN_PATH);
    /*---(finish)-------------------------*/
    yURG_msg ('-', "SUCCESS, job/khronos file acceptable");
    yURG_msg (' ', "");
    /*---(complete)-----------------------*/
-   DEBUG_INPT   yLOG_exit    (__FUNCTION__);
+   DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -460,6 +466,7 @@ yJOBS_acceptable         (cchar a_runas, cchar *a_name, char *r_fuser, int *r_fu
    char        x_root      [LEN_PATH]  = "";
    char        x_home      [LEN_PATH]  = "";
    int         x_uid       =    0;
+   DEBUG_YEXEC   yLOG_point   ("r_fuid"    , r_fuid);
    if (rc >= 0) rc = yJOBS_local_dir       (a_runas, x_root, x_home);
    if (rc >= 0) rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, &x_user, 'n');
    if (rc >= 0) rc = yJOBS_acceptable_full (a_runas, x_home, x_root, a_name, x_user, x_uid, r_fuser, r_fuid, r_fdesc, r_dir);
@@ -483,7 +490,7 @@ yJOBS_central_full       (cchar a_runas, cchar *a_central, cchar *a_name, cchar 
    char        x_fuser     [LEN_LABEL] = "";
    int         x_fuid      =   -1;
    /*---(header)-------------------------*/
-   DEBUG_INPT  yLOG_enter   (__FUNCTION__);
+   DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
    yURG_msg ('>', "central file check...");
    /*---(defaults)-----------------------*/
    if (r_fuser != NULL)  strcpy (r_fuser, "");
@@ -491,26 +498,26 @@ yJOBS_central_full       (cchar a_runas, cchar *a_central, cchar *a_name, cchar 
    if (r_fdesc != NULL)  strcpy (r_fdesc, "");
    /*---(naming)-------------------------*/
    rc = yjobs__naming (a_name);
-   DEBUG_INPT  yLOG_value   ("naming"    , rc);
+   DEBUG_YEXEC  yLOG_value   ("naming"    , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(verify user)--------------------*/
    rc = yjobs__location (a_runas, YJOBS_CENTRAL, "n/a", "n/a", a_name, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
-   DEBUG_INPT  yLOG_value   ("location"  , rc);
+   DEBUG_YEXEC  yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(stats)--------------------------*/
    rc = yjobs__stats (YJOBS_CENTRAL, a_central, a_name, a_muser, a_muid, x_fuser, x_fuid);
-   DEBUG_INPT  yLOG_value   ("stats"     , rc);
+   DEBUG_YEXEC  yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
       yURG_msg (' ', "");
-      DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(update globals)-----------------*/
@@ -521,7 +528,7 @@ yJOBS_central_full       (cchar a_runas, cchar *a_central, cchar *a_name, cchar 
    yURG_msg ('-', "SUCCESS, job/khronos file acceptable");
    yURG_msg (' ', "");
    /*---(complete)-----------------------*/
-   DEBUG_INPT   yLOG_exit    (__FUNCTION__);
+   DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -562,17 +569,17 @@ yJOBS_central_dir       (cchar a_runas, cchar *a_name, char *a_dir, char *a_user
    /*---(files)--------------------------*/
    --rce;  switch (a_runas) {
    case IAM_KHRONOS   : case IAM_UKHRONOS  :
-      DEBUG_INPT   yLOG_info    ("a_name"    , a_name);
+      DEBUG_YEXEC   yLOG_info    ("a_name"    , a_name);
       if (strncmp (a_name, "khronos.", 8) == 0) {
          p = strchr (a_name, '.');
-         DEBUG_INPT   yLOG_point   ("p"         , p);
+         DEBUG_YEXEC   yLOG_point   ("p"         , p);
          if (p == NULL)  return rce;
-         DEBUG_INPT   yLOG_info    ("a_user"    , a_user);
+         DEBUG_YEXEC   yLOG_info    ("a_user"    , a_user);
          sprintf (a_file, "%s%s", a_user, p);
       } else {
          strcpy (a_file, a_name);
       }
-      DEBUG_INPT   yLOG_info    ("a_file"    , a_file);
+      DEBUG_YEXEC   yLOG_info    ("a_file"    , a_file);
       break;
    case IAM_EOS       : case IAM_UEOS      : 
       strlcpy (a_file, "eos.conf"     , LEN_PATH);
@@ -584,17 +591,17 @@ yJOBS_central_dir       (cchar a_runas, cchar *a_name, char *a_dir, char *a_user
       strlcpy (a_file, "hypnos.conf"  , LEN_PATH);
       break;
    case IAM_HERACLES  : case IAM_UHERACLES : 
-      DEBUG_INPT   yLOG_info    ("a_name"    , a_name);
+      DEBUG_YEXEC   yLOG_info    ("a_name"    , a_name);
       if (strncmp (a_name, "job.", 4) == 0) {
          p = strchr (a_name, '.');
-         DEBUG_INPT   yLOG_point   ("p"         , p);
+         DEBUG_YEXEC   yLOG_point   ("p"         , p);
          if (p == NULL)  return rce;
-         DEBUG_INPT   yLOG_info    ("a_user"    , a_user);
+         DEBUG_YEXEC   yLOG_info    ("a_user"    , a_user);
          sprintf (a_file, "%s%s", a_user, p);
       } else {
          strcpy (a_file, a_name);
       }
-      DEBUG_INPT   yLOG_info    ("a_file"    , a_file);
+      DEBUG_YEXEC   yLOG_info    ("a_file"    , a_file);
       break;
    default  :
       yURG_err ('f', "a_runas (%c) is not recognized", a_runas);

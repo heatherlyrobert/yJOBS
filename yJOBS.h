@@ -23,15 +23,17 @@ typedef const  char      cchar;
 #define     IAM_HYPNOS       'y'
 #define     IAM_HERACLES     'h'
 #define     IAM_KHRONOS      'k'
+#define     IAM_POLYMNIA     'p'
 /*---(run-as/unit testing)----------------------*/
 #define     IAM_UEOS         'E'
 #define     IAM_UASTRAIOS    'A'
 #define     IAM_UHYPNOS      'Y'
 #define     IAM_UHERACLES    'H'
 #define     IAM_UKHRONOS     'K'
+#define     IAM_UPOLYMNIA    'P'
 /*---(run-as/combination)-----------------------*/
-#define     IAM_VALID        "eayhkEAYHK"
-#define     IAM_UNIT         "EAYHK"
+#define     IAM_VALID        "eayhkpEAYHKP"
+#define     IAM_UNIT         "EAYHKP"
 #define     IAM_ETC          "eayEAY"
 /*---(run-as/done)------------------------------*/
 
@@ -57,11 +59,20 @@ typedef const  char      cchar;
 #define     ACT_CINSTALL    'ð'
 #define     IF_INSTALL      if (yJOBS_ifinstall () == 1)
 #define     CASE_INSTALL    'i' : case 'I' : case 'ð'
+/*---(incomming)------------*/
+#define     ACT_UPDATE      'u'
+#define     ACT_VUPDATE     'U'
+#define     ACT_CUPDATE     'û'
+#define     IF_UPDATE       if (yJOBS_ifupdate  () == 1)
+#define     CASE_UPDATE     'u' : case 'U' : case 'û'
 /*---(central/inventory)----*/
 #define     ACT_COUNT       'l'
 #define     ACT_LIST        'L'
 #define     IF_LIST         if (yJOBS_iflist    () == 1)
 #define     CASE_LIST       'l' : case 'L'
+/*---(central/inventory)----*/
+#define     ACT_REPORT      '?'
+#define     CASE_REPORT     '?' 
 /*---(central/installed)----*/
 #define     ACT_CHECK       'c'
 #define     ACT_VCHECK      'C'
@@ -80,6 +91,12 @@ typedef const  char      cchar;
 #define     ACT_CFIX        'ü'
 #define     IF_FIX          if (yJOBS_iffix     () == 1)
 #define     CASE_FIX        'f' : case 'F' : case 'ü'
+/*---(outgoing)-------------*/
+#define     ACT_CLEAR       'x'
+#define     ACT_VCLEAR      'X'
+#define     ACT_CCLEAR      'õ'
+#define     IF_CLEAR        if (yJOBS_ifclear   () == 1)
+#define     CASE_CLEAR      'x' : case 'X' : case 'õ'
 /*---(outgoing)-------------*/
 #define     ACT_REMOVE      'r'
 #define     ACT_VREMOVE     'R'
@@ -111,11 +128,18 @@ typedef const  char      cchar;
 #define     ACT_CNORMAL     'ô'
 #define     IF_NORMAL       if (yJOBS_ifnormal  () == 1)
 #define     CASE_NORMAL     'n' : case 'N' : case 'ô'
+/*---(normal)---------------*/
+#define     ACT_STRICT      's'
+#define     ACT_VSTRICT     'S'
+#define     ACT_CSTRICT     'ù'
+#define     IF_STRICT       if (yJOBS_ifstrict  () == 1)
+#define     CASE_STRICT     's' : case 'S' : case 'ù'
 /*---(combination)----------*/
 #define     IF_SILENT       if (yJOBS_ifsilent  () == 1)
 #define     IF_VERBOSE      if (yJOBS_ifverbose () == 1)
 #define     IF_CONFIRM      if (yJOBS_ifconfirm () == 1)
 /*---(combination)----------*/
+#define     IF_CENTRAL      if (yJOBS_ifcheck () == 1 || yJOBS_ifaudit () == 1 || yJOBS_ifdaemon () == 1 || yJOBS_ifprickly () == 1 || yJOBS_ifnormal () == 1 || yJOBS_ifstrict () == 1)
 #define     IF_CCHECK       if (a_act == ACT_CCHECK)
 #define     IF_VCHECK       if (a_act == ACT_VCHECK)
 #define     IF_CREVIEW      if (a_act == ACT_CAUDIT  || a_act == ACT_CDAEMON || a_act == ACT_CPRICKLY || a_act == ACT_CNORMAL)
@@ -124,6 +148,7 @@ typedef const  char      cchar;
 #define     IF_VCENTRAL     if (a_act == ACT_VCHECK  || a_act == ACT_VAUDIT  || a_act == ACT_VDAEMON  || a_act == ACT_VPRICKLY || a_act == ACT_VNORMAL)
 /*---(unit testing)---------*/
 #define     IF_NORUN        if (yJOBS_ifnorun   () == 1)
+#define     IF_NOEND        if (yJOBS_ifnoend   () == 1)
 
 
 
@@ -174,7 +199,7 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_onelin
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_file, char *a_user, int a_uid, void *a_assimilate);
+char        yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_file, char *a_user, int a_uid, void *a_assimilate, void *a_runner);
 
 
 
@@ -191,6 +216,7 @@ char        yJOBS_ifverify          (void);
 char        yJOBS_ifinstall         (void);
 char        yJOBS_iflist            (void);
 char        yJOBS_ifcheck           (void);
+char        yJOBS_ifclear           (void);
 char        yJOBS_ifremove          (void);
 char        yJOBS_ifextract         (void);
 char        yJOBS_ifaudit           (void);
@@ -198,7 +224,9 @@ char        yJOBS_iffix             (void);
 char        yJOBS_ifdaemon          (void);
 char        yJOBS_ifprickly         (void);
 char        yJOBS_ifnormal          (void);
+char        yJOBS_ifstrict          (void);
 char        yJOBS_ifnorun           (void);
+char        yJOBS_ifnoend           (void);
 /*---(done)-----------------*/
 
 

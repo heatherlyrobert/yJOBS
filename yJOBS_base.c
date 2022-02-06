@@ -39,25 +39,35 @@ static void      o___IDENTIFY________________o (void) {;};
 char
 yJOBS_runas             (char *a_runas, char *a_name)
 {
+   char        rce         =  -10;
+   --rce;  if (a_name == NULL)  return rce;
    if (a_runas != NULL)  *a_runas = '-';
-   if      (strncmp (a_name, "eos"           ,  3) == 0)    g_runas = IAM_EOS;
-   else if (strncmp (a_name, "/sbin/eos"     ,  9) == 0)    g_runas = IAM_EOS;
-   else if (strcmp  (a_name, "init"              ) == 0)    g_runas = IAM_EOS;
-   else if (strncmp (a_name, "astraios"      ,  8) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strncmp (a_name, "/sbin/astraios", 14) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "shutdown"          ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "halt"              ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "restart"           ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strncmp (a_name, "hypnos"        ,  6) == 0)    g_runas = IAM_HYPNOS;
-   else if (strncmp (a_name, "/sbin/hypnos"  , 12) == 0)    g_runas = IAM_HYPNOS;
-   else if (strncmp (a_name, "heracles"      ,  8) == 0)    g_runas = IAM_HERACLES;
-   else if (strncmp (a_name, "/sbin/heracles", 14) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "H"                 ) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "/sbin/H"           ) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "cron"              ) == 0)    g_runas = IAM_KHRONOS;
-   else if (strcmp  (a_name, "crontab"           ) == 0)    g_runas = IAM_KHRONOS;
-   else if (strncmp (a_name, "khronos"       ,  7) == 0)    g_runas = IAM_KHRONOS;
-   else if (strncmp (a_name, "/sbin/khronos" , 13) == 0)    g_runas = IAM_KHRONOS;
+   if      (strcmp  (a_name, "eos_unit"                   ) == 0)    g_runas = IAM_UEOS;
+   else if (strncmp (a_name, "eos"                    ,  3) == 0)    g_runas = IAM_EOS;
+   else if (strncmp (a_name, "/sbin/eos"              ,  9) == 0)    g_runas = IAM_EOS;
+   else if (strcmp  (a_name, "init"                       ) == 0)    g_runas = IAM_EOS;
+   else if (strcmp  (a_name, "astraios_unit"              ) == 0)    g_runas = IAM_UASTRAIOS;
+   else if (strncmp (a_name, "astraios"               ,  8) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strncmp (a_name, "/sbin/astraios"         , 14) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "shutdown"                   ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "halt"                       ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "restart"                    ) == 0)    g_runas = IAM_ASTRAIOS;
+   else if (strcmp  (a_name, "hypnos_unit"                ) == 0)    g_runas = IAM_UHYPNOS;
+   else if (strncmp (a_name, "hypnos"                 ,  6) == 0)    g_runas = IAM_HYPNOS;
+   else if (strncmp (a_name, "/sbin/hypnos"           , 12) == 0)    g_runas = IAM_HYPNOS;
+   else if (strcmp  (a_name, "heracles_unit"              ) == 0)    g_runas = IAM_UHERACLES;
+   else if (strncmp (a_name, "heracles"               ,  8) == 0)    g_runas = IAM_HERACLES;
+   else if (strncmp (a_name, "/sbin/heracles"         , 14) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "H"                          ) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "/sbin/H"                    ) == 0)    g_runas = IAM_HERACLES;
+   else if (strcmp  (a_name, "khronos_unit"               ) == 0)    g_runas = IAM_UKHRONOS;
+   else if (strncmp (a_name, "khronos"                ,  7) == 0)    g_runas = IAM_KHRONOS;
+   else if (strncmp (a_name, "/sbin/khronos"          , 13) == 0)    g_runas = IAM_KHRONOS;
+   else if (strcmp  (a_name, "cron"                       ) == 0)    g_runas = IAM_KHRONOS;
+   else if (strcmp  (a_name, "crontab"                    ) == 0)    g_runas = IAM_KHRONOS;
+   else if (strcmp  (a_name, "polymnia_unit"              ) == 0)    g_runas = IAM_UPOLYMNIA;
+   else if (strncmp (a_name, "polymnia"               ,  7) == 0)    g_runas = IAM_POLYMNIA;
+   else if (strcmp  (a_name, "/usr/local/bin/polymnia"    ) == 0)    g_runas = IAM_POLYMNIA;
    else {
       return -10;
    }
@@ -86,6 +96,9 @@ yJOBS_iam               (char a_iam, char *a_print)
    case IAM_KHRONOS   : case IAM_UKHRONOS  :
       strlcpy (a_print, "khronos-anileis (merciless time)"       , LEN_HUND);
       break;
+   case IAM_POLYMNIA  : case IAM_UPOLYMNIA :
+      strlcpy (a_print, "polymnia-hymnos (many praises)"         , LEN_HUND);
+      break;
    default               :
       strlcpy (a_print, "unknown"                                , LEN_HUND);
       return -10;
@@ -113,8 +126,14 @@ yJOBS_mode              (char a_mode, char *a_print)
    case CASE_INSTALL :
       strcpy (a_print, "install");
       break;
+   case CASE_UPDATE  :
+      strcpy (a_print, "update");
+      break;
    case CASE_LIST    :
       strcpy (a_print, "list");
+      break;
+   case CASE_REPORT  :
+      strcpy (a_print, "report");
       break;
    case CASE_CHECK   :
       strcpy (a_print, "check");
@@ -124,6 +143,9 @@ yJOBS_mode              (char a_mode, char *a_print)
       break;
    case CASE_FIX     :
       strcpy (a_print, "fix");
+      break;
+   case CASE_CLEAR   :
+      strcpy (a_print, "clear");
       break;
    case CASE_REMOVE  :
       strcpy (a_print, "remove");
@@ -139,6 +161,9 @@ yJOBS_mode              (char a_mode, char *a_print)
       break;
    case CASE_NORMAL  :
       strcpy (a_print, "normal");
+      break;
+   case CASE_STRICT  :
+      strcpy (a_print, "strict");
       break;
    case ACT_RELOAD   :
       strcpy (a_print, "reload");
