@@ -17,6 +17,7 @@ char          g_verbose     [LEN_LABEL] = "";
 
 /*---(incomming)------------*/
 char          g_verify      [LEN_SHORT] = "";
+char          g_register    [LEN_SHORT] = "";
 char          g_install     [LEN_SHORT] = "";
 char          g_update      [LEN_SHORT] = "";
 /*---(central)--------------*/
@@ -24,9 +25,12 @@ char          g_list        [LEN_SHORT] = "";
 char          g_check       [LEN_SHORT] = "";
 char          g_audit       [LEN_SHORT] = "";
 char          g_fix         [LEN_SHORT] = "";
+/*---(outgoing)-------------*/
+char          g_withdraw    [LEN_SHORT] = "";
 char          g_clear       [LEN_SHORT] = "";
 char          g_remove      [LEN_SHORT] = "";
 char          g_extract     [LEN_SHORT] = "";
+/*---(execution)------------*/
 char          g_daemon      [LEN_SHORT] = "";
 char          g_prickly     [LEN_SHORT] = "";
 char          g_normal      [LEN_SHORT] = "";
@@ -61,8 +65,10 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    /*---(information)--------------------*/
    { "version"  , "1··", "present a short versioning string"            , "---·", '·' },
    { "help"     , "2··", "present a simple help message"                , "---·", '·' },
+   { "stats"    , "3··", "give basic information about database"        , "----", '·' },
    /*---(upward)-------------------------*/
-   { "verify"   , "vÿV", "verify local file for correctness"            , "FFF·", '·' },
+   { "verify"   , "vÿV", "verify local file for correctness"            , "FFF-", '·' },
+   { "register" , "béB", "verify local file and register centrally"     , "···-", '·' },
    { "install"  , "iðI", "verify local file, then install centrally"    , "FFF-", '·' },
    { "update"   , "uûU", "update central with single file"              , "···-", '·' },
    /*---(central)------------------------*/
@@ -76,14 +82,15 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    { "upload"   , "···", "from central to elsewhere"                    , "····", '·' },
    { "download" , "···", "to central from elsewhere"                    , "····", '·' },
    /*---(downward)-----------------------*/
+   { "withdraw" , "qþQ", "unregister centrally"                         , "···F", '·' },
    { "clear"    , "xõX", "clear file from central location"             , "···F", '·' },
    { "remove"   , "røR", "remove file from central location"            , "·FFF", '·' },
    { "extract"  , "eìE", "extract a central file to local copy"         , "·FF·", '·' },
    /*---(execution)----------------------*/
    { "daemon"   , "dëD", "execute specific file in daemon-mode"         , "··-·", '·' },
    { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" , "··-·", '·' },
-   { "normal"   , "nôN", "execute specific file in normal-mode"         , "---·", '·' },
-   { "strict"   , "sùS", "execute specific file in strict normal-mode"  , "---·", '·' },
+   { "normal"   , "nôN", "execute specific file in normal-mode"         , "----", '·' },
+   { "strict"   , "sùS", "execute specific file in strict normal-mode"  , "----", '·' },
    { "reload"   , "H··", "send signal to reload daemon"                 , "··-·", '·' },
    /*---(unit testing)-------------------*/
    { "norun"    , "-··", "daemons only load data"                       , "---·", '·' },
@@ -103,25 +110,29 @@ char
 yjobs_args__empty       (void)
 {
    /*---(verbosity)----------------------*/
-   strlcpy (g_silent , "", LEN_LABEL);
-   strlcpy (g_confirm, "", LEN_LABEL);
-   strlcpy (g_verbose, "", LEN_LABEL);
+   strlcpy (g_silent  , "", LEN_LABEL);
+   strlcpy (g_confirm , "", LEN_LABEL);
+   strlcpy (g_verbose , "", LEN_LABEL);
    /*---(incomming)----------------------*/
-   strlcpy (g_verify , "", LEN_SHORT);
-   strlcpy (g_install, "", LEN_SHORT);
-   strlcpy (g_update , "", LEN_SHORT);
+   strlcpy (g_verify  , "", LEN_SHORT);
+   strlcpy (g_register, "", LEN_SHORT);
+   strlcpy (g_install , "", LEN_SHORT);
+   strlcpy (g_update  , "", LEN_SHORT);
    /*---(central)------------------------*/
-   strlcpy (g_list   , "", LEN_SHORT);
-   strlcpy (g_check  , "", LEN_SHORT);
-   strlcpy (g_audit  , "", LEN_SHORT);
-   strlcpy (g_fix    , "", LEN_SHORT);
-   strlcpy (g_clear  , "", LEN_SHORT);
-   strlcpy (g_remove , "", LEN_SHORT);
-   strlcpy (g_extract, "", LEN_SHORT);
-   strlcpy (g_daemon , "", LEN_SHORT);
-   strlcpy (g_prickly, "", LEN_SHORT);
-   strlcpy (g_normal , "", LEN_SHORT);
-   strlcpy (g_strict , "", LEN_SHORT);
+   strlcpy (g_list    , "", LEN_SHORT);
+   strlcpy (g_check   , "", LEN_SHORT);
+   strlcpy (g_audit   , "", LEN_SHORT);
+   strlcpy (g_fix     , "", LEN_SHORT);
+   /*---(outgoing)-----------------------*/
+   strlcpy (g_clear   , "", LEN_SHORT);
+   strlcpy (g_withdraw, "", LEN_SHORT);
+   strlcpy (g_remove  , "", LEN_SHORT);
+   strlcpy (g_extract , "", LEN_SHORT);
+   /*---(execution)----------------------*/
+   strlcpy (g_daemon  , "", LEN_SHORT);
+   strlcpy (g_prickly , "", LEN_SHORT);
+   strlcpy (g_normal  , "", LEN_SHORT);
+   strlcpy (g_strict  , "", LEN_SHORT);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -156,21 +167,23 @@ yjobs_args__single      (char *a_levels, char n)
    }
    /*---(load by action)-----------------*/
    switch (a_levels [0]) {
-   case 'v' :   strlcat (g_verify , t, LEN_SHORT);   break;
-   case 'i' :   strlcat (g_install, t, LEN_SHORT);   break;
-   case 'u' :   strlcat (g_update , t, LEN_SHORT);   break;
-   case 'l' :   strlcat (g_list   , t, LEN_SHORT);   break;
-   case 'L' :   strlcat (g_list   , t, LEN_SHORT);   break;
-   case 'c' :   strlcat (g_check  , t, LEN_SHORT);   break;
-   case 'a' :   strlcat (g_audit  , t, LEN_SHORT);   break;
-   case 'f' :   strlcat (g_fix    , t, LEN_SHORT);   break;
-   case 'x' :   strlcat (g_clear  , t, LEN_SHORT);   break;
-   case 'r' :   strlcat (g_remove , t, LEN_SHORT);   break;
-   case 'e' :   strlcat (g_extract, t, LEN_SHORT);   break;
-   case 'd' :   strlcat (g_daemon , t, LEN_SHORT);   break;
-   case 'p' :   strlcat (g_prickly, t, LEN_SHORT);   break;
-   case 'n' :   strlcat (g_normal , t, LEN_SHORT);   break;
-   case 's' :   strlcat (g_strict , t, LEN_SHORT);   break;
+   case 'v' :   strlcat (g_verify  , t, LEN_SHORT);   break;
+   case 'b' :   strlcat (g_register, t, LEN_SHORT);   break;
+   case 'i' :   strlcat (g_install , t, LEN_SHORT);   break;
+   case 'u' :   strlcat (g_update  , t, LEN_SHORT);   break;
+   case 'l' :   strlcat (g_list    , t, LEN_SHORT);   break;
+   case 'L' :   strlcat (g_list    , t, LEN_SHORT);   break;
+   case 'c' :   strlcat (g_check   , t, LEN_SHORT);   break;
+   case 'a' :   strlcat (g_audit   , t, LEN_SHORT);   break;
+   case 'f' :   strlcat (g_fix     , t, LEN_SHORT);   break;
+   case 'x' :   strlcat (g_clear   , t, LEN_SHORT);   break;
+   case 'q' :   strlcat (g_withdraw, t, LEN_SHORT);   break;
+   case 'r' :   strlcat (g_remove  , t, LEN_SHORT);   break;
+   case 'e' :   strlcat (g_extract , t, LEN_SHORT);   break;
+   case 'd' :   strlcat (g_daemon  , t, LEN_SHORT);   break;
+   case 'p' :   strlcat (g_prickly , t, LEN_SHORT);   break;
+   case 'n' :   strlcat (g_normal  , t, LEN_SHORT);   break;
+   case 's' :   strlcat (g_strict  , t, LEN_SHORT);   break;
    }
    /*---(complete)-----------------------*/
    return 0;
@@ -530,31 +543,36 @@ yJOBS_final             (int a_uid)
 /*====================------------------------------------====================*/
 static void      o___SHORTCUT________________o (void) {;};
 
-CHECK  char  yJOBS_ifsilent  (void) { if (strchr (g_silent , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifverbose (void) { if (strchr (g_verbose, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifconfirm (void) { if (strchr (g_confirm, g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifsilent   (void) { if (strchr (g_silent  , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifverbose  (void) { if (strchr (g_verbose , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifconfirm  (void) { if (strchr (g_confirm , g_runmode) != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifhelp    (void) { if (g_runmode == ACT_HELP)                  return 1; else return 0; }
-CHECK  char  yJOBS_ifversion (void) { if (g_runmode == ACT_VERSION)               return 1; else return 0; }
+CHECK  char  yJOBS_ifhelp     (void) { if (g_runmode == ACT_HELP)                  return 1; else return 0; }
+CHECK  char  yJOBS_ifversion  (void) { if (g_runmode == ACT_VERSION)               return 1; else return 0; }
+CHECK  char  yJOBS_ifstats    (void) { if (g_runmode == ACT_STATS)                 return 1; else return 0; }
 
-CHECK  char  yJOBS_ifverify  (void) { if (strchr (g_verify , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifinstall (void) { if (strchr (g_install, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifupdate  (void) { if (strchr (g_update , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifverify   (void) { if (strchr (g_verify  , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifregister (void) { if (strchr (g_register, g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifinstall  (void) { if (strchr (g_install , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifupdate   (void) { if (strchr (g_update  , g_runmode) != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_iflist    (void) { if (strchr (g_list   , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifcheck   (void) { if (strchr (g_check  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifaudit   (void) { if (strchr (g_audit  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_iffix     (void) { if (strchr (g_fix    , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifclear   (void) { if (strchr (g_clear  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifremove  (void) { if (strchr (g_remove , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifextract (void) { if (strchr (g_extract, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifdaemon  (void) { if (strchr (g_daemon , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifprickly (void) { if (strchr (g_prickly, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifnormal  (void) { if (strchr (g_normal , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifstrict  (void) { if (strchr (g_strict , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_iflist     (void) { if (strchr (g_list    , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifcheck    (void) { if (strchr (g_check   , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifaudit    (void) { if (strchr (g_audit   , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_iffix      (void) { if (strchr (g_fix     , g_runmode) != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifnorun   (void) { if (g_norun == 'y')                         return 1; else return 0; }
-CHECK  char  yJOBS_ifnoend   (void) { if (g_noend == 'y')                         return 1; else return 0; }
+CHECK  char  yJOBS_ifwithdraw (void) { if (strchr (g_withdraw, g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifclear    (void) { if (strchr (g_clear   , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifremove   (void) { if (strchr (g_remove  , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifextract  (void) { if (strchr (g_extract , g_runmode) != NULL)  return 1; else return 0; }
+
+CHECK  char  yJOBS_ifdaemon   (void) { if (strchr (g_daemon  , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifprickly  (void) { if (strchr (g_prickly , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifnormal   (void) { if (strchr (g_normal  , g_runmode) != NULL)  return 1; else return 0; }
+CHECK  char  yJOBS_ifstrict   (void) { if (strchr (g_strict  , g_runmode) != NULL)  return 1; else return 0; }
+
+CHECK  char  yJOBS_ifnorun    (void) { if (g_norun == 'y')                         return 1; else return 0; }
+CHECK  char  yJOBS_ifnoend    (void) { if (g_noend == 'y')                         return 1; else return 0; }
 
 
 

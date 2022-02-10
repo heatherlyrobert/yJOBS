@@ -120,8 +120,14 @@ yJOBS_mode              (char a_mode, char *a_print)
    case ACT_HELP     :
       strcpy (a_print, "usage");
       break;
+   case ACT_STATS    :
+      strcpy (a_print, "stats");
+      break;
    case CASE_VERIFY  :
       strcpy (a_print, "verify");
+      break;
+   case CASE_REGISTER:
+      strcpy (a_print, "register");
       break;
    case CASE_INSTALL :
       strcpy (a_print, "install");
@@ -146,6 +152,9 @@ yJOBS_mode              (char a_mode, char *a_print)
       break;
    case CASE_CLEAR   :
       strcpy (a_print, "clear");
+      break;
+   case CASE_WITHDRAW:
+      strcpy (a_print, "withdraw");
       break;
    case CASE_REMOVE  :
       strcpy (a_print, "remove");

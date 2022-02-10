@@ -45,14 +45,22 @@ typedef const  char      cchar;
 /*---(simple)---------------*/
 #define     ACT_VERSION     '1'
 #define     ACT_HELP        '2'
+#define     ACT_STATS       '3'
 #define     IF_VERSION      if (yJOBS_ifversion () == 1)
 #define     IF_HELP         if (yJOBS_ifhelp    () == 1)
+#define     IF_STATS        if (yJOBS_ifstats   () == 1)
 /*---(local)----------------*/
 #define     ACT_VERIFY      'v'
 #define     ACT_VVERIFY     'V'
 #define     ACT_CVERIFY     'ÿ'
 #define     IF_VERIFY       if (yJOBS_ifverify  () == 1)
 #define     CASE_VERIFY     'v' : case 'V' : case 'ÿ'
+/*---(local)----------------*/
+#define     ACT_REGISTER    'b'
+#define     ACT_VREGISTER   'B'
+#define     ACT_CREGISTER   'é'
+#define     IF_REGISTER     if (yJOBS_ifregister() == 1)
+#define     CASE_REGISTER   'b' : case 'é' : case 'B'
 /*---(incomming)------------*/
 #define     ACT_INSTALL     'i'
 #define     ACT_VINSTALL    'I'
@@ -91,6 +99,12 @@ typedef const  char      cchar;
 #define     ACT_CFIX        'ü'
 #define     IF_FIX          if (yJOBS_iffix     () == 1)
 #define     CASE_FIX        'f' : case 'F' : case 'ü'
+/*---(outgoing)-------------*/
+#define     ACT_WITHDRAW    'q'
+#define     ACT_VWITHDRAW   'Q'
+#define     ACT_CWITHDRAW   'þ'
+#define     IF_WITHDRAW     if (yJOBS_ifwithdraw() == 1)
+#define     CASE_WITHDRAW   'q' : case 'þ' : case 'Q'
 /*---(outgoing)-------------*/
 #define     ACT_CLEAR       'x'
 #define     ACT_VCLEAR      'X'
@@ -211,6 +225,7 @@ char        yJOBS_final             (int a_uid);
 /*---(checkers)-------------*/
 char        yJOBS_ifsilent          (void);
 char        yJOBS_ifverbose         (void);
+char        yJOBS_ifregister        (void);
 char        yJOBS_ifconfirm         (void);
 char        yJOBS_ifverify          (void);
 char        yJOBS_ifinstall         (void);
@@ -221,6 +236,7 @@ char        yJOBS_ifremove          (void);
 char        yJOBS_ifextract         (void);
 char        yJOBS_ifaudit           (void);
 char        yJOBS_iffix             (void);
+char        yJOBS_ifwithdraw        (void);
 char        yJOBS_ifdaemon          (void);
 char        yJOBS_ifprickly         (void);
 char        yJOBS_ifnormal          (void);

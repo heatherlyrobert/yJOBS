@@ -35,8 +35,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0c"
-#define     P_VERTXT    "adding to polymnia as well, making updates"
+#define     P_VERNUM    "1.0d"
+#define     P_VERTXT    "build in register, withraw, and other polymnia supporting arguments"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
