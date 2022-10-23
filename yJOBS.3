@@ -1,0 +1,162 @@
+.TH yJOBS 3 2021-jan "linux" "interfacing applications with library"
+
+.SH NAME
+.B yJOBS
+\- personal shared job control environment
+
+.SH PATRON
+.B heracles-promachus
+(leader in battle) greatest human greek hero
+
+.SH IMAGERY
+massive, athletic, giant of a man wearing a lion skin and club
+
+.SH SUMMARY
+yJOBS is a personal shared library created to standardize command line
+arguments for service daemons, the flow of execution for the resulting
+actions, and the nature and verbosity of feedback.
+
+.SH CRAZY, NIAVE, DOG-FOODING, BOOT-STRAPPING ANIMAL
+i am not competing to be the best.  i created this to understand, learn,
+and own every byte.  it's optimized for transparency and debugging.  if i
+wanted awesome, fast, and cutting-edge, i'd use yours ;)
+
+.SH DOCUMENTATION FILES (see also)
+.nf  
+.B yJOBS (3)···········interfacing applications with library
+yJOBS (5)           user files, data streams, and configuration
+yJOBS (6)           interactive feel, usage, and navigation
+yJOBS (7)           decision rationale, scope, and objectives
+
+.SH TABLE OF CONTENTS
+.nf  
+a) synopsis         standard public function overview
+b) heads-up         upfront notes
+c) baseline use     recommended base usage
+d) assimilation     stand-alone assimilation
+e) driving          stand-alone driving
+f) debugging        external program testing and debugging
+
+.SH A) SYNOPSIS
+.nf
+---(header)------------------------------------
+.sp
+.B #include  <yJOBS.h>
+.sp
+---(baseline use)------------------------------
+.sp
+.BI "char *yJOBS_version   (void);"
+.sp
+.BI "char  yJOBS_runas     (cchar *" "a_name" ", char *" "r_runas " ");"
+.sp
+.BI "char  yJOBS_argument  (int *" "i" ", char *" "a_arg" ", char *" "a_next" ","
+.BI " " "                        " "char *" "r_runas" ", char *" "r_mode" ", char *" "r_file" ");"
+.BI "char  yJOBS_driver    (char *" "a_oneline" ", void *" "f_assim" ", void *" "f_run" ");"
+.sp
+.BI "char  yJOBS_wrap      (void);"
+.sp
+---(stand-alone assimilation)------------------
+.sp
+.BI "char  yJOBS_local     (cchar *" "a_name" ", char *" "r_user" ","
+.BI " " "                        " "int *" "r_uid" ", char *" "r_desc" ", char *" "r_dir" ");"
+.BI "char  yJOBS_central   (cchar *" "a_name" ", char *" "r_user" ","
+.BI " " "                        " "int *" "r_uid" ", char *" "r_desc" ", char *" "r_dir" ");"
+.sp
+---(stand-alone driving)-----------------------
+.sp
+.BI "char  yJOBS_verify    (cchar *" "a_oneline" ", cchar *" "a_name" ", void *" "f_assim" ");"
+.sp
+.BI "char  yJOBS_install   (cchar *" "a_oneline" ", cchar *" "a_name" ", void *" "f_assim" ");"
+.sp
+.BI "char  yJOBS_check     (cchar *" "a_oneline" ", cchar *" "a_name" ", void *" "f_assim" ");"
+.sp
+.BI "char  yJOBS_remove    (cchar *" "a_oneline" ", cchar *" "a_name" ");"
+.sp
+.BI "char  yJOBS_extract   (cchar *" "a_oneline" ", cchar *" "a_name" ");"
+.sp
+.BI "char  yJOBS_security  (cchar *" "a_oneline" ");"
+.sp
+.BI "char  yJOBS_fix       (cchar *" "a_oneline" ");"
+.sp
+.BI "char  yJOBS_review    (cchar *" "a_oneline" ", cchar *" "a_regex" ", void *" "f_assim" ");"
+.sp
+---(debugging and unittest)--------------------
+.sp
+.BI "char *yJOBS_iam       (void);"
+.sp
+.BI "char *yJOBS_mode      (void);"
+.sp
+.BI "char  yJOBS_mkdirs    (void);"
+.sp
+.BI "char  yJOBS_rmdirs    (void);"
+.sp
+---(linking)-----------------------------------
+.sp
+.B link with -L/usr/local/libs -lyJOBS or -lyJOBS_debug
+.sp
+---(done)--------------------------------------
+
+.SH B) HEADS-UP
+yJOBS is pretty standard stuff from an interface standpoint.  notice, arguments
+have several different prefixes to aide my debugging...
+   a_···   normal (incomming) argument
+   r_···   return (outgoing) argument
+   b_···   two-way (both incomming and outgoing) argument
+   f_···   function pointer as argument
+
+.SH C) BASELINE USE
+yJOBS has most of the capabilities required built-in to adapt to my different
+uses.  when adding a new program, i need to edit some tables and maybe adapt;
+but, that's about it.
+
+.BI "char *yJOBS_version   (void);"
+.RS 3
+simply returns a character string with the compiler name, version number,
+and version description.  very useful for debugging.
+.RE
+
+.BI "char  yJOBS_runas     (cchar *" "a_name" ", ´´´>"
+.RS 3
+call this functions as soon as possible, before argument processing. it
+typically, accepts argv [0] as the name and assigns a runas code based on
+which program is calling.
+.sp
+the return pointer argument may be NULL, but it allows key information to flow back
+to your program, if desired.
+.RE
+
+.BI "char  yJOBS_argument  (int *" "i" ", char *" "a_arg" ", char *" "a_next" ", ´´´>"
+.RS 3
+call this function in the argument processing loop, before you check your own.
+it accepts the current argument index, the current string, and next argument
+string.
+.sp
+if it recognizes the option, it will make updates and update the
+argument counter appropriately.  if it returns a 1, it handled it, 0 means not-handled, negative means regcognized, but trouble.
+.sp
+the three return pointer arguments may be NULL, but they allow key information
+to flow back to your program, if desired.
+.RE
+
+.BI "char  yJOBS_finalize  (void);"
+.RS 3
+call this function after all arguments are processed.  it adjusts the verbosity
+level to match the selected options.  it also performs final security checks.
+.RE
+
+.BI "char  yJOBS_driver    (char *" "a_oneline" ", void *" "f_assim" ", void *" "f_run" ");"
+.RS 3
+call this function in main, after all startup processing is complete.
+the oneline is a text string identifying the program and purpose.
+.sp
+the two function pointers handle reading source files and executing them
+respectively.
+.RE
+
+.BI "char  yJOBS_wrap      (void);"
+.RS 3
+simply makes sure dynamic memory is freed up during program shutdown.  while
+technically unnecessary, i require for testing anyway.
+.RE
+
+

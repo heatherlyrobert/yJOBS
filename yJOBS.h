@@ -13,6 +13,7 @@ typedef const  char      cchar;
 
 #define     YJOBS_CENTRAL  'C'
 #define     YJOBS_LOCAL    'L'
+#define     YJOBS_NEITHER  '-'
 
 
 
@@ -24,6 +25,10 @@ typedef const  char      cchar;
 #define     IAM_HERACLES     'h'
 #define     IAM_KHRONOS      'k'
 #define     IAM_POLYMNIA     'p'
+#define     IAM_METIS        'm'
+#define     IAM_HELIOS       'l'
+#define     IAM_HERMES       'r'
+#define     IAM_THEMIS       't'
 /*---(run-as/unit testing)----------------------*/
 #define     IAM_UEOS         'E'
 #define     IAM_UASTRAIOS    'A'
@@ -31,10 +36,15 @@ typedef const  char      cchar;
 #define     IAM_UHERACLES    'H'
 #define     IAM_UKHRONOS     'K'
 #define     IAM_UPOLYMNIA    'P'
-/*---(run-as/combination)-----------------------*/
-#define     IAM_VALID        "eayhkpEAYHKP"
-#define     IAM_UNIT         "EAYHKP"
-#define     IAM_ETC          "eayEAY"
+#define     IAM_UMETIS       'M'
+#define     IAM_UHELIOS      'L'
+#define     IAM_UHERMES      'R'
+#define     IAM_UTHEMIS      'T'
+/*---(run-as for actions)-----------------------*/
+#define     IAM_DEFAULT      '-'
+#define     IAM_VERIFY       "eayhkpmEAYHKPM"
+#define     IAM_INSTALL      "eayhkpmEAYHKPM"
+#define     IAM_CHECK        "eayhkEAYHK"
 /*---(run-as/done)------------------------------*/
 
 
@@ -52,9 +62,9 @@ typedef const  char      cchar;
 /*---(local)----------------*/
 #define     ACT_VERIFY      'v'
 #define     ACT_VVERIFY     'V'
-#define     ACT_CVERIFY     'ÿ'
+#define     ACT_CVERIFY     'Ñ'
 #define     IF_VERIFY       if (yJOBS_ifverify  () == 1)
-#define     CASE_VERIFY     'v' : case 'V' : case 'ÿ'
+#define     CASE_VERIFY     'v' : case 'V' : case 'Ñ'
 /*---(local)----------------*/
 #define     ACT_REGISTER    'b'
 #define     ACT_VREGISTER   'B'
@@ -79,8 +89,8 @@ typedef const  char      cchar;
 #define     IF_LIST         if (yJOBS_iflist    () == 1)
 #define     CASE_LIST       'l' : case 'L'
 /*---(central/inventory)----*/
-#define     ACT_REPORT      '?'
-#define     CASE_REPORT     '?' 
+#define     ACT_REPORT      'ò'
+#define     CASE_REPORT     'ò' 
 /*---(central/installed)----*/
 #define     ACT_CHECK       'c'
 #define     ACT_VCHECK      'C'
@@ -123,8 +133,25 @@ typedef const  char      cchar;
 #define     ACT_CEXTRACT    'ì'
 #define     IF_EXTRACT      if (yJOBS_ifextract () == 1)
 #define     CASE_EXTRACT    'e' : case 'E' : case 'ì'
+/*---(upload)---------------*/
+#define     ACT_UPLOAD      'y'
+#define     ACT_VUPLOAD     'Y'
+#define     ACT_CUPLOAD     'ï'
+#define     IF_UPLOAD       if (yJOBS_ifupload  () == 1)
+#define     CASE_UPLOAD     'y' : case 'Y' : case 'ï'
+/*---(download)-------------*/
+#define     ACT_DOWNLOAD    'z'
+#define     ACT_VDOWNLOAD   'Z'
+#define     ACT_CDOWNLOAD   'í'
+#define     IF_DOWNLOAD     if (yJOBS_ifdownload() == 1)
+#define     CASE_DOWNLOAD   'z' : case 'Z' : case 'í'
+/*---(gather)---------------*/
+#define     ACT_GATHER      'g'
+#define     ACT_VGATHER     'G'
+#define     ACT_CGATHER     'ê'
+#define     IF_GATHER       if (yJOBS_ifgather  () == 1)
+#define     CASE_GATHER     'g' : case 'G' : case 'ê'
 /*---(daemon)---------------*/
-#define     ACT_RELOAD      'H'
 #define     ACT_DAEMON      'd'
 #define     ACT_VDAEMON     'D'
 #define     ACT_CDAEMON     'ë'
@@ -148,6 +175,12 @@ typedef const  char      cchar;
 #define     ACT_CSTRICT     'ù'
 #define     IF_STRICT       if (yJOBS_ifstrict  () == 1)
 #define     CASE_STRICT     's' : case 'S' : case 'ù'
+/*---(reload)---------------*/
+#define     ACT_RELOAD      'h'
+#define     ACT_VRELOAD     'H'
+#define     ACT_CRELOAD     'î'
+#define     IF_RELOAD       if (yJOBS_ifreload  () == 1)
+#define     CASE_RELOAD     'h' : case 'H' : case 'î'
 /*---(combination)----------*/
 #define     IF_SILENT       if (yJOBS_ifsilent  () == 1)
 #define     IF_VERBOSE      if (yJOBS_ifverbose () == 1)
@@ -161,6 +194,7 @@ typedef const  char      cchar;
 #define     IF_CCENTRAL     if (a_act == ACT_CCHECK  || a_act == ACT_CAUDIT  || a_act == ACT_CDAEMON  || a_act == ACT_CPRICKLY || a_act == ACT_CNORMAL)
 #define     IF_VCENTRAL     if (a_act == ACT_VCHECK  || a_act == ACT_VAUDIT  || a_act == ACT_VDAEMON  || a_act == ACT_VPRICKLY || a_act == ACT_VNORMAL)
 /*---(unit testing)---------*/
+#define     ACT_TESTING     'j'
 #define     IF_NORUN        if (yJOBS_ifnorun   () == 1)
 #define     IF_NOEND        if (yJOBS_ifnoend   () == 1)
 
@@ -169,16 +203,23 @@ typedef const  char      cchar;
 
 
 
+/*===[[ BASE USAGE ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-/*---(version)--------------*/
 char*       yJOBS_version           (void);
-/*---(identity)-------------*/
-char        yJOBS_runas             (char *a_runas, char *a_name);
-char        yJOBS_iam               (char a_iam , char *a_print);
-char        yJOBS_mode              (char a_mode, char *a_print);
+char        yJOBS_runas             (cchar *a_name, char *r_runas);
+char        yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, char *r_mode, char *r_file);
+char        yJOBS_driver            (char *a_oneline, char *a_user, int a_uid, void *a_assimilate, void *a_runner);
+char        yJOBS_wrap              (void);
+
+
+
+/*===[[ DEBUGGING ]]==========================================================*/
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char*       yJOBS_iam               (void);
+char*       yJOBS_mode              (void);
 /*---(done)-----------------*/
-char        yJOBS__unit_mkdir       (void);
-char        yJOBS__unit_rmdir       (void);
+char        yJOBS_mkdirs            (void);
+char        yJOBS_rmdirs            (void);
 
 
 
@@ -191,8 +232,7 @@ char        yJOBS_acceptable        (cchar a_runas, cchar *a_name, char *r_fuser
 char        yJOBS_central_full      (cchar a_runas, cchar *a_central, cchar *a_name, cchar *a_muser, int a_muid, char *r_fuser, int *r_fuid, char *r_fdesc);
 char        yJOBS_central_dir       (cchar a_runas, cchar *a_name, char *a_dir, char *a_user, char *a_file);
 char        yJOBS_central           (cchar a_runas, cchar *a_name, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir);
-/*---(done)-----------------*/
-
+/*---(done)-----------------*/ 
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
@@ -204,8 +244,8 @@ char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_onelin
 char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
 char        yJOBS_act_extract       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
 /*---(security)-------------*/
-char        yJOBS_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline);
-char        yJOBS_act_fix           (cchar a_runas, cchar a_act, cchar *a_oneline);
+char        yJOBS_security          (cchar *a_oneline);
+char        yJOBS_fix               (cchar *a_oneline);
 /*---(review)---------------*/
 char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_muser, int a_muid, cchar *a_regex, void *a_assimilate);
 /*---(done)-----------------*/
@@ -213,16 +253,17 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_onelin
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_file, char *a_user, int a_uid, void *a_assimilate, void *a_runner);
 
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(arguments)------------*/
 char        yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile);
-char        yJOBS_args_handle       (char *a_runas, char *a_runmode, char *a_runfile, int *i, char *a_arg, char *a_next);
 char        yJOBS_final             (int a_uid);
 /*---(checkers)-------------*/
+char        yJOBS_ifvalid           (void);
+char        yJOBS_ifunit            (void);
+char        yJOBS_ifetc             (void);
 char        yJOBS_ifsilent          (void);
 char        yJOBS_ifverbose         (void);
 char        yJOBS_ifregister        (void);
@@ -237,10 +278,14 @@ char        yJOBS_ifextract         (void);
 char        yJOBS_ifaudit           (void);
 char        yJOBS_iffix             (void);
 char        yJOBS_ifwithdraw        (void);
+char        yJOBS_ifupload          (void);
+char        yJOBS_ifdownload        (void);
+char        yJOBS_ifgather          (void);
 char        yJOBS_ifdaemon          (void);
 char        yJOBS_ifprickly         (void);
 char        yJOBS_ifnormal          (void);
 char        yJOBS_ifstrict          (void);
+char        yJOBS_ifreload          (void);
 char        yJOBS_ifnorun           (void);
 char        yJOBS_ifnoend           (void);
 /*---(done)-----------------*/

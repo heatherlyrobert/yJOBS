@@ -21,8 +21,13 @@ yJOBS_act_verify        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
-   DEBUG_YEXEC  yLOG_point   ("a_runas"   , a_runas);
    /*---(defense)------------------------*/
+   DEBUG_YEXEC  yLOG_char    ("a_runas"   , a_runas);
+   DEBUG_YEXEC  yLOG_info    ("allowed"   , IAM_VERIFY);
+   --rce;  if (a_runas == 0 || strchr (IAM_VERIFY, a_runas) == NULL) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    DEBUG_YEXEC  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline    == NULL) {
       DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
@@ -163,8 +168,13 @@ yJOBS_act_install       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    char        x_desc      [LEN_DESC]  = "";
    /*---(header)-------------------------*/
    DEBUG_YEXEC  yLOG_enter   (__FUNCTION__);
-   DEBUG_YEXEC  yLOG_point   ("a_runas"   , a_runas);
    /*---(defense)------------------------*/
+   DEBUG_YEXEC  yLOG_char    ("a_runas"   , a_runas);
+   DEBUG_YEXEC  yLOG_info    ("allowed"   , IAM_INSTALL);
+   --rce;  if (a_runas == 0 || strchr (IAM_INSTALL, a_runas) == NULL) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    DEBUG_YEXEC  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline    == NULL) {
       DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
@@ -234,8 +244,13 @@ yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    int         rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YEXEC   yLOG_enter   (__FUNCTION__);
-   DEBUG_YEXEC  yLOG_point   ("a_runas"   , a_runas);
    /*---(defense)------------------------*/
+   DEBUG_YEXEC  yLOG_char    ("a_runas"   , a_runas);
+   DEBUG_YEXEC  yLOG_info    ("allowed"   , IAM_CHECK);
+   --rce;  if (a_runas == 0 || strchr (IAM_CHECK, a_runas) == NULL) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    DEBUG_YEXEC  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline    == NULL) {
       DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
@@ -366,7 +381,36 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
 static void      o___SECURITY________________o (void) {;}
 
 char
-yjobs_act__checkdir     (cchar *a_dir, int a_perms)
+yjobs_act__fixdir       (char a_issue, tSTAT *s, char n, cchar *a_dir, int a_perms)
+{
+   char        rc          =    0;
+   char        t           [LEN_TERSE] = "";
+   sprintf (t, "%4o", a_perms);
+   switch (a_issue) {
+   case 'e' :
+      DEBUG_YEXEC  yLOG_note    ("fixdir attempting create");
+      yURG_msg ('+', "set to fix, directory does not exist, attempt to create");
+      break;
+   case 'o' :
+      DEBUG_YEXEC  yLOG_note    ("fixdir attempting change owner");
+      yURG_msg ('+', "set to fix, owner was not ¶root¶, attempt to change");
+      break;
+   case 'g' :
+      DEBUG_YEXEC  yLOG_note    ("fixdir attempting change group");
+      yURG_msg ('+', "set to fix, group was not ¶root¶, attempt to change");
+      break;
+   case 'p' :
+      DEBUG_YEXEC  yLOG_note    ("fixdir attempting change permissions");
+      yURG_msg ('+', "set to fix, permissions were not %s, attempt to change", t);
+      break;
+   }
+   yURG_mkdir (a_dir, "root", "root", t);
+   rc = lstat (a_dir, s);
+   return rc;
+}
+
+char
+yjobs_act_checkdir      (char n, cchar *a_dir, int a_perms, char a_fix)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -375,73 +419,162 @@ yjobs_act__checkdir     (cchar *a_dir, int a_perms)
    int         x_perms     =    0;
    /*---(header)-------------------------*/
    DEBUG_YEXEC   yLOG_enter   (__FUNCTION__);
+   /*---(prepare)------------------------*/
+   DEBUG_YEXEC   yLOG_value   ("n"         , n);
    DEBUG_YEXEC   yLOG_info    ("a_dir"     , a_dir);
+   yURG_msg ('-', "checking level %d å%sæ", n, a_dir);
    /*---(check existance)----------------*/
    rc = lstat (a_dir, &s);
    DEBUG_YEXEC   yLOG_value   ("stat"      , rc);
    --rce;  if (rc < 0) {
-      yURG_err ('f', "å%sæ directory does not exist (bad configuration)", a_dir);
-      DEBUG_YEXEC   yLOG_note    ("can not open /var");
-      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      if (a_fix == 'y') rc = yjobs_act__fixdir ('o', &s, n, a_dir, a_perms);
+      if (rc < 0) {
+         yURG_err ('ü', "å%sæ directory does not exist (bad configuration)", a_dir);
+         DEBUG_YEXEC   yLOG_note    ("can not open/stat directory");
+         DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
    --rce;  if (S_ISLNK (s.st_mode))  {
-      yURG_err ('f', "å%sæ actually refers to a symbolic link (security risk)", a_dir);
+      yURG_err ('ü', "å%sæ actually refers to a symbolic link (security risk)", a_dir);
       DEBUG_YEXEC  yLOG_note    ("can not use a symlink");
       DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   --rce;  if (!S_ISDIR (s.st_mode))  {
-      yURG_err ('f', "å%sæ is not a directory/symlink (bad configuration)", a_dir);
-      DEBUG_YEXEC   yLOG_note    ("can not use a directory");
+   --rce;  if (S_ISREG (s.st_mode))  {
+      yURG_err ('ü', "å%sæ is a regular file, not a directory (bad configuration)", a_dir);
+      DEBUG_YEXEC   yLOG_note    ("can not use a regular file");
       DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   yURG_msg ('-', "å%sæ directory exists and is not a symlink", a_dir);
+   --rce;  if (!S_ISDIR (s.st_mode))  {
+      yURG_err ('ü', "å%sæ is a specialty file (bad configuration)", a_dir);
+      DEBUG_YEXEC   yLOG_note    ("can not use a specialty file");
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   yURG_msg ('+', "å%sæ directory exists and is not a file/symlink", a_dir);
    /*---(ownership)----------------------*/
    --rce;  if (s.st_uid != 0) {
-      yURG_err ('f', "å%sæ is not owned by root (security risk)", a_dir);
-      DEBUG_YEXEC  yLOG_note    ("/var/spool/khronos not owned by root (security risk)");
-      DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      if (a_fix == 'y') rc = yjobs_act__fixdir ('o', &s, n, a_dir, a_perms);
+      if (s.st_uid != 0) {
+         yURG_err ('ü', "å%sæ is not owned by root (security risk)", a_dir);
+         DEBUG_YEXEC  yLOG_note    ("/var/spool/khronos not owned by root (security risk)");
+         DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
    DEBUG_YEXEC  yLOG_note    ("ownership is root (private)");
-   yURG_msg ('-', "å%sæ directory ownership is root", a_dir);
    --rce;  if (s.st_gid != 0) {
-      yURG_err ('f', "å%sæ is not root group (security risk)", a_dir);
-      DEBUG_YEXEC  yLOG_note    ("/var/spool/khronos not group of root (security risk)");
-      DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      if (a_fix == 'y') rc = yjobs_act__fixdir ('g', &s, n, a_dir, a_perms);
+      if (s.st_gid != 0) {
+         yURG_err ('ü', "å%sæ is not root group (security risk)", a_dir);
+         DEBUG_YEXEC  yLOG_note    ("/var/spool/khronos not group of root (security risk)");
+         DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
-   yURG_msg ('-', "å%sæ directory group ownership is root", a_dir);
-   DEBUG_YEXEC  yLOG_note    ("group ownership is root (private)");
+   yURG_msg ('+', "å%sæ directory owner and group are both root", a_dir);
+   DEBUG_YEXEC  yLOG_note    ("owner and group are both root (private)");
    /*---(permissions)--------------------*/
-   x_perms = s.st_mode & 0777;
+   x_perms = s.st_mode & 07777;
    DEBUG_YEXEC   yLOG_complex ("x_perms"   , "%04o", x_perms);
    DEBUG_YEXEC   yLOG_complex ("a_perms"   , "%04o", a_perms);
-   if  (x_perms != a_perms)  {
-      yURG_err ('f', "å%sæ perms are %04o, not the requested %04o (security risk)", a_dir, s.st_mode & 0777, a_perms);
-      DEBUG_YEXEC   yLOG_note    ("permissions not set correctly (private to user)");
-      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+   --rce;  if  (x_perms != a_perms)  {
+      if (a_fix == 'y') rc = yjobs_act__fixdir ('p', &s, n, a_dir, a_perms);
+      x_perms = s.st_mode & 07777;
+      if  (x_perms != a_perms)  {
+         yURG_err ('ü', "å%sæ perms are %04o, not the requested %04o (security risk)", a_dir, s.st_mode & 07777, a_perms);
+         DEBUG_YEXEC   yLOG_note    ("permissions not set correctly (private to user)");
+         DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
-   yURG_msg ('-', "å%sæ directory permissions confirmed as %04o", a_dir, a_perms);
-   DEBUG_YEXEC  yLOG_note    ("permissions are propiate (private)");
+   yURG_msg ('+', "å%sæ directory permissions confirmed as %04o", a_dir, a_perms);
+   DEBUG_YEXEC  yLOG_note    ("permissions are appropiate (private)");
    /*---(complete)-----------------------*/
    DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
-yJOBS_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline)
+yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   char        x_orig      [LEN_PATH]  = "";
-   char        x_path      [LEN_PATH]  = "";
+   char        x_dir       [LEN_DESC]  = "";
+   char        r_dir       [LEN_DESC]  = "";
    char       *p           = NULL;
-   char       *r           = NULL;
+   int         l           =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YEXEC   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YEXEC   yLOG_info    ("a_dir"     , a_dir);
+   --rce;  if (a_dir == NULL) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(copy to local)------------------*/
+   strlcpy (x_dir, a_dir, LEN_DESC);
+   l = strlen (x_dir);
+   if (l > 0 && x_dir [l - 1] == '/')  x_dir [--l] = '\0';
+   DEBUG_YEXEC   yLOG_complex ("x_dir"     , "%2då%sæ", l, x_dir);
+   /*---(stop recursion)-----------------*/
+   --rce;  if (l == 0) {
+      DEBUG_YEXEC   yLOG_note    ("bottomed out at root '/'");
+      DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(peal next layer)----------------*/
+   strlcpy (r_dir, x_dir, LEN_DESC);
+   p = strrchr (r_dir, '/');
+   DEBUG_YEXEC   yLOG_point   ("p"         , p);
+   if  (p != NULL)   p [0] = '\0';
+   l = strlen (r_dir);
+   DEBUG_YEXEC   yLOG_complex ("r_dir"     , "%2då%sæ", l, r_dir);
+   /*---(recurse)------------------------*/
+   rc = yjobs_act_directory (n + 1, r_dir, a_fix);
+   DEBUG_YEXEC   yLOG_value   ("recursed"  , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(tail execute)-------------------*/
+   l = strlen (x_dir);
+   DEBUG_YEXEC   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
+   rc = 0;
+   if      (strcmp (x_dir, "/etc"      ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/var"      ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/var/lib"  ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/var/spool") == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/home"     ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/tmp"      ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 01777, a_fix);
+   else if (strcmp (x_dir, "/tmp/etc"  ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/tmp/lib"  ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/tmp/spool") == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else if (strcmp (x_dir, "/tmp/home" ) == 0)  rc = yjobs_act_checkdir (n, x_dir, 0755 , a_fix);
+   else                                         rc = yjobs_act_checkdir (n, x_dir, 0700 , a_fix);
+   /*---(handle trouble)-----------------*/
+   --rce;  if (rc < 0) {
+      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YEXEC   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
+yjobs_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline, char a_fix)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_cdir      [LEN_PATH]  = "";
+   char        x_hdir      [LEN_PATH]  = "";
+   char        x_world     [LEN_LABEL] = "";
+   char        x_db        [LEN_LABEL] = "";
    /*---(header)-------------------------*/
    DEBUG_YEXEC   yLOG_enter   (__FUNCTION__);
    /*---(defense)-------------------------------*/
@@ -460,33 +593,29 @@ yJOBS_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline)
    yURG_msg (' ', "");
    yURG_msg ('>', "central directory setup/security...");
    /*---(defense)-------------------------------*/
-   rc = yJOBS_central_dir  (a_runas, NULL, x_orig, "n/", NULL);
+   /*> rc = yJOBS_central_dir  (a_runas, NULL, x_orig, "n/", NULL);                   <*/
+   rc = yjobs_who_location (a_runas, x_cdir, x_hdir, x_world, x_db);
+   DEBUG_YEXEC   yLOG_value   ("location"  , rc);
    --rce;  if (rc <  0) {
       DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YEXEC   yLOG_info    ("x_orig"    , x_orig);
-   yURG_msg ('-', "for (%c), directory å%sæ selected", a_runas, x_orig);
-   /*---(get first level)-----------------------*/
-   p = strtok_r (x_orig, "/", &r);
-   DEBUG_YEXEC   yLOG_point   ("p"         , p);
-   --rce;  if (p == NULL) {
-      yURG_err ('f', "can not parse directory name");
-      DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(check each level)----------------------*/
-   --rce;  while (p != NULL) {
-      sprintf (x_path, "%s/%s", x_path, p);
-      if      (strcmp (p, "khronos")  == 0)   rc = yjobs_act__checkdir (x_path, 0700);
-      else if (strcmp (p, "heracles") == 0)   rc = yjobs_act__checkdir (x_path, 0700);
-      else if (strcmp (p, "tmp"     ) == 0)   rc = yjobs_act__checkdir (x_path, 0777);
-      else                                    rc = yjobs_act__checkdir (x_path, 0755);
-      if (rc < 0) {
+   /*---(check directories)---------------------*/
+   DEBUG_YEXEC   yLOG_info    ("x_cdir"    , x_cdir);
+   --rce;  if (strcmp (x_cdir, "") != 0) {
+      rc = yjobs_act_directory (0, x_cdir, a_fix);
+      if (rc <  0) {
          DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      p = strtok_r (NULL, "/", &r);
+   }
+   DEBUG_YEXEC   yLOG_info    ("x_hdir"    , x_hdir);
+   if (strcmp (x_hdir, "") != 0) {
+      rc = yjobs_act_directory (0, x_hdir, a_fix);
+      if (rc <  0) {
+         DEBUG_YEXEC   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
    /*---(complete)------------------------------*/
    yURG_msg ('-', "SUCCESS, central directory basic security measures confirmed");
@@ -495,39 +624,8 @@ yJOBS_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline)
    return 0;
 }
 
-char
-yJOBS_act_fix           (cchar a_runas, cchar a_act, cchar *a_oneline)
-{
-   switch (a_runas) {
-   case IAM_KHRONOS   :
-      chown  ("/var", 0   , 0   );
-      chmod  ("/var", 0755);
-      chown  ("/var/spool", 0   , 0   );
-      chmod  ("/var/spool", 0755);
-      chown  ("/var/spool/khronos", 0   , 0   );
-      chmod  ("/var/spool/khronos", 0700);
-      break;
-   case IAM_UKHRONOS  :
-      chown  ("/tmp", 0   , 0   );
-      chmod  ("/tmp", 0755);
-      chown  ("/tmp/yJOBS", 0   , 0   );
-      chmod  ("/tmp/yJOBS", 0755);
-      chown  ("/tmp/yJOBS/khronos", 0   , 0   );
-      chmod  ("/tmp/yJOBS/khronos", 0700);
-      system ("rm -f /tmp/yJOBS/khronos/*~");
-      system ("rm -f /tmp/yJOBS/khronos/.*");
-      break;
-   case IAM_POLYMNIA  :
-      chown  ("/var", 0   , 0   );
-      chmod  ("/var", 0755);
-      chown  ("/var/lib", 0   , 0   );
-      chmod  ("/var/lib", 0755);
-      chown  ("/var/lib/polymnia", 0   , 0   );
-      chmod  ("/var/lib/polymnia", 0700);
-      break;
-   }
-   return 0;
-}
+char yJOBS_security      (cchar *a_oneline) { return yjobs_act_security (g_runas, g_runmode, a_oneline, '-'); }
+char yJOBS_fix           (cchar *a_oneline) { return yjobs_act_security (g_runas, g_runmode, a_oneline, 'y'); }
 
 
 
@@ -654,7 +752,7 @@ yjobs_act__prepare      (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_
    case ACT_DAEMON     : case ACT_CDAEMON    : case ACT_VDAEMON    :
    case ACT_PRICKLY    : case ACT_CPRICKLY   : case ACT_VPRICKLY   :
    case ACT_NORMAL     : case ACT_CNORMAL    : case ACT_VNORMAL    :
-      rc = yJOBS_act_security (a_runas, a_act, a_oneline);
+      rc = yjobs_act_security (a_runas, a_act, a_oneline, '-');
       if (rc < 0) {
          IF_CREVIEW   yURG_msg_live ();
          IF_CREVIEW   yURG_msg ('-', "FAILED, central directory insecure, run --vaudit to identify reasons");

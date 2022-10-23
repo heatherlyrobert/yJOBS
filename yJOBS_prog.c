@@ -3,10 +3,10 @@
 #include   "yJOBS_priv.h"
 
 
-static char (*s_runner) ();
+static char (*s_runner) (void);
 
 char
-yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_file, char *a_user, int a_uid, void *a_assimilate, void *a_runner)
+yJOBS_driver            (char *a_oneline, char *a_user, int a_uid, void *a_assimilate, void *a_runner)
 {
    /*---(locals)-----------+-----+-----+-*/
    int         rce         =  -10;
@@ -14,29 +14,29 @@ yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_fil
    /*---(header)-------------------------*/
    DEBUG_YEXEC   yLOG_enter   (__FUNCTION__);
    /*---(route action)-------------------*/
-   --rce;  switch (a_mode) {
+   --rce;  switch (g_runmode) {
    case CASE_VERIFY     :
-      rc = yJOBS_act_verify  (a_runas, a_mode, a_oneline, a_file, a_assimilate);
+      rc = yJOBS_act_verify  (g_runas, g_runmode, a_oneline, g_runfile, a_assimilate);
       break;
    case CASE_INSTALL    :
-      rc = yJOBS_act_install (a_runas, a_mode, a_oneline, a_file, a_assimilate);
+      rc = yJOBS_act_install (g_runas, g_runmode, a_oneline, g_runfile, a_assimilate);
       break;
    case CASE_CHECK      :
-      rc = yJOBS_act_check   (a_runas, a_mode, a_oneline, a_file, a_assimilate);
+      rc = yJOBS_act_check   (g_runas, g_runmode, a_oneline, g_runfile, a_assimilate);
       break;
    case CASE_REMOVE     :
-      rc = yJOBS_act_remove  (a_runas, a_mode, a_oneline, a_file);
+      rc = yJOBS_act_remove  (g_runas, g_runmode, a_oneline, g_runfile);
       break;
    case CASE_LIST       :
-      rc = yJOBS_act_review  (a_runas, a_mode, a_oneline, a_user, a_uid, "*", a_assimilate);
+      rc = yJOBS_act_review  (g_runas, g_runmode, a_oneline, a_user, a_uid, "*", a_assimilate);
       break;
    case CASE_AUDIT      :
-      rc = yJOBS_act_review  (a_runas, a_mode, a_oneline, a_user, a_uid, "*", a_assimilate);
+      rc = yJOBS_act_review  (g_runas, g_runmode, a_oneline, a_user, a_uid, "*", a_assimilate);
       break;
    case CASE_DAEMON     :
    case CASE_PRICKLY    :
       DEBUG_YEXEC   yLOG_note    ("processing a DAEMON/PRICKLY action");
-      rc = yJOBS_act_review  (a_runas, a_mode, a_oneline, a_user, a_uid, "*", a_assimilate);
+      rc = yJOBS_act_review  (g_runas, g_runmode, a_oneline, a_user, a_uid, "*", a_assimilate);
       DEBUG_YEXEC   yLOG_value   ("review"    , rc);
       DEBUG_YEXEC   yLOG_char    ("g_norun"   , g_norun);
       IF_STRICT {
@@ -57,7 +57,7 @@ yJOBS_driver            (char a_runas, char a_mode, char *a_oneline, char *a_fil
    case CASE_NORMAL     :
    case CASE_STRICT     :
       DEBUG_YEXEC   yLOG_note    ("processing a NORMAL/STRICT action");
-      rc = yJOBS_act_check   (a_runas, a_mode, a_oneline, a_file, a_assimilate);
+      rc = yJOBS_act_check   (g_runas, g_runmode, a_oneline, g_runfile, a_assimilate);
       DEBUG_YEXEC   yLOG_value   ("check"     , rc);
       DEBUG_YEXEC   yLOG_char    ("g_norun"   , g_norun);
       IF_STRICT {

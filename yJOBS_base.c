@@ -3,6 +3,25 @@
 #include   "yJOBS_priv.h"
 
 
+tLOCAL myJOBS;
+
+
+const tWHO  g_whos [MAX_WHO] = {
+   /* primary--------  unittest-------  name------ , installed----------- , description----------------------------------------    allowed-actions-----------------  */
+   /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vbui lLòcaf ktw yz qxre gdpnsh -  , loc  cen   123456789-123456789-12345 ,  123456789-123456789-12345   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- ,  database------------ , */
+   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , ""                    },
+   {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , ""                    },
+   {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , ""                    }, 
+   {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "--- F··F --·F-- ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+   {  IAM_KHRONOS    , IAM_UKHRONOS   , "khronos"  , "/sbin/"             , "khronos-anileis (merciless time)"                  , "--- F··F --·F-- ··· ·· ·FFF ·----- -" , 'y', 'y', "/var/spool/khronos/"      , "/tmp/spool/khronos/"      , "khronos."   , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+   {  IAM_POLYMNIA   , IAM_UPOLYMNIA  , "polymnia" , "/usr/local/bin/"    , "polymnia-hymnos (many praises)"                    , "-·- ---- ··F--- ··· ·· ---· -····· -" , '·', '·', ""                         , ""                         , ""           , ""           , ""           , ""                , "/var/lib/polymnia/"       , "/tmp/lib/polymnia/"       , "world.txt"           , "polymnia.db"         }, 
+   {  IAM_METIS      , IAM_UMETIS     , "metis"    , "/usr/local/bin/"    , "metis-okeanides (wise-counsel)"                    , "-·- FFFF ··F--- ··· ·· FFFF ------ -" , 'y', '·', ""                         , ""                         , ""           , ""           , ".tasks"     , ""                , "/var/lib/metis/"          , "/tmp/lib/metis/"          , "world.txt"           , "metis.db"            },
+   {  IAM_HELIOS     , IAM_UHELIOS    , "helios"   , "/sbin/"             , "helios-phaeton (radiant)"                          , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "helios."    , "helios."    , ".conf"      , "helios.conf"     , "/var/lib/helios/"         , "/tmp/lib/helios/"         , ""                    , "helios.db"           }, 
+   {  IAM_HERMES     , IAM_UHERMES    , "hermes"   , "/sbin/"             , "hermes-diactoros (messenger of gods)"              , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hermes."    , "hermes."    , ".conf"      , "hermes.conf"     , "/var/lib/hermes/"         , "/tmp/lib/hermes/"         , ""                    , ""                    }, 
+   {  IAM_THEMIS     , IAM_UTHEMIS    , "themis"   , "/sbin/"             , "themis-euboulos (divine law)"                      , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "themis."    , "themis."    , ".conf"      , "themis.conf"     , "/var/lib/themis/"         , "/tmp/lib/themis/"         , ""                    , ""                    }, 
+   {  0              , 0              , "--end--"  , "--end--"            , "--end--"                                           , "··· ···· ······ ··· ·· ···· ······ ·" , '·', '·', "--end--"                  , "--end--"                  , ""           , ""           , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+};
+
 
 
 /*====================------------------------------------====================*/
@@ -15,18 +34,172 @@ static char yJOBS_ver [LEN_HUND] = "";
 char*        /*--> return library versioning info --------[ leaf-- [ ------ ]-*/
 yJOBS_version      (void)
 {
-   char        t [20] = "";
+   char        t [LEN_LABEL] = "";
 #if    __TINYC__ > 0
-   strncpy (t, "[tcc built  ]", 15);
+   strncpy (t, "[tcc built  ]", LEN_LABEL);
 #elif  __GNUC__  > 0
-   strncpy (t, "[gnu gcc    ]", 15);
+   strncpy (t, "[gnu gcc    ]", LEN_LABEL);
 #elif  __HEPH__  > 0
-   strncpy (t, "[hephaestus ]", 18);
+   strncpy (t, "[hephaestus ]", LEN_LABEL);
 #else
-   strncpy (t, "[unknown    ]", 15);
+   strncpy (t, "[unknown    ]", LEN_LABEL);
 #endif
    snprintf (yJOBS_ver, LEN_HUND, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
    return yJOBS_ver;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                      who table access                        ----===*/
+/*====================------------------------------------====================*/
+static void      o___WHO_TABLE_______________o (void) {;}
+
+char
+yjobs_who_init          (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   int         i           =    0;
+   char        t           [LEN_TERSE] = "";
+   /*---(default)------------------------*/
+   strlcat (g_valid   , "", LEN_DESC);
+   strlcat (g_unit    , "", LEN_DESC);
+   strlcat (g_etc     , "", LEN_DESC);
+   /*---(load)---------------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      sprintf (t, "%c", g_whos [i].abbr);
+      strlcat (g_valid, t, LEN_DESC);
+      if (strcmp ("/etc/", g_whos [i].cdir) == 0) strlcat (g_etc, t, LEN_DESC);
+      sprintf (t, "%c", g_whos [i].unit);
+      strlcat (g_valid, t, LEN_DESC);
+      strlcat (g_unit , t, LEN_DESC);
+      if (strcmp ("/etc/", g_whos [i].cdir) == 0) strlcat (g_etc, t, LEN_DESC);
+   }
+   return 0;
+}
+
+char
+yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_lpre, char *a_cpre, char *a_lsuf, char *a_cname)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         i           =    0;
+   /*---(default)------------------------*/
+   if (a_local   != NULL)  *a_local   = '·';
+   if (a_central != NULL)  *a_central = '·';
+   if (a_lpre    != NULL)  strlcpy (a_lpre , "", LEN_LABEL);
+   if (a_cpre    != NULL)  strlcpy (a_cpre , "", LEN_LABEL);
+   if (a_lsuf    != NULL)  strlcpy (a_lsuf , "", LEN_LABEL);
+   if (a_cname   != NULL)  strlcpy (a_cname, "", LEN_DESC);
+   /*---(walk data)----------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+         if (a_local   != NULL)  *a_local   = g_whos [i].local;
+         if (a_central != NULL)  *a_central = g_whos [i].central;
+         if (a_lpre    != NULL)  strlcpy (a_lpre , g_whos [i].lpre , LEN_LABEL);
+         if (a_cpre    != NULL)  strlcpy (a_cpre , g_whos [i].cpre , LEN_LABEL);
+         if (a_lsuf    != NULL)  strlcpy (a_lsuf , g_whos [i].lsuf , LEN_LABEL);
+         if (a_cname   != NULL)  strlcpy (a_cname, g_whos [i].cname, LEN_LABEL);
+         return 0;
+      }
+   }
+   /*---(complete)-----------------------*/
+   return rce;
+}
+
+char
+yjobs_who_location      (cchar a_runas, char *a_cdir, char *a_hdir, char *a_world, char *a_db)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         i           =    0;
+   /*---(default)------------------------*/
+   if (a_cdir  != NULL)  strlcpy (a_cdir , "", LEN_DESC);
+   if (a_hdir  != NULL)  strlcpy (a_hdir , "", LEN_DESC);
+   if (a_world != NULL)  strlcpy (a_world, "", LEN_LABEL);
+   if (a_db    != NULL)  strlcpy (a_db   , "", LEN_LABEL);
+   /*---(walk data)----------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      if (a_runas == g_whos [i].abbr) {
+         if (a_cdir  != NULL)  strlcpy (a_cdir , g_whos [i].cdir , LEN_DESC);
+         if (a_hdir  != NULL)  strlcpy (a_hdir , g_whos [i].hdir , LEN_DESC);
+         if (a_world != NULL)  strlcpy (a_world, g_whos [i].world, LEN_LABEL);
+         if (a_db    != NULL)  strlcpy (a_db   , g_whos [i].db   , LEN_LABEL);
+         return 0;
+      }
+      if (a_runas == g_whos [i].unit) {
+         if (a_cdir  != NULL)  strlcpy (a_cdir , g_whos [i].udir , LEN_DESC);
+         if (a_hdir  != NULL)  strlcpy (a_hdir , g_whos [i].uhdir, LEN_DESC);
+         if (a_world != NULL)  strlcpy (a_world, g_whos [i].world, LEN_LABEL);
+         if (a_db    != NULL)  strlcpy (a_db   , g_whos [i].db   , LEN_LABEL);
+         return 0;
+      }
+   }
+   /*---(complete)-----------------------*/
+   return rce;
+}
+
+char
+yjobs_who_by_index      (char n, char *a_cdir, char *a_hdir, char *a_world, char *a_db)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         i           =    0;
+   /*---(default)------------------------*/
+   if (a_cdir  != NULL)  strlcpy (a_cdir , "", LEN_DESC);
+   if (a_hdir  != NULL)  strlcpy (a_hdir , "", LEN_DESC);
+   if (a_world != NULL)  strlcpy (a_world, "", LEN_LABEL);
+   if (a_db    != NULL)  strlcpy (a_db   , "", LEN_LABEL);
+   /*---(walk data)----------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      if (i != n)                       continue;
+      if (a_cdir  != NULL)  strlcpy (a_cdir , g_whos [i].udir , LEN_DESC);
+      if (a_hdir  != NULL)  strlcpy (a_hdir , g_whos [i].uhdir, LEN_DESC);
+      if (a_world != NULL)  strlcpy (a_world, g_whos [i].world, LEN_LABEL);
+      if (a_db    != NULL)  strlcpy (a_db   , g_whos [i].db   , LEN_LABEL);
+      return 0;
+   }
+   /*---(complete)-----------------------*/
+   return rce;
+}
+
+char
+yjobs_who_action        (cchar a_runas, cchar a_opt)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   int         i           =    0;
+   /*---(defense)------------------------*/
+   if (a_opt <  0)  return '·';
+   if (a_opt > 35)  return '·';
+   /*---(walk data)----------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+         return g_whos [i].acts [a_opt];
+      }
+   }
+   /*---(complete)-----------------------*/
+   return '·';
+}
+
+char
+yjobs_who_testing       (cchar a_runas)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   int         i           =    0;
+   /*---(walk data)----------------------*/
+   for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0)         break;
+      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+         return g_whos [i].unit;
+      }
+   }
+   /*---(complete)-----------------------*/
+   return '?';
 }
 
 
@@ -37,159 +210,119 @@ yJOBS_version      (void)
 static void      o___IDENTIFY________________o (void) {;};
 
 char
-yJOBS_runas             (char *a_runas, char *a_name)
+yJOBS_runas             (cchar *a_name, char *r_runas)
 {
+   /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   --rce;  if (a_name == NULL)  return rce;
-   if (a_runas != NULL)  *a_runas = '-';
-   if      (strcmp  (a_name, "eos_unit"                   ) == 0)    g_runas = IAM_UEOS;
-   else if (strncmp (a_name, "eos"                    ,  3) == 0)    g_runas = IAM_EOS;
-   else if (strncmp (a_name, "/sbin/eos"              ,  9) == 0)    g_runas = IAM_EOS;
-   else if (strcmp  (a_name, "init"                       ) == 0)    g_runas = IAM_EOS;
-   else if (strcmp  (a_name, "astraios_unit"              ) == 0)    g_runas = IAM_UASTRAIOS;
-   else if (strncmp (a_name, "astraios"               ,  8) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strncmp (a_name, "/sbin/astraios"         , 14) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "shutdown"                   ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "halt"                       ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "restart"                    ) == 0)    g_runas = IAM_ASTRAIOS;
-   else if (strcmp  (a_name, "hypnos_unit"                ) == 0)    g_runas = IAM_UHYPNOS;
-   else if (strncmp (a_name, "hypnos"                 ,  6) == 0)    g_runas = IAM_HYPNOS;
-   else if (strncmp (a_name, "/sbin/hypnos"           , 12) == 0)    g_runas = IAM_HYPNOS;
-   else if (strcmp  (a_name, "heracles_unit"              ) == 0)    g_runas = IAM_UHERACLES;
-   else if (strncmp (a_name, "heracles"               ,  8) == 0)    g_runas = IAM_HERACLES;
-   else if (strncmp (a_name, "/sbin/heracles"         , 14) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "H"                          ) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "/sbin/H"                    ) == 0)    g_runas = IAM_HERACLES;
-   else if (strcmp  (a_name, "khronos_unit"               ) == 0)    g_runas = IAM_UKHRONOS;
-   else if (strncmp (a_name, "khronos"                ,  7) == 0)    g_runas = IAM_KHRONOS;
-   else if (strncmp (a_name, "/sbin/khronos"          , 13) == 0)    g_runas = IAM_KHRONOS;
-   else if (strcmp  (a_name, "cron"                       ) == 0)    g_runas = IAM_KHRONOS;
-   else if (strcmp  (a_name, "crontab"                    ) == 0)    g_runas = IAM_KHRONOS;
-   else if (strcmp  (a_name, "polymnia_unit"              ) == 0)    g_runas = IAM_UPOLYMNIA;
-   else if (strncmp (a_name, "polymnia"               ,  7) == 0)    g_runas = IAM_POLYMNIA;
-   else if (strcmp  (a_name, "/usr/local/bin/polymnia"    ) == 0)    g_runas = IAM_POLYMNIA;
-   else {
-      return -10;
+   char        rc          =    0;
+   int         i           =    0;
+   char        t           [LEN_HUND]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(prepare)------------------------*/
+   if (g_runas == IAM_DEFAULT) {
+      rc = yjobs_world_init ();
    }
-   if (a_runas != NULL)  *a_runas = g_runas;
+   /*---(default)------------------------*/
+   if (r_runas != NULL)  *r_runas = IAM_DEFAULT;
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS  yLOG_point   ("a_name"    , a_name);
+   --rce;  if (a_name == NULL) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS  yLOG_info    ("a_name"    , a_name);
+   /*---(walk data)----------------------*/
+   --rce;  for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0) {
+         DEBUG_YJOBS  yLOG_note    ("runas entry never found");
+         DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      /*---(normal)----------------------*/
+      if (strcmp (a_name, g_whos [i].name) == 0) {
+         DEBUG_YJOBS  yLOG_note    ("found an unqualified normal entry");
+         g_runas = g_whos [i].abbr;
+         break;
+      }
+      /*---(qualified)-------------------*/
+      sprintf (t, "%s%s"   , g_whos [i].inst, g_whos [i].name);
+      if (strcmp (a_name, t) == 0) {
+         DEBUG_YJOBS  yLOG_note    ("found an qualified normal entry");
+         g_runas = g_whos [i].abbr;
+         break;
+      }
+      /*---(debug)-----------------------*/
+      sprintf (t, "%s_debug", g_whos [i].name);
+      if (strcmp (a_name, t) == 0) {
+         DEBUG_YJOBS  yLOG_note    ("found a debugging entry");
+         g_runas = g_whos [i].abbr;
+         break;
+      }
+      /*---(unittest)--------------------*/
+      sprintf (t, "%s_unit", g_whos [i].name);
+      if (strcmp (a_name, t) == 0) {
+         DEBUG_YJOBS  yLOG_note    ("found a unit testing entry");
+         g_runas = g_whos [i].unit;
+         break;
+      }
+      /*---(done)------------------------*/
+   }
+   /*---(save-back)----------------------*/
+   if (r_runas != NULL)  *r_runas = g_runas;
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
-char
-yJOBS_iam               (char a_iam, char *a_print)
+char*
+yjobs_iam               (char a_runas)
 {
+   /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   --rce;  if (a_print == NULL)  return rce;
-   switch (a_iam) {
-   case IAM_EOS       : case IAM_UEOS      :
-      strlcpy (a_print, "eos-rhododactylos (rosy-fingered dawn)" , LEN_HUND);
-      break;
-   case IAM_ASTRAIOS  : case IAM_UASTRAIOS :
-      strlcpy (a_print, "astraios-aeolus (sparkling wind-father)", LEN_HUND);
-      break;
-   case IAM_HYPNOS    : case IAM_UHYPNOS   :
-      strlcpy (a_print, "hypnos-epidotes (giver of sleep)"       , LEN_HUND);
-      break;
-   case IAM_HERACLES  : case IAM_UHERACLES :
-      strlcpy (a_print, "heracles-promachus (leader in battle)"  , LEN_HUND);
-      break;
-   case IAM_KHRONOS   : case IAM_UKHRONOS  :
-      strlcpy (a_print, "khronos-anileis (merciless time)"       , LEN_HUND);
-      break;
-   case IAM_POLYMNIA  : case IAM_UPOLYMNIA :
-      strlcpy (a_print, "polymnia-hymnos (many praises)"         , LEN_HUND);
-      break;
-   default               :
-      strlcpy (a_print, "unknown"                                , LEN_HUND);
-      return -10;
-      break;
+   int         i           =    0;
+   /*---(default)------------------------*/
+   strlcpy (g_print, "unknown"         , LEN_HUND);
+   /*---(walk data)----------------------*/
+   --rce;  for (i = 0; i < MAX_WHO; ++i) {
+      if (g_whos [i].abbr == 0) g_print;
+      if (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+         strlcpy (g_print, g_whos [i].desc, LEN_HUND);
+         break;
+      }
    }
-   return 0;
+   /*---(complete)-----------------------*/
+   return g_print;
 }
 
-char
-yJOBS_mode              (char a_mode, char *a_print)
+char* yJOBS_iam  (void) { return yjobs_iam (g_runas); }
+
+char*
+yjobs_mode              (char a_mode)
 {
    char        rce         =  -10;
+   char        rc          =    0;
    char        x_flag      =  '-';
-   --rce;  if (a_print == NULL)  return rce;
-   switch (a_mode) {
-   case ACT_VERSION  :
-      strcpy (a_print, "version");
-      break;
-   case ACT_HELP     :
-      strcpy (a_print, "usage");
-      break;
-   case ACT_STATS    :
-      strcpy (a_print, "stats");
-      break;
-   case CASE_VERIFY  :
-      strcpy (a_print, "verify");
-      break;
-   case CASE_REGISTER:
-      strcpy (a_print, "register");
-      break;
-   case CASE_INSTALL :
-      strcpy (a_print, "install");
-      break;
-   case CASE_UPDATE  :
-      strcpy (a_print, "update");
-      break;
-   case CASE_LIST    :
-      strcpy (a_print, "list");
-      break;
-   case CASE_REPORT  :
-      strcpy (a_print, "report");
-      break;
-   case CASE_CHECK   :
-      strcpy (a_print, "check");
-      break;
-   case CASE_AUDIT   :
-      strcpy (a_print, "audit");
-      break;
-   case CASE_FIX     :
-      strcpy (a_print, "fix");
-      break;
-   case CASE_CLEAR   :
-      strcpy (a_print, "clear");
-      break;
-   case CASE_WITHDRAW:
-      strcpy (a_print, "withdraw");
-      break;
-   case CASE_REMOVE  :
-      strcpy (a_print, "remove");
-      break;
-   case CASE_EXTRACT :
-      strcpy (a_print, "extract");
-      break;
-   case CASE_DAEMON  :
-      strcpy (a_print, "daemon");
-      break;
-   case CASE_PRICKLY :
-      strcpy (a_print, "prickly");
-      break;
-   case CASE_NORMAL  :
-      strcpy (a_print, "normal");
-      break;
-   case CASE_STRICT  :
-      strcpy (a_print, "strict");
-      break;
-   case ACT_RELOAD   :
-      strcpy (a_print, "reload");
-      break;
-   default           :
-      strcpy (a_print, "unknown");
-      x_flag = 'y';
-      break;
+   strlcpy (g_print, "unknown (unknown)", LEN_LABEL);
+   rc = yjobs_args_info         (a_mode, g_print);
+   if (rc >= 0)  {
+      IF_SILENT         strcat (g_print, " (silent)");
+      else IF_CONFIRM   strcat (g_print, " (confirm)");
+      else IF_VERBOSE   strcat (g_print, " (verbose)");
+      else {
+         strcat (g_print, " (unknown)");
+         x_flag = 'y';
+      }
    }
-   IF_SILENT         strcat (a_print, " (silent)");
-   else IF_CONFIRM   strcat (a_print, " (confirm)");
-   else IF_VERBOSE   strcat (a_print, " (verbose)");
-   else {
-      strcat (a_print, " (unknown)");
-      x_flag = 'y';
-   }
-   if (x_flag == 'y') return -10;
+   return g_print;
+}
+
+char* yJOBS_mode (void) { return yjobs_iam (g_runmode); }
+
+char
+yJOBS_wrap              (void)
+{
+   yjobs_world__purge ();
    return 0;
 }
 
@@ -212,39 +345,12 @@ yjobs_base__unit        (char *a_question)
    strncpy  (unit_answer, "BASE             : question not understood", LEN_RECD);
    /*---(simple)-------------------------*/
    if      (strcmp (a_question, "mode"    )        == 0) {
-      yJOBS_iam  (g_runas  , s);
-      yJOBS_mode (g_runmode, t);
+      strlcpy (s, yJOBS_iam  (), LEN_RECD);
+      strlcpy (t, yJOBS_mode (), LEN_RECD);
       snprintf (unit_answer, LEN_RECD, "BASE mode        : iam (%c) %-18.18s, run (%c) %-18.18s, å%sæ", g_runas, s, g_runmode, t, g_runfile);
    }
    /*---(complete)-----------------------*/
    return unit_answer;
-}
-
-char       /*----: set up program urgents/debugging --------------------------*/
-yjobs__unit_quiet       (void)
-{
-   yLOGS_begin ("yJOBS", YLOG_SYS, YLOG_QUIET);
-   yURG_err_none ();
-   yURG_msg_none ();
-   return 0;
-}
-
-char       /*----: set up program urgents/debugging --------------------------*/
-yjobs__unit_loud        (void)
-{
-   yLOGS_begin   ("yJOBS", YLOG_SYS, YLOG_NOISE);
-   yURG_name     ("yjobs", YURG_ON);
-   yURG_err_none ();
-   yURG_msg_none ();
-   DEBUG_YEXEC  yLOG_info     ("yJOBS"     , yJOBS_version   ());
-   return 0;
-}
-
-char       /*----: stop logging ----------------------------------------------*/
-yjobs__unit_end         (void)
-{
-   yLOGS_end     ();
-   return 0;
 }
 
 
