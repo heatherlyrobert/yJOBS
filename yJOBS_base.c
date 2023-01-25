@@ -3,25 +3,55 @@
 #include   "yJOBS_priv.h"
 
 
-tLOCAL myJOBS;
+tLOCAL myJOBS = { '-', '-' };
 
+
+/*
+ *
+ *       ƒ€€€€€€€€€€€€€€€€€€€ 10 system daemon/utils designed for yJOBS €€€€€€€€€€€€€€€€€€€€€€€‚
+ *       Œ                                                                                     Œ
+ *       Œ  eos           system start-up             eos-rhododactylos (rosy-fingered dawn)   Œ
+ *       Œ  astraios      system shut-down            astraios-aeolus (sparkling wind-father)  Œ
+ *       Œ  hypnos        system hybernation          hypnos-epidotes (giver of sleep)         Œ
+ *       Œ                                                                                     Œ
+ *       Œ  heracles      requested job execution     heracles-promachus (leader in battle)    Œ
+ *       Œ  khronos       scheduled job execution     khronos-anileis (merciless time)         Œ
+ *       Œ                                                                                     Œ
+ *       Œ  polymnia      source code analysis        polymnia-hymnos (many praises)           Œ
+ *       Œ  metis         task management             metis-okeanides (wise-counsel)           Œ
+ *       Œ                                                                                     Œ
+ *       Œ  helios        file location               helios-phaeton (radiant)                 Œ
+ *       Œ  hermes        executable control          hermes-diactoros (messenger of gods)     Œ
+ *       Œ  themis        configuration control       themis-euboulos (divine law)             Œ
+ *       Œ                                                                                     Œ
+ *       ‡€€€€€€€€€€€€€€€€€€€€ examples of specifically excluded daemons €€€€€€€€€€€€€€€€€€€€€€†
+ *       Œ                                                                                     Œ
+ *       Œ  kharon        process one                 kharon-charopos (the ferryman)           Œ
+ *       Œ  hestia        getty daemon                hestia-polyolbos (full of blessings)     Œ
+ *       Œ                                                                                     Œ
+ *       „€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€…
+ *
+ *
+ *
+ */
 
 const tWHO  g_whos [MAX_WHO] = {
    /* primary--------  unittest-------  name------ , installed----------- , description----------------------------------------    allowed-actions-----------------  */
-   /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vbui lLòcaf ktw yz qxre gdpnsh -  , loc  cen   123456789-123456789-12345 ,  123456789-123456789-12345   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- ,  database------------ , */
-   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , ""                    },
-   {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , ""                    },
-   {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "--· F··F ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , ""                    }, 
-   {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "--- F··F --·F-- ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
-   {  IAM_KHRONOS    , IAM_UKHRONOS   , "khronos"  , "/sbin/"             , "khronos-anileis (merciless time)"                  , "--- F··F --·F-- ··· ·· ·FFF ·----- -" , 'y', 'y', "/var/spool/khronos/"      , "/tmp/spool/khronos/"      , "khronos."   , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
-   {  IAM_POLYMNIA   , IAM_UPOLYMNIA  , "polymnia" , "/usr/local/bin/"    , "polymnia-hymnos (many praises)"                    , "-·- ---- ··F--- ··· ·· ---· -····· -" , '·', '·', ""                         , ""                         , ""           , ""           , ""           , ""                , "/var/lib/polymnia/"       , "/tmp/lib/polymnia/"       , "world.txt"           , "polymnia.db"         }, 
-   {  IAM_METIS      , IAM_UMETIS     , "metis"    , "/usr/local/bin/"    , "metis-okeanides (wise-counsel)"                    , "-·- FFFF ··F--- ··· ·· FFFF ------ -" , 'y', '·', ""                         , ""                         , ""           , ""           , ".tasks"     , ""                , "/var/lib/metis/"          , "/tmp/lib/metis/"          , "world.txt"           , "metis.db"            },
-   {  IAM_HELIOS     , IAM_UHELIOS    , "helios"   , "/sbin/"             , "helios-phaeton (radiant)"                          , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "helios."    , "helios."    , ".conf"      , "helios.conf"     , "/var/lib/helios/"         , "/tmp/lib/helios/"         , ""                    , "helios.db"           }, 
-   {  IAM_HERMES     , IAM_UHERMES    , "hermes"   , "/sbin/"             , "hermes-diactoros (messenger of gods)"              , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hermes."    , "hermes."    , ".conf"      , "hermes.conf"     , "/var/lib/hermes/"         , "/tmp/lib/hermes/"         , ""                    , ""                    }, 
-   {  IAM_THEMIS     , IAM_UTHEMIS    , "themis"   , "/sbin/"             , "themis-euboulos (divine law)"                      , "-·- F··F ···--- ··· ·· ···- -····· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "themis."    , "themis."    , ".conf"      , "themis.conf"     , "/var/lib/themis/"         , "/tmp/lib/themis/"         , ""                    , ""                    }, 
-   {  0              , 0              , "--end--"  , "--end--"            , "--end--"                                           , "··· ···· ······ ··· ·· ···· ······ ·" , '·', '·', "--end--"                  , "--end--"                  , ""           , ""           , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+   /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vòbui #=ócaf ktw yz qxre gdpnsh -  , loc  cen   123456789-123456789-12345 ,  123456789-123456789-12345   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- ,  database------------ , */
+   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "-·· F··FF ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , ""                    },
+   {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "-·· F··FF ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , ""                    },
+   {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "-·· F··FF ···--- ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , ""                    }, 
+   {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "-·· F··FF --·F-- ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+   {  IAM_KHRONOS    , IAM_UKHRONOS   , "khronos"  , "/usr/sbin/"         , "khronos-anileis (merciless time)"                  , "--· F··FF --FF-- ··· ·· ·FFF ·----- -" , 'y', 'y', "/var/spool/khronos/"      , "/tmp/spool/khronos/"      , "khronos."   , "(USER)."    , ""           , ""                , "/var/lib/khronos/"        , "/tmp/lib/khronos/"        , ""                    , ""                    }, 
+   {  IAM_POLYMNIA   , IAM_UPOLYMNIA  , "polymnia" , "/usr/local/bin/"    , "polymnia-hymnos (many praises)"                    , "--· ----- --F·-- ··· ·· ---· -··--· -" , '·', '·', ""                         , ""                         , ""           , ""           , ""           , ""                , "/var/lib/polymnia/"       , "/tmp/lib/polymnia/"       , "world.txt"           , "polymnia.db"         }, 
+   {  IAM_METIS      , IAM_UMETIS     , "metis"    , "/usr/local/bin/"    , "metis-okeanides (wise-counsel)"                    , "-·· FFFFF --F--- ··· ·· FFFF -··--· -" , 'y', '·', ""                         , ""                         , ""           , ""           , ".tasks"     , ""                , "/var/lib/metis/"          , "/tmp/lib/metis/"          , "world.txt"           , "metis.db"            },
+   {  IAM_HELIOS     , IAM_UHELIOS    , "helios"   , "/sbin/"             , "helios-phaeton (radiant)"                          , "-·· F··FF -·F--- ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "helios."    , "helios."    , ".conf"      , "helios.conf"     , "/var/lib/helios/"         , "/tmp/lib/helios/"         , ""                    , "helios.db"           }, 
+   {  IAM_HERMES     , IAM_UHERMES    , "hermes"   , "/sbin/"             , "hermes-diactoros (messenger of gods)"              , "-·· F··FF -·F--- ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hermes."    , "hermes."    , ".conf"      , "hermes.conf"     , "/var/lib/hermes/"         , "/tmp/lib/hermes/"         , ""                    , "hermes.db"           }, 
+   {  IAM_THEMIS     , IAM_UTHEMIS    , "themis"   , "/sbin/"             , "themis-euboulos (divine law)"                      , "-·· F··FF -·F--- ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "themis."    , "themis."    , ".conf"      , "themis.conf"     , "/var/lib/themis/"         , "/tmp/lib/themis/"         , ""                    , "themis.db"           }, 
+   {  0              , 0              , "--end--"  , "--end--"            , "--end--"                                           , "··· ····· ······ ··· ·· ···· ······ ·" , '·', '·', "--end--"                  , "--end--"                  , ""           , ""           , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
 };
 
+static const char *g_nada = "";
 
 
 /*====================------------------------------------====================*/
@@ -210,7 +240,7 @@ yjobs_who_testing       (cchar a_runas)
 static void      o___IDENTIFY________________o (void) {;};
 
 char
-yJOBS_runas             (cchar *a_name, char *r_runas)
+yjobs_runas             (cchar *a_name, char *r_runas)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -219,12 +249,16 @@ yJOBS_runas             (cchar *a_name, char *r_runas)
    char        t           [LEN_HUND]  = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   if (g_runas == IAM_DEFAULT) {
-      rc = yjobs_world_init ();
-   }
    /*---(default)------------------------*/
+   myJOBS.m_runas   = IAM_DEFAULT;
    if (r_runas != NULL)  *r_runas = IAM_DEFAULT;
+   /*---(prepare)------------------------*/
+   rc = yjobs_world_init ();
+   DEBUG_YJOBS  yLOG_point   ("world"     , rc);
+   rc = yjobs_args_init (r_runas, NULL, NULL);
+   DEBUG_YJOBS  yLOG_point   ("args"      , rc);
+   /*---(clear summary)------------------*/
+   for (i = 0; i < MAX_SUMM; ++i)   myJOBS.m_summary [i] = g_nada;
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_point   ("a_name"    , a_name);
    --rce;  if (a_name == NULL) {
@@ -241,35 +275,76 @@ yJOBS_runas             (cchar *a_name, char *r_runas)
       }
       /*---(normal)----------------------*/
       if (strcmp (a_name, g_whos [i].name) == 0) {
-         DEBUG_YJOBS  yLOG_note    ("found an unqualified normal entry");
-         g_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
+         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_char    ("normal"    , myJOBS.m_runas);
          break;
       }
       /*---(qualified)-------------------*/
       sprintf (t, "%s%s"   , g_whos [i].inst, g_whos [i].name);
       if (strcmp (a_name, t) == 0) {
-         DEBUG_YJOBS  yLOG_note    ("found an qualified normal entry");
-         g_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
+         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_char    ("qualified" , myJOBS.m_runas);
          break;
       }
       /*---(debug)-----------------------*/
       sprintf (t, "%s_debug", g_whos [i].name);
       if (strcmp (a_name, t) == 0) {
-         DEBUG_YJOBS  yLOG_note    ("found a debugging entry");
-         g_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
+         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_char    ("debug"     , myJOBS.m_runas);
          break;
       }
       /*---(unittest)--------------------*/
       sprintf (t, "%s_unit", g_whos [i].name);
       if (strcmp (a_name, t) == 0) {
-         DEBUG_YJOBS  yLOG_note    ("found a unit testing entry");
-         g_runas = g_whos [i].unit;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
+         myJOBS.m_runas = g_whos [i].unit;
+         DEBUG_YJOBS  yLOG_char    ("unittest"  , myJOBS.m_runas);
          break;
       }
       /*---(done)------------------------*/
    }
    /*---(save-back)----------------------*/
-   if (r_runas != NULL)  *r_runas = g_runas;
+   if (r_runas != NULL)  *r_runas = myJOBS.m_runas;
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
+yJOBS_runas             (cchar *a_name, char *r_runas, ...)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   va_list     x_args;
+   int         i           =    0;
+   char        n           =    0;
+   uchar      *x_str       = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(call runas)---------------------*/
+   rc =  yjobs_runas (a_name, r_runas);
+   DEBUG_YJOBS  yLOG_value   ("runas"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(parse extra data)---------------*/
+   va_start   (x_args, r_runas);
+   for (i = 0; i < MAX_SUMM; ++i) {
+      x_str = (char *) va_arg (x_args, int*);
+      if (x_str == NULL)  break;
+      ++n;
+      myJOBS.m_summary [i] = x_str;
+      DEBUG_YJOBS  yLOG_complex ("summary"   , "%2d å%sæ", i, myJOBS.m_summary [i]);
+   }
+   va_end     (x_args);
+   /*---(summary)------------------------*/
+   DEBUG_YJOBS  yLOG_value   ("n"         , n);
+   myJOBS.m_nsummary = n;
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -295,29 +370,25 @@ yjobs_iam               (char a_runas)
    return g_print;
 }
 
-char* yJOBS_iam  (void) { return yjobs_iam (g_runas); }
+char* yJOBS_iam  (void) { return yjobs_iam (myJOBS.m_runas); }
 
 char*
 yjobs_mode              (char a_mode)
 {
    char        rce         =  -10;
    char        rc          =    0;
-   char        x_flag      =  '-';
    strlcpy (g_print, "unknown (unknown)", LEN_LABEL);
    rc = yjobs_args_info         (a_mode, g_print);
    if (rc >= 0)  {
-      IF_SILENT         strcat (g_print, " (silent)");
-      else IF_CONFIRM   strcat (g_print, " (confirm)");
-      else IF_VERBOSE   strcat (g_print, " (verbose)");
-      else {
-         strcat (g_print, " (unknown)");
-         x_flag = 'y';
-      }
+      if      (strchr (g_silent , a_mode) != NULL)  strlcat (g_print, " (silent)" , LEN_DESC);
+      else if (strchr (g_confirm, a_mode) != NULL)  strlcat (g_print, " (confirm)", LEN_DESC);
+      else if (strchr (g_verbose, a_mode) != NULL)  strlcat (g_print, " (verbose)", LEN_DESC);
+      else                                          strlcat (g_print, " (unknown)", LEN_DESC);
    }
    return g_print;
 }
 
-char* yJOBS_mode (void) { return yjobs_iam (g_runmode); }
+char* yJOBS_mode (void) { return yjobs_mode (myJOBS.m_mode); }
 
 char
 yJOBS_wrap              (void)
@@ -347,7 +418,7 @@ yjobs_base__unit        (char *a_question)
    if      (strcmp (a_question, "mode"    )        == 0) {
       strlcpy (s, yJOBS_iam  (), LEN_RECD);
       strlcpy (t, yJOBS_mode (), LEN_RECD);
-      snprintf (unit_answer, LEN_RECD, "BASE mode        : iam (%c) %-18.18s, run (%c) %-18.18s, å%sæ", g_runas, s, g_runmode, t, g_runfile);
+      snprintf (unit_answer, LEN_RECD, "BASE mode        : iam (%c) %-18.18s, run (%c) %-18.18s, å%sæ", myJOBS.m_runas, s, myJOBS.m_mode, t, myJOBS.m_file);
    }
    /*---(complete)-----------------------*/
    return unit_answer;

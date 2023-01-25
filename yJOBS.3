@@ -16,10 +16,10 @@ yJOBS is a personal shared library created to standardize command line
 arguments for service daemons, the flow of execution for the resulting
 actions, and the nature and verbosity of feedback.
 
-.SH CRAZY, NIAVE, DOG-FOODING, BOOT-STRAPPING ANIMAL
-i am not competing to be the best.  i created this to understand, learn,
-and own every byte.  it's optimized for transparency and debugging.  if i
-wanted awesome, fast, and cutting-edge, i'd use yours ;)
+.SH CRAZY, NAIVE, DOG-FOODING, BOOT-STRAPPING ANIMAL
+i am not competing to be the best.  i created this to learn deeply and own
+every byte.  it's optimized for transparency and debugging.  if i wanted
+awesome, fast, and cutting-edge, i'd use yours ;)
 
 .SH DOCUMENTATION FILES (see also)
 .nf  
@@ -33,9 +33,11 @@ yJOBS (7)           decision rationale, scope, and objectives
 a) synopsis         standard public function overview
 b) heads-up         upfront notes
 c) baseline use     recommended base usage
-d) assimilation     stand-alone assimilation
-e) driving          stand-alone driving
-f) debugging        external program testing and debugging
+d) callback         overall design of callback routine
+e) common use       recommended base usage
+f) assimilation     stand-alone assimilation
+g) driving          stand-alone driving
+h) debugging        external program testing and debugging
 
 .SH A) SYNOPSIS
 .nf
@@ -45,13 +47,15 @@ f) debugging        external program testing and debugging
 .sp
 ---(baseline use)------------------------------
 .sp
-.BI "char *yJOBS_version   (void);"
+.BI "char  yJOBS_runas     (cchar *" "a_name" ", char *" "r_runas" ",  ...);"
 .sp
-.BI "char  yJOBS_runas     (cchar *" "a_name" ", char *" "r_runas " ");"
-.sp
-.BI "char  yJOBS_argument  (int *" "i" ", char *" "a_arg" ", char *" "a_next" ","
+.BI "char  yJOBS_argument  (int *" "b_pos" ", cchar *" "a_arg" ", cchar *" "a_next" ","
 .BI " " "                        " "char *" "r_runas" ", char *" "r_mode" ", char *" "r_file" ");"
-.BI "char  yJOBS_driver    (char *" "a_oneline" ", void *" "f_assim" ", void *" "f_run" ");"
+.BI "char  yJOBS_driver    (cchar *" "a_oneline" ", void *" "f_callback" ");"
+.sp
+---(common use)--------------------------------
+.sp
+.BI "char *yJOBS_version   (void);"
 .sp
 .BI "char  yJOBS_wrap      (void);"
 .sp
@@ -109,13 +113,7 @@ yJOBS has most of the capabilities required built-in to adapt to my different
 uses.  when adding a new program, i need to edit some tables and maybe adapt;
 but, that's about it.
 
-.BI "char *yJOBS_version   (void);"
-.RS 3
-simply returns a character string with the compiler name, version number,
-and version description.  very useful for debugging.
-.RE
-
-.BI "char  yJOBS_runas     (cchar *" "a_name" ", ´´´>"
+.BI "char  yJOBS_runas     (cchar *" "a_name" ", char *" "r_runas" ", ´´´>"
 .RS 3
 call this functions as soon as possible, before argument processing. it
 typically, accepts argv [0] as the name and assigns a runas code based on
@@ -123,6 +121,10 @@ which program is calling.
 .sp
 the return pointer argument may be NULL, but it allows key information to flow back
 to your program, if desired.
+.sp
+variable number of summary description strings (up to 40) of my standard
+program header.  these are passed to support the --about option.  use a
+terminal NULL to indicate the list is done.
 .RE
 
 .BI "char  yJOBS_argument  (int *" "i" ", char *" "a_arg" ", char *" "a_next" ", ´´´>"
@@ -138,19 +140,37 @@ the three return pointer arguments may be NULL, but they allow key information
 to flow back to your program, if desired.
 .RE
 
-.BI "char  yJOBS_finalize  (void);"
-.RS 3
-call this function after all arguments are processed.  it adjusts the verbosity
-level to match the selected options.  it also performs final security checks.
-.RE
-
-.BI "char  yJOBS_driver    (char *" "a_oneline" ", void *" "f_assim" ", void *" "f_run" ");"
+.BI "char  yJOBS_driver    (cchar *" "a_oneline" ", void *" "f_callback" ");"
 .RS 3
 call this function in main, after all startup processing is complete.
 the oneline is a text string identifying the program and purpose.
 .sp
-the two function pointers handle reading source files and executing them
-respectively.
+the callback function pointer handles program-side actions, such as database
+reading, file reading, auditing, etc.
+.RE
+
+.SH D) CALLBACK
+yJOBS does a majority of the coordination and lifting, but requires "services"
+to be provided from the source program that are very specific to its function.
+   1) read actual database                YJOBS_READ
+   2) write updated database              YJOBS_WRITE
+   3) read/verify input file details      YJOBS_PULL  
+   4) clear specific file from database   YJOBS_CLEAR
+   5) confirm database quality            YJOBS_AUDIT
+   6) write database statistics           YJOBS_STATS
+   7) write a specific database report    YJOBS_REPORT
+   8) write a specific local file report  YJOBS_LOCALRPT
+   9) mass gathering                      YJOBS_GATHER
+   a) extract a file to local             YJOBS_PUSH
+
+.SH E) COMMON USE
+these two functions are not technically required, but i used them in every
+program to keep things clean and tight.
+
+.BI "char *yJOBS_version   (void);"
+.RS 3
+simply returns a character string with the compiler name, version number,
+and version description.  very useful for debugging.
 .RE
 
 .BI "char  yJOBS_wrap      (void);"

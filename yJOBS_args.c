@@ -4,10 +4,6 @@
 
 
 
-char          g_runas       = '-';
-char          g_runmode     = '-';
-char          g_runfile     [LEN_PATH]  = "";
-char          g_oneline     [LEN_HUND]  = "";
 char          g_norun       = '-';
 char          g_noend       = '-';
 
@@ -20,16 +16,20 @@ char          g_valid       [LEN_DESC]  = "";
 char          g_unit        [LEN_DESC]  = "";
 char          g_etc         [LEN_DESC]  = "";
 /*---(verbosity)------------*/
+char          g_allmode     [LEN_HUND]  = "";
 char          g_silent      [LEN_DESC]  = "";
 char          g_confirm     [LEN_DESC]  = "";
 char          g_verbose     [LEN_DESC]  = "";
 /*---(incomming)------------*/
 char          g_verify      [LEN_SHORT] = "";
+char          g_localrpt    [LEN_SHORT] = "";
 char          g_register    [LEN_SHORT] = "";
 char          g_install     [LEN_SHORT] = "";
 char          g_update      [LEN_SHORT] = "";
 /*---(central)--------------*/
+char          g_stats       [LEN_SHORT] = "";
 char          g_list        [LEN_SHORT] = "";
+char          g_report      [LEN_SHORT] = "";
 char          g_check       [LEN_SHORT] = "";
 char          g_audit       [LEN_SHORT] = "";
 char          g_fix         [LEN_SHORT] = "";
@@ -43,13 +43,55 @@ char          g_upload      [LEN_SHORT] = "";
 char          g_download    [LEN_SHORT] = "";
 /*---(execution)------------*/
 char          g_gather      [LEN_SHORT] = "";
+char          g_running     [LEN_LABEL] = "";
+char          g_daemony     [LEN_LABEL] = "";
 char          g_daemon      [LEN_SHORT] = "";
 char          g_prickly     [LEN_SHORT] = "";
 char          g_normal      [LEN_SHORT] = "";
 char          g_strict      [LEN_SHORT] = "";
 char          g_reload      [LEN_SHORT] = "";
+/*---(done)-----------------*/
 
 
+
+/*
+ *
+ *
+ *      
+ *       ƒ·············· yJOBS standard request set (28) ················‚
+ *            
+ *                                   ƒ€€€€€€€€€‚
+ *                                   Œ version Œ
+ *                                   Œ about   Œ
+ *           ƒ····                  3„€€€€‰€€€€…                ····‚
+ *           Œ  ƒ··········‚              Œ                         Œ
+ *           Œ   verify                 Œ                         Œ
+ *           Œ   local                  Œ           ƒ··········‚  Œ
+ *           Œ   register ‡€€>>>€€€€€€€‚ Œ ƒ€€€€>>>€€† backup     Œ
+ *           Œ   update            ƒ€€ˆ€ˆ€ˆ€€‚       upload     Œ
+ *           Œ   install          6Œ stats   Œ     2„··········…  Œ
+ *           Œ  „··········…5        Œ list    Œ                    Œ
+ *         local                     Œ report  Œ                 cloud
+ *           Œ                       Œ check   Œ                    Œ
+ *           Œ  ƒ··········‚4        Œ audit   Œ                    Œ
+ *           Œ   withdraw          Œ fix     Œ     2ƒ··········‚  Œ
+ *           Œ   clear             „€€‰€‰€‰€€…       restore    Œ
+ *           Œ   remove   ‡€€<<<€€€€€€€…  „€€€€<<<€€† download   Œ
+ *           Œ   extract                           „··········…  Œ
+ *           Œ  „··········…                                       Œ
+ *           „····                  6ƒ€€€€ˆ€€€€‚                ····…
+ *                                   Œ gather  Œ
+ *                                   Œ daemon  Œ
+ *                                   Œ prickly Œ
+ *                                   Œ normal  Œ
+ *                                   Œ strict  Œ
+ *                                   Œ reload  Œ
+ *                                   „€€€€€€€€€…
+ *
+ *
+ *
+ *
+ */
 
 
 #define     MAX_OPTS    60
@@ -59,49 +101,51 @@ struct cOPTS {
    char        levels      [LEN_SHORT];
    char        desc        [LEN_DESC];
    char        offset;
+   char        run;
    char        where;
 };
 static const tOPTS   s_opts [MAX_OPTS] = {
-   /*---(information)--------------------*/
-   { "version"  , "1··", "present a short versioning string"            ,   0, YJOBS_NEITHER  },
-   { "help"     , "2··", "present a simple help message"                ,   1, YJOBS_NEITHER  },
-   { "stats"    , "3··", "give basic information about database"        ,   2, YJOBS_NEITHER  },
-   /*---(upward)-------------------------*/
-   { "verify"   , "vÑV", "verify local file for correctness"            ,   4, YJOBS_LOCAL    },
-   { "register" , "béB", "verify local file and register centrally"     ,   5, YJOBS_LOCAL    },
-   { "update"   , "uûU", "update central with single file"              ,   6, YJOBS_LOCAL    },
-   { "install"  , "iðI", "verify local file, then install centrally"    ,   7, YJOBS_LOCAL    },
-   /*---(central)------------------------*/
-   { "count"    , "l··", "count all user-applicable central files"      ,   9, YJOBS_CENTRAL  },
-   { "list"     , "L··", "list all user-applicable central files"       ,  10, YJOBS_CENTRAL  },
-   { "report"   , "ò··", "report on central database"                   ,  11, YJOBS_CENTRAL  },
-   { "check"    , "cýC", "check central file for correctness"           ,  12, YJOBS_CENTRAL  },
-   { "audit"    , "aèA", "audit central environment and all its files"  ,  13, YJOBS_CENTRAL  },
-   { "fix"      , "füF", "audit central environment and fix issues"     ,  14, YJOBS_CENTRAL  },
+   /*---(informational 3)----------------*/
+   { "version"  , "1··", "present a short versioning string"            ,   0, '-', YJOBS_NEITHER  },
+   { "about"    , "2··", "key information about program"                ,   1, '-', YJOBS_NEITHER  },
+   { "help"     , "3··", "present a simple help message"                ,   2, '-', YJOBS_NEITHER  },
+   /*---(incomming 5)--------------------*/
+   { "verify"   , "vÑV", "verify local file for correctness"            ,   4, '-', YJOBS_LOCAL    },
+   { "local"    , "lòL", "report on local content"                      ,   5, '-', YJOBS_LOCAL    },
+   { "register" , "béB", "verify local file and register centrally"     ,   6, '-', YJOBS_LOCAL    },
+   { "update"   , "uûU", "update central with single file"              ,   7, '-', YJOBS_LOCAL    },
+   { "install"  , "iðI", "verify local file, then install centrally"    ,   8, '-', YJOBS_LOCAL    },
+   /*---(maintain 6)---------------------*/
+   { "stats"    , "#··", "information about database and environment"   ,  10, '-', YJOBS_CENTRAL  },
+   { "list"     , "=··", "list of executable content"                   ,  11, '-', YJOBS_CENTRAL  },
+   { "report"   , "móM", "report on central database"                   ,  12, '-', YJOBS_CENTRAL  },
+   { "check"    , "cýC", "check central file for correctness"           ,  13, '-', YJOBS_CENTRAL  },
+   { "audit"    , "aèA", "audit central environment and all its files"  ,  14, '-', YJOBS_CENTRAL  },
+   { "fix"      , "füF", "audit central environment and fix issues"     ,  15, '-', YJOBS_CENTRAL  },
    /*---(epic)---------------------------*/
-   { "backup"   , "kñK", "backup the central system"                    ,  16, YJOBS_CENTRAL  },
-   { "restore"  , "túT", "restore the central system from backup"       ,  17, YJOBS_CENTRAL  },
-   { "purge"    , "wÿW", "wipe clean entire central system"             ,  18, YJOBS_CENTRAL  },
+   { "backup"   , "kñK", "backup the central system"                    ,  17, '-', YJOBS_CENTRAL  },
+   { "restore"  , "túT", "restore the central system from backup"       ,  18, '-', YJOBS_CENTRAL  },
+   { "purge"    , "wÿW", "wipe clean entire central system"             ,  19, '-', YJOBS_CENTRAL  },
    /*---(elsewhere)----------------------*/
-   { "upload"   , "yïY", "from elsewhere to central"                    ,  20, YJOBS_CENTRAL  },
-   { "download" , "zíZ", "from central to elsewhere"                    ,  21, YJOBS_CENTRAL  },
-   /*---(downward)-----------------------*/
-   { "withdraw" , "qþQ", "unregister centrally"                         ,  23, YJOBS_CENTRAL  },
-   { "clear"    , "xõX", "clear file from central location"             ,  24, YJOBS_CENTRAL  },
-   { "remove"   , "røR", "remove file from central location"            ,  25, YJOBS_CENTRAL  },
-   { "extract"  , "eìE", "extract a central file to local copy"         ,  26, YJOBS_CENTRAL  },
+   { "upload"   , "yïY", "from elsewhere to central"                    ,  21, '-', YJOBS_CENTRAL  },
+   { "download" , "zíZ", "from central to elsewhere"                    ,  22, '-', YJOBS_CENTRAL  },
+   /*---(outgoing 4)---------------------*/
+   { "withdraw" , "qþQ", "unregister centrally"                         ,  24, '-', YJOBS_CENTRAL  },
+   { "clear"    , "xõX", "clear file from central location"             ,  25, '-', YJOBS_CENTRAL  },
+   { "remove"   , "røR", "remove file from central location"            ,  26, '-', YJOBS_CENTRAL  },
+   { "extract"  , "eìE", "extract a central file to local copy"         ,  27, '-', YJOBS_CENTRAL  },
    /*---(execution)----------------------*/
-   { "gather"   , "gêG", "execute system-wide data gather"              ,  28, YJOBS_NEITHER  },
-   { "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  29, YJOBS_NEITHER  },
-   { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  30, YJOBS_NEITHER  },
-   { "normal"   , "nôN", "execute specific file in normal-mode"         ,  31, YJOBS_NEITHER  },
-   { "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  32, YJOBS_NEITHER  },
-   { "reload"   , "hîH", "send signal to reload daemon"                 ,  33, YJOBS_NEITHER  },
+   { "gather"   , "gêG", "execute system-wide data gather"              ,  29, '-', YJOBS_NEITHER  },
+   { "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  30, 'y', YJOBS_NEITHER  },
+   { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  31, 'y', YJOBS_NEITHER  },
+   { "normal"   , "nôN", "execute specific file in normal-mode"         ,  32, 'y', YJOBS_NEITHER  },
+   { "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  33, 'y', YJOBS_NEITHER  },
+   { "reload"   , "hîH", "send signal to reload daemon"                 ,  34, '-', YJOBS_NEITHER  },
    /*---(unit testing)-------------------*/
-   { "testing"  , "j··", "change to test directories"                   ,  35, YJOBS_NEITHER  },
-   { "norun"    , "-··", "daemons only load data"                       ,   0, YJOBS_NEITHER  },
+   { "testing"  , "j··", "change to test directories"                   ,  36, '-', YJOBS_NEITHER  },
+   { "norun"    , "-··", "daemons only load data"                       ,   0, '-', YJOBS_NEITHER  },
    /*---(sentinal)-----------------------*/
-   { ""         , "···", ""                                             ,   0, YJOBS_NEITHER  },
+   { ""         , "···", ""                                             ,   0, '-', YJOBS_NEITHER  },
    /*---(done)---------------------------*/
 };
 
@@ -153,22 +197,29 @@ yjobs_args__empty       (void)
    strlcpy (g_unit    , "", LEN_DESC);
    strlcpy (g_etc     , "", LEN_DESC);
    /*---(verbosity)----------------------*/
+   strlcpy (g_allmode , "", LEN_HUND);
    strlcpy (g_silent  , "", LEN_DESC);
    strlcpy (g_confirm , "", LEN_DESC);
    strlcpy (g_verbose , "", LEN_DESC);
    /*---(incomming)----------------------*/
    strlcpy (g_verify  , "", LEN_SHORT);
+   strlcpy (g_local   , "", LEN_SHORT);
    strlcpy (g_register, "", LEN_SHORT);
    strlcpy (g_install , "", LEN_SHORT);
    strlcpy (g_update  , "", LEN_SHORT);
    /*---(central)------------------------*/
    strlcpy (g_list    , "", LEN_SHORT);
+   strlcpy (g_stats   , "", LEN_SHORT);
+   strlcpy (g_report  , "", LEN_SHORT);
    strlcpy (g_check   , "", LEN_SHORT);
    strlcpy (g_audit   , "", LEN_SHORT);
    strlcpy (g_fix     , "", LEN_SHORT);
+   /*---(cloud)--------------------------*/
+   strlcpy (g_upload  , "", LEN_SHORT);
+   strlcpy (g_download, "", LEN_SHORT);
    /*---(outgoing)-----------------------*/
-   strlcpy (g_clear   , "", LEN_SHORT);
    strlcpy (g_withdraw, "", LEN_SHORT);
+   strlcpy (g_clear   , "", LEN_SHORT);
    strlcpy (g_remove  , "", LEN_SHORT);
    strlcpy (g_extract , "", LEN_SHORT);
    /*---(transfer)-----------------------*/
@@ -176,6 +227,8 @@ yjobs_args__empty       (void)
    strlcpy (g_download, "", LEN_SHORT);
    /*---(execution)----------------------*/
    strlcpy (g_gather  , "", LEN_SHORT);
+   strlcpy (g_running , "", LEN_LABEL);
+   strlcpy (g_daemony , "", LEN_LABEL);
    strlcpy (g_daemon  , "", LEN_SHORT);
    strlcpy (g_prickly , "", LEN_SHORT);
    strlcpy (g_normal  , "", LEN_SHORT);
@@ -186,7 +239,7 @@ yjobs_args__empty       (void)
 }
 
 char
-yjobs_args__single      (char *a_levels, char n, char a_where)
+yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -208,45 +261,55 @@ yjobs_args__single      (char *a_levels, char n, char a_where)
    --rce;  if (strchr (g_verbose, c) != NULL) return rce;
    /*---(load correctly)-----------------*/
    sprintf (t, "%c", c);
+   strlcat (g_allmode, t, LEN_HUND);
    switch (n) {
    case  0  :   strlcat (g_silent , t, LEN_DESC);    break;
    case  1  :   strlcat (g_confirm, t, LEN_DESC);    break;
    case  2  :   strlcat (g_verbose, t, LEN_DESC);    break;
    }
+   if (a_run == 'y')        strlcat (g_running, t, LEN_LABEL);
    switch (a_where) {
    case  YJOBS_LOCAL    :   strlcat (g_local  , t, LEN_DESC);    break;
    case  YJOBS_CENTRAL  :   strlcat (g_central, t, LEN_DESC);    break;
    }
    /*---(load by action)-----------------*/
    switch (a_levels [0]) {
-   case 'v' :   strlcat (g_verify  , t, LEN_SHORT);   break;
-   case 'b' :   strlcat (g_register, t, LEN_SHORT);   break;
-   case 'i' :   strlcat (g_install , t, LEN_SHORT);   break;
-   case 'u' :   strlcat (g_update  , t, LEN_SHORT);   break;
-   case 'l' :   strlcat (g_list    , t, LEN_SHORT);   break;
-   case 'L' :   strlcat (g_list    , t, LEN_SHORT);   break;
-   case 'c' :   strlcat (g_check   , t, LEN_SHORT);   break;
-   case 'a' :   strlcat (g_audit   , t, LEN_SHORT);   break;
-   case 'f' :   strlcat (g_fix     , t, LEN_SHORT);   break;
-   case 'x' :   strlcat (g_clear   , t, LEN_SHORT);   break;
-   case 'q' :   strlcat (g_withdraw, t, LEN_SHORT);   break;
-   case 'r' :   strlcat (g_remove  , t, LEN_SHORT);   break;
-   case 'e' :   strlcat (g_extract , t, LEN_SHORT);   break;
-   case 'y' :   strlcat (g_upload  , t, LEN_SHORT);   break;
-   case 'z' :   strlcat (g_download, t, LEN_SHORT);   break;
-   case 'g' :   strlcat (g_gather  , t, LEN_SHORT);   break;
-   case 'd' :   strlcat (g_daemon  , t, LEN_SHORT);   break;
-   case 'p' :   strlcat (g_prickly , t, LEN_SHORT);   break;
-   case 'n' :   strlcat (g_normal  , t, LEN_SHORT);   break;
-   case 's' :   strlcat (g_strict  , t, LEN_SHORT);   break;
-   case 'h' :   strlcat (g_reload  , t, LEN_SHORT);   break;
+
+   case ACT_VERIFY   :   strlcat (g_verify  , t, LEN_SHORT);   break;
+   case ACT_LOCALRPT :   strlcat (g_localrpt, t, LEN_SHORT);   break;
+   case ACT_REGISTER :   strlcat (g_register, t, LEN_SHORT);   break;
+   case ACT_INSTALL  :   strlcat (g_install , t, LEN_SHORT);   break;
+   case ACT_UPDATE   :   strlcat (g_update  , t, LEN_SHORT);   break;
+
+   case ACT_STATS    :   strlcat (g_stats   , t, LEN_SHORT);   break;
+   case ACT_LIST     :   strlcat (g_list    , t, LEN_SHORT);   break;
+   case ACT_REPORT   :   strlcat (g_report  , t, LEN_SHORT);   break;
+   case ACT_CHECK    :   strlcat (g_check   , t, LEN_SHORT);   break;
+   case ACT_AUDIT    :   strlcat (g_audit   , t, LEN_SHORT);   break;
+   case ACT_FIX      :   strlcat (g_fix     , t, LEN_SHORT);   break;
+
+   case ACT_UPLOAD   :   strlcat (g_upload  , t, LEN_SHORT);   break;
+   case ACT_DOWNLOAD :   strlcat (g_download, t, LEN_SHORT);   break;
+
+   case ACT_WITHDRAW :   strlcat (g_withdraw, t, LEN_SHORT);   break;
+   case ACT_CLEAR    :   strlcat (g_clear   , t, LEN_SHORT);   break;
+   case ACT_REMOVE   :   strlcat (g_remove  , t, LEN_SHORT);   break;
+   case ACT_EXTRACT  :   strlcat (g_extract , t, LEN_SHORT);   break;
+
+   case ACT_GATHER   :   strlcat (g_gather  , t, LEN_SHORT);   break;
+   case ACT_DAEMON   :   strlcat (g_daemon  , t, LEN_SHORT);   strlcat (g_daemony , t, LEN_LABEL);   break;
+   case ACT_PRICKLY  :   strlcat (g_prickly , t, LEN_SHORT);   strlcat (g_daemony , t, LEN_LABEL);   break;
+   case ACT_NORMAL   :   strlcat (g_normal  , t, LEN_SHORT);   break;
+   case ACT_STRICT   :   strlcat (g_strict  , t, LEN_SHORT);   break;
+   case ACT_RELOAD   :   strlcat (g_reload  , t, LEN_SHORT);   break;
+
    }
    /*---(complete)-----------------------*/
    return 0;
 }
 
 char
-yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile)
+yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
@@ -262,20 +325,25 @@ yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile)
       p = s_opts [i].levels;
       DEBUG_YJOBS  yLOG_complex ("current"   , "%2d, %s, %s", i, s_opts [i].levels, s_opts [i].option);
       if (p [0] == '\0')  break;
-      if (rc >= 0)  rc = yjobs_args__single (p, 0, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, 0, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("0"         , rc);
-      if (rc >= 0)  rc = yjobs_args__single (p, 1, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, 1, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("1"         , rc);
-      if (rc >= 0)  rc = yjobs_args__single (p, 2, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, 2, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("2"         , rc);
       if (rc <  0)  break;
    }
-   g_runas   = a_runas;
-   g_runmode = a_runmode;
-   g_norun   = '-';
-   g_noend   = '-';
-   if (a_runfile != NULL) strcpy (g_runfile, a_runfile);
-   else                   strcpy (g_runfile, "");
+   if (r_runas != NULL)   *r_runas = myJOBS.m_runas;
+   myJOBS.m_mode = YJOBS_NEITHER;
+   if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
+   myJOBS.m_flag = '·';
+   strlcpy (myJOBS.m_file, "", LEN_DESC);
+   strlcpy (myJOBS.m_dir , "", LEN_PATH);
+   strlcpy (myJOBS.m_full, "", LEN_PATH);
+   if (r_file  != NULL)   strlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   g_norun   = YJOBS_NEITHER;
+   g_noend   = YJOBS_NEITHER;
+   DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
    DEBUG_YJOBS  yLOG_info    ("g_silent"  , g_silent);
    DEBUG_YJOBS  yLOG_info    ("g_confirm" , g_confirm);
    DEBUG_YJOBS  yLOG_info    ("g_verbose" , g_verbose);
@@ -284,43 +352,46 @@ yJOBS_args_init         (char a_runas, char a_runmode, char *a_runfile)
 }
 
 char
-yjobs_args__clearmode   (char *a_runas, char *a_runmode, char *a_runfile)
+yjobs_args__clearmode   (char *r_runas, char *r_mode, char *r_file)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   /*---(defense)------------------------*/
-   --rce;  if (a_runas   == NULL)  return rce;
-   --rce;  if (a_runmode == NULL)  return rce;
-   --rce;  if (a_runfile == NULL)  return rce;
    /*---(defaults)-----------------------*/
-   g_runas = *a_runas;
-   *a_runmode = g_runmode = '-';
-   strlcpy (a_runfile, "", LEN_PATH);
-   strlcpy (g_runfile, "", LEN_PATH);
+   if (r_runas != NULL)  *r_runas   = myJOBS.m_runas;
+   myJOBS.m_mode = YJOBS_NEITHER;
+   if (r_mode  != NULL)  *r_mode = YJOBS_NEITHER;
+   myJOBS.m_flag = '·';
+   strlcpy (myJOBS.m_file, "", LEN_DESC);
+   strlcpy (myJOBS.m_dir , "", LEN_PATH);
+   strlcpy (myJOBS.m_full, "", LEN_PATH);
+   if (r_file  != NULL)  strlcpy (r_file, "", LEN_DESC);
    /*---(complete)-----------------------*/
    return 0;
 }
 char
-yjobs_args__prepare     (char *a_runas, char *a_runmode, char *a_runfile, int *i, char *a_arg, char *a_next)
+yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, char *r_mode, char *r_file)
 { 
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(pointer defense)----------------*/
-   DEBUG_YJOBS  yLOG_point   ("a_runmode" , a_runmode);
-   --rce;  if (a_runmode == NULL) {
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+   /*---(defaults)-----------------------*/
+   DEBUG_YJOBS  yLOG_point   ("r_runas"   , r_runas);
+   if (r_runas != NULL)   *r_runas = myJOBS.m_runas;
+   DEBUG_YJOBS  yLOG_point   ("r_mode"    , r_mode);
+   if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
+   DEBUG_YJOBS  yLOG_point   ("r_file"    , r_file);
+   if (r_file  != NULL)   strlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", myJOBS.m_runas, g_valid);
+   --rce;  if (yJOBS_ifvalid () == 0) {
+      DEBUG_YJOBS   yLOG_note    ("runas not recognized");
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return rce;
    }
-   DEBUG_YJOBS  yLOG_point   ("a_runfile" , a_runfile);
-   --rce;  if (a_runfile == NULL) {
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_point   ("i"         , i);
-   --rce;  if (i         == NULL) {
+   DEBUG_YJOBS  yLOG_point   ("b_pos"     , b_pos);
+   --rce;  if (b_pos     == NULL) {
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -332,7 +403,7 @@ yjobs_args__prepare     (char *a_runas, char *a_runmode, char *a_runfile, int *i
    /*---(check reload)-------------------*/
    if (strcmp (g_silent, "") == 0) {
       DEBUG_YJOBS  yLOG_note    ("first run, will call init");
-      rc = yJOBS_args_init (*a_runas, *a_runmode, a_runfile);
+      rc = yjobs_args_init (r_runas, r_mode, r_file);
    }
    /*---(unit testing stuff)-------------*/
    if (strcmp (a_arg, "--norun") == 0) {
@@ -352,8 +423,8 @@ yjobs_args__prepare     (char *a_runas, char *a_runmode, char *a_runfile, int *i
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
-   --rce;  if (*a_runmode != '-') {
-      yURG_err ('F', "run action already set (%c), can not update to å%sæ", *a_runmode, a_arg);
+   --rce;  if (myJOBS.m_mode != '-') {
+      yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
@@ -363,7 +434,7 @@ yjobs_args__prepare     (char *a_runas, char *a_runmode, char *a_runfile, int *i
 }
 
 char
-yjobs_args__find        (char *a_runas, char *a_arg, char *n)
+yjobs_args__find        (char *a_arg, char *n, char *r_runas)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -378,6 +449,7 @@ yjobs_args__find        (char *a_runas, char *a_arg, char *n)
    if (n != NULL)  *n = -1;
    /*---(find action)--------------------*/
    for (j = 0; j < MAX_OPTS; ++j) {
+      DEBUG_YJOBS  yLOG_value   ("loop"      , j);
       p = s_opts [j].option;
       if (p [0] == '\0')  break;
       if (strcmp (a_arg + 2, p) == 0) {
@@ -399,9 +471,9 @@ yjobs_args__find        (char *a_runas, char *a_arg, char *n)
    /*---(handle non-existant)------------*/
    DEBUG_YJOBS  yLOG_char    ("c"         , c);
    --rce;  if (c == '?') {
-      yURG_err ('F', "action å%sæ not found in database", a_arg);
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
-      return '·';
+      yURG_msg ('-', "action å%sæ not found in database, maybe program specific", a_arg);
+      DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+      return c;
    }
    /*---(handle not-allowed)-------------*/
    DEBUG_YJOBS  yLOG_char    ("c"         , c);
@@ -411,20 +483,17 @@ yjobs_args__find        (char *a_runas, char *a_arg, char *n)
       return '·';
    }
    /*---(testing)------------------------*/
-   x_runas = yjobs_who_testing (*a_runas);
+   DEBUG_YJOBS  yLOG_char    ("m_runas"   , myJOBS.m_runas);
+   x_runas = yjobs_who_testing (myJOBS.m_runas);
+   DEBUG_YJOBS  yLOG_char    ("x_runas"   , x_runas);
    --rce;  if (c == ACT_TESTING) {
       if (x_runas == '?') {
-         yURG_err ('F', "testing version of for run-as (%c) not found", *a_runas);
+         yURG_err ('F', "testing version of for run-as (%c) not found", myJOBS.m_runas);
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return '·';
       }
-      *a_runas = g_runas = x_runas;
-   } else {
-      if (x_runas == '?') {
-         yURG_err ('F', "current runas (%c) is not found", *a_runas);
-         DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
-         return '·';
-      }
+      myJOBS.m_runas = x_runas;
+      if (r_runas != NULL)  *r_runas = x_runas;
    }
    /*---(save-back)----------------------*/
    if (n != NULL)  *n = s_opts [j].offset;
@@ -434,7 +503,7 @@ yjobs_args__find        (char *a_runas, char *a_arg, char *n)
 }
 
 char
-yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, char *r_mode, char *r_file)
+yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas, char *r_mode, char *r_file)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -448,7 +517,7 @@ yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, cha
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_args__prepare (r_runas, r_mode, r_file, i, a_arg, a_next);
+   rc = yjobs_args__prepare (b_pos, a_arg, a_next, r_runas, r_mode, r_file);
    DEBUG_YJOBS  yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
@@ -460,8 +529,12 @@ yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, cha
       return 1;
    }
    /*---(walk options)-------------------*/
-   x_act = yjobs_args__find (r_runas, a_arg, &n);
+   x_act = yjobs_args__find (a_arg, &n, r_runas);
    DEBUG_YJOBS  yLOG_char    ("x_act"     , x_act);
+   if (x_act == '?') {
+      DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
    --rce;  if (x_act == '·') {
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -469,36 +542,36 @@ yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, cha
    if (x_act == ACT_TESTING) {
       DEBUG_YJOBS  yLOG_note    ("handled --testing runas change");
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
-      return 0;
+      return 1;
    }
-   /*---(handle run as changnes)---------*/
-   g_runas = *r_runas;
    /*---(get file flag)------------------*/
-   f = yjobs_who_action (*r_runas, n);
+   f = yjobs_who_action (myJOBS.m_runas, n);
    DEBUG_YJOBS  yLOG_char    ("f"         , f);
    --rce;  if (f == '?') {
-      yURG_err ('F', "runas (%c) not found in g_whos database", *r_runas);
+      yURG_err ('F', "runas (%c) not found in g_whos database", myJOBS.m_runas);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    --rce;  if (f == '·') {
-      yURG_err ('F', "action å%sæ not allowed for runas (%c)", a_arg, *r_runas);
+      yURG_err ('F', "action å%sæ not allowed for runas (%c)", a_arg, myJOBS.m_runas);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(handle run mode changes)--------*/
-   *r_mode = g_runmode = x_act;
+   myJOBS.m_mode = x_act;
+   myJOBS.m_flag = f;
+   if (r_mode != NULL)  *r_mode = x_act;
    /*---(handle simple option)-----------*/
    if (f == '-') {
       if (strchr (g_central, x_act) != NULL) {
-         if (strchr (g_etc, *r_runas) != NULL) {
-            rc = yjobs_who_naming (*r_runas, NULL, NULL, NULL, NULL, NULL, x_file);
-            strlcpy (r_file, x_file, LEN_DESC);
-            strlcpy (g_runfile, x_file, LEN_DESC);
+         if (strchr (g_etc, myJOBS.m_runas) != NULL) {
+            rc = yjobs_who_naming (myJOBS.m_runas, NULL, NULL, NULL, NULL, NULL, x_file);
+            strlcpy (myJOBS.m_file, x_file, LEN_DESC);
+            if (r_file != NULL)  strlcpy (r_file, x_file, LEN_DESC);
          }
       }
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
-      return 0;
+      return 1;
    }
    /*---(handle file flag)---------------*/
    --rce;  if (f != 'F') {
@@ -513,22 +586,24 @@ yJOBS_argument          (int *i, cchar *a_arg, cchar *a_next, char *r_runas, cha
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
-   strlcpy (r_file   , a_next, LEN_PATH);
-   strlcpy (g_runfile, a_next, LEN_PATH);
-   ++(*i);
+   strlcpy (myJOBS.m_file, a_next, LEN_DESC);
+   DEBUG_YJOBS  yLOG_info    ("m_file"    , myJOBS.m_file);
+   if (r_file != NULL)  strlcpy (r_file   , a_next, LEN_DESC);
+   ++(*b_pos);
+   DEBUG_YJOBS  yLOG_value   ("b_pos"     , *b_pos);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 1;
 }
 
 char
-yJOBS_final             (int a_uid)
+yjobs_final_full        (int a_uid)
 {
    char        rce         =  -10;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(setup location)-----------------*/
-   if (strchr (g_unit, g_runas) != NULL) {
+   if (strchr (g_unit, myJOBS.m_runas) != NULL) {
       DEBUG_YJOBS  yLOG_note    ("unit testing, run output and errors to tmp file");
       yURG_msg_tmp  ();
       yURG_err_tmp  (); 
@@ -538,9 +613,11 @@ yJOBS_final             (int a_uid)
       yURG_err_std  ();
    }
    /*---(check for illegal)--------------*/
-   --rce;  if (g_runas == '-' || g_runmode == '-') {
+   --rce;  if (myJOBS.m_runas == '-' || myJOBS.m_mode == '-') {
+      DEBUG_YJOBS  yLOG_note    ("illegal runas or mode, muting all");
       yURG_msg_mute ();
       yURG_err_mute ();
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(setup verbosity)----------------*/
@@ -548,7 +625,7 @@ yJOBS_final             (int a_uid)
       DEBUG_YJOBS  yLOG_note    ("silent, muting all output and errors");
       yURG_msg_mute ();
       yURG_err_mute ();
-   }
+   } 
    else IF_CONFIRM {
       DEBUG_YJOBS  yLOG_note    ("confirm, muting output and errors until summary");
       yURG_msg_mute ();
@@ -602,7 +679,7 @@ yJOBS_final             (int a_uid)
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      if (g_runmode == ACT_RELOAD)  {
+      if (myJOBS.m_mode == ACT_RELOAD)  {
          DEBUG_YJOBS  yLOG_note    ("reload require root privlege");
          yURG_err ('F', "--reload requires root privlege");
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
@@ -629,6 +706,39 @@ yJOBS_final             (int a_uid)
    return 0;
 }
 
+char
+yjobs_final             (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_user      [LEN_LABEL] = "";
+   int         x_uid       =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(action)-------------------------*/
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, x_user, 'n');
+   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS  yLOG_value   ("x_uid"     , x_uid);
+   DEBUG_YJOBS  yLOG_info    ("x_user"    , x_user);
+   /*---(call final)---------------------*/
+   rc = yjobs_final_full (x_uid);
+   DEBUG_YJOBS  yLOG_value   ("final"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char  yJOBS_final       (int a_uid)   { return yjobs_final_full (a_uid); }
+
 
 
 /*====================------------------------------------====================*/
@@ -636,45 +746,50 @@ yJOBS_final             (int a_uid)
 /*====================------------------------------------====================*/
 static void      o___SHORTCUT________________o (void) {;};
 
-CHECK  char  yJOBS_ifvalid    (void) { if (strchr (g_valid   , g_runas  ) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifunit     (void) { if (strchr (g_unit    , g_runas  ) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifetc      (void) { if (strchr (g_etc     , g_runas  ) != NULL)  return 1; else return 0; }
+char  yJOBS_ifvalid    (void) { if (strchr (g_valid   , myJOBS.m_runas) != NULL)  return 1; else return 0; }
+char  yJOBS_ifunit     (void) { if (strchr (g_unit    , myJOBS.m_runas) != NULL)  return 1; else return 0; }
+char  yJOBS_ifetc      (void) { if (strchr (g_etc     , myJOBS.m_runas) != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifsilent   (void) { if (strchr (g_silent  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifconfirm  (void) { if (strchr (g_confirm , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifverbose  (void) { if (strchr (g_verbose , g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifallmode  (void) { if (strchr (g_allmode , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifsilent   (void) { if (strchr (g_silent  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifconfirm  (void) { if (strchr (g_confirm , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifverbose  (void) { if (strchr (g_verbose , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifhelp     (void) { if (g_runmode == ACT_HELP)                  return 1; else return 0; }
-CHECK  char  yJOBS_ifversion  (void) { if (g_runmode == ACT_VERSION)               return 1; else return 0; }
-CHECK  char  yJOBS_ifstats    (void) { if (g_runmode == ACT_STATS)                 return 1; else return 0; }
+char  yJOBS_ifhelp     (void) { if (myJOBS.m_mode == ACT_HELP)                    return 1; else return 0; }
+char  yJOBS_ifversion  (void) { if (myJOBS.m_mode == ACT_VERSION)                 return 1; else return 0; }
 
-CHECK  char  yJOBS_ifverify   (void) { if (strchr (g_verify  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifregister (void) { if (strchr (g_register, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifinstall  (void) { if (strchr (g_install , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifupdate   (void) { if (strchr (g_update  , g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifverify   (void) { if (strchr (g_verify  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_iflocalrpt (void) { if (strchr (g_localrpt, myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifregister (void) { if (strchr (g_register, myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifinstall  (void) { if (strchr (g_install , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifupdate   (void) { if (strchr (g_update  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_iflist     (void) { if (strchr (g_list    , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifcheck    (void) { if (strchr (g_check   , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifaudit    (void) { if (strchr (g_audit   , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_iffix      (void) { if (strchr (g_fix     , g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifstats    (void) { if (strchr (g_stats   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_iflist     (void) { if (strchr (g_list    , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifreport   (void) { if (strchr (g_report  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifcheck    (void) { if (strchr (g_check   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifaudit    (void) { if (strchr (g_audit   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_iffix      (void) { if (strchr (g_fix     , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifwithdraw (void) { if (strchr (g_withdraw, g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifclear    (void) { if (strchr (g_clear   , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifremove   (void) { if (strchr (g_remove  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifextract  (void) { if (strchr (g_extract , g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifupload   (void) { if (strchr (g_upload  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifdownload (void) { if (strchr (g_download, myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifupload   (void) { if (strchr (g_upload  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifdownload (void) { if (strchr (g_download, g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifwithdraw (void) { if (strchr (g_withdraw, myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifclear    (void) { if (strchr (g_clear   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifremove   (void) { if (strchr (g_remove  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifextract  (void) { if (strchr (g_extract , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifgather   (void) { if (strchr (g_gather  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifdaemon   (void) { if (strchr (g_daemon  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifprickly  (void) { if (strchr (g_prickly , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifnormal   (void) { if (strchr (g_normal  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifstrict   (void) { if (strchr (g_strict  , g_runmode) != NULL)  return 1; else return 0; }
-CHECK  char  yJOBS_ifreload   (void) { if (strchr (g_reload  , g_runmode) != NULL)  return 1; else return 0; }
+char  yJOBS_ifgather   (void) { if (strchr (g_gather  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifrunning  (void) { if (strchr (g_running , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifdaemony  (void) { if (strchr (g_daemony , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifdaemon   (void) { if (strchr (g_daemon  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifprickly  (void) { if (strchr (g_prickly , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifnormal   (void) { if (strchr (g_normal  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifstrict   (void) { if (strchr (g_strict  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifreload   (void) { if (strchr (g_reload  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
-CHECK  char  yJOBS_ifnorun    (void) { if (g_norun == 'y')                         return 1; else return 0; }
-CHECK  char  yJOBS_ifnoend    (void) { if (g_noend == 'y')                         return 1; else return 0; }
+char  yJOBS_ifnorun    (void) { if (g_norun == 'y')                               return 1; else return 0; }
+char  yJOBS_ifnoend    (void) { if (g_noend == 'y')                               return 1; else return 0; }
 
 
 
