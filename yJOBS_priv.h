@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0f"
-#define     P_VERTXT    "updated to yURG_by_name after yURG change"
+#define     P_VERNUM    "1.0g"
+#define     P_VERTXT    "fixes due to changed str functions to ¶ystr¶ in ySTR"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -195,6 +195,7 @@ extern char   g_report      [LEN_SHORT];
 extern char   g_check       [LEN_SHORT];
 extern char   g_audit       [LEN_SHORT];
 extern char   g_fix         [LEN_SHORT];
+extern char   g_only        [LEN_SHORT];
 /*---(outgoing)-------------*/
 extern char   g_withdraw    [LEN_SHORT];
 extern char   g_clear       [LEN_SHORT];
@@ -369,7 +370,7 @@ char        yjobs_world__read       (char *a_recd);
 char        yjobs_world__import     (cchar a_runas);
 char        yjobs_world__export     (cchar a_runas);
 /*---(actions)--------------*/
-/*> char        yjobs_world__justhome   (char *r_file, char *r_path);                 <*/
+char        yjobs_world__exist      (cchar *a_path);
 char        yjobs_world__home       (cchar a_act, cchar *a_file, char *r_path);
 char        yjobs_world_audit       (cchar a_runas);
 char        yjobs_world_list        (cchar a_runas);

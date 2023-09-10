@@ -33,6 +33,7 @@ char          g_report      [LEN_SHORT] = "";
 char          g_check       [LEN_SHORT] = "";
 char          g_audit       [LEN_SHORT] = "";
 char          g_fix         [LEN_SHORT] = "";
+char          g_only        [LEN_SHORT] = "";
 /*---(outgoing)-------------*/
 char          g_withdraw    [LEN_SHORT] = "";
 char          g_clear       [LEN_SHORT] = "";
@@ -122,27 +123,28 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    { "check"    , "cýC", "check central file for correctness"           ,  13, '-', YJOBS_CENTRAL  },
    { "audit"    , "aèA", "audit central environment and all its files"  ,  14, '-', YJOBS_CENTRAL  },
    { "fix"      , "füF", "audit central environment and fix issues"     ,  15, '-', YJOBS_CENTRAL  },
+   { "only"     , "oöO", "run on single central data file"              ,  16, 'y', YJOBS_CENTRAL  },
    /*---(epic)---------------------------*/
-   { "backup"   , "kñK", "backup the central system"                    ,  17, '-', YJOBS_CENTRAL  },
-   { "restore"  , "túT", "restore the central system from backup"       ,  18, '-', YJOBS_CENTRAL  },
-   { "purge"    , "wÿW", "wipe clean entire central system"             ,  19, '-', YJOBS_CENTRAL  },
+   { "backup"   , "kñK", "backup the central system"                    ,  18, '-', YJOBS_CENTRAL  },
+   { "restore"  , "túT", "restore the central system from backup"       ,  19, '-', YJOBS_CENTRAL  },
+   { "purge"    , "wÿW", "wipe clean entire central system"             ,  20, '-', YJOBS_CENTRAL  },
    /*---(elsewhere)----------------------*/
-   { "upload"   , "yïY", "from elsewhere to central"                    ,  21, '-', YJOBS_CENTRAL  },
-   { "download" , "zíZ", "from central to elsewhere"                    ,  22, '-', YJOBS_CENTRAL  },
+   { "upload"   , "yïY", "from elsewhere to central"                    ,  22, '-', YJOBS_CENTRAL  },
+   { "download" , "zíZ", "from central to elsewhere"                    ,  23, '-', YJOBS_CENTRAL  },
    /*---(outgoing 4)---------------------*/
-   { "withdraw" , "qþQ", "unregister centrally"                         ,  24, '-', YJOBS_CENTRAL  },
-   { "clear"    , "xõX", "clear file from central location"             ,  25, '-', YJOBS_CENTRAL  },
-   { "remove"   , "røR", "remove file from central location"            ,  26, '-', YJOBS_CENTRAL  },
-   { "extract"  , "eìE", "extract a central file to local copy"         ,  27, '-', YJOBS_CENTRAL  },
+   { "withdraw" , "qþQ", "unregister centrally"                         ,  25, '-', YJOBS_CENTRAL  },
+   { "clear"    , "xõX", "clear file from central location"             ,  26, '-', YJOBS_CENTRAL  },
+   { "remove"   , "røR", "remove file from central location"            ,  27, '-', YJOBS_CENTRAL  },
+   { "extract"  , "eìE", "extract a central file to local copy"         ,  28, '-', YJOBS_CENTRAL  },
    /*---(execution)----------------------*/
-   { "gather"   , "gêG", "execute system-wide data gather"              ,  29, '-', YJOBS_NEITHER  },
-   { "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  30, 'y', YJOBS_NEITHER  },
-   { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  31, 'y', YJOBS_NEITHER  },
-   { "normal"   , "nôN", "execute specific file in normal-mode"         ,  32, 'y', YJOBS_NEITHER  },
-   { "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  33, 'y', YJOBS_NEITHER  },
-   { "reload"   , "hîH", "send signal to reload daemon"                 ,  34, '-', YJOBS_NEITHER  },
+   { "gather"   , "gêG", "execute system-wide data gather"              ,  30, '-', YJOBS_NEITHER  },
+   { "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31, 'y', YJOBS_NEITHER  },
+   { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32, 'y', YJOBS_NEITHER  },
+   { "normal"   , "nôN", "execute specific file in normal-mode"         ,  33, 'y', YJOBS_NEITHER  },
+   { "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34, 'y', YJOBS_NEITHER  },
+   { "reload"   , "hîH", "send signal to reload daemon"                 ,  35, '-', YJOBS_NEITHER  },
    /*---(unit testing)-------------------*/
-   { "testing"  , "j··", "change to test directories"                   ,  36, '-', YJOBS_NEITHER  },
+   { "testing"  , "j··", "change to test directories"                   ,  37, '-', YJOBS_NEITHER  },
    { "norun"    , "-··", "daemons only load data"                       ,   0, '-', YJOBS_NEITHER  },
    /*---(sentinal)-----------------------*/
    { ""         , "···", ""                                             ,   0, '-', YJOBS_NEITHER  },
@@ -174,7 +176,7 @@ yjobs_args_info         (char a_mode, char *a_name)
       if (strcmp (s_opts [i].option, "") == 0)  break;
       DEBUG_YJOBS  yLOG_complex ("current"   , "%2d, %s, %s", i, s_opts [i].levels, s_opts [i].option);
       if (strchr (s_opts [i].levels, a_mode) != NULL) {
-         strlcpy (a_name, s_opts [i].option, LEN_LABEL);
+         ystrlcpy (a_name, s_opts [i].option, LEN_LABEL);
          DEBUG_YJOBS  yLOG_info    ("option"    , a_name);
          DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
          return 0;
@@ -190,50 +192,51 @@ char
 yjobs_args__empty       (void)
 {
    /*---(location)-----------------------*/
-   strlcpy (g_local   , "", LEN_DESC);
-   strlcpy (g_central , "", LEN_DESC);
+   ystrlcpy (g_local   , "", LEN_DESC);
+   ystrlcpy (g_central , "", LEN_DESC);
    /*---(validity)-----------------------*/
-   strlcpy (g_valid   , "", LEN_DESC);
-   strlcpy (g_unit    , "", LEN_DESC);
-   strlcpy (g_etc     , "", LEN_DESC);
+   ystrlcpy (g_valid   , "", LEN_DESC);
+   ystrlcpy (g_unit    , "", LEN_DESC);
+   ystrlcpy (g_etc     , "", LEN_DESC);
    /*---(verbosity)----------------------*/
-   strlcpy (g_allmode , "", LEN_HUND);
-   strlcpy (g_silent  , "", LEN_DESC);
-   strlcpy (g_confirm , "", LEN_DESC);
-   strlcpy (g_verbose , "", LEN_DESC);
+   ystrlcpy (g_allmode , "", LEN_HUND);
+   ystrlcpy (g_silent  , "", LEN_DESC);
+   ystrlcpy (g_confirm , "", LEN_DESC);
+   ystrlcpy (g_verbose , "", LEN_DESC);
    /*---(incomming)----------------------*/
-   strlcpy (g_verify  , "", LEN_SHORT);
-   strlcpy (g_local   , "", LEN_SHORT);
-   strlcpy (g_register, "", LEN_SHORT);
-   strlcpy (g_install , "", LEN_SHORT);
-   strlcpy (g_update  , "", LEN_SHORT);
+   ystrlcpy (g_verify  , "", LEN_SHORT);
+   ystrlcpy (g_local   , "", LEN_SHORT);
+   ystrlcpy (g_register, "", LEN_SHORT);
+   ystrlcpy (g_install , "", LEN_SHORT);
+   ystrlcpy (g_update  , "", LEN_SHORT);
    /*---(central)------------------------*/
-   strlcpy (g_list    , "", LEN_SHORT);
-   strlcpy (g_stats   , "", LEN_SHORT);
-   strlcpy (g_report  , "", LEN_SHORT);
-   strlcpy (g_check   , "", LEN_SHORT);
-   strlcpy (g_audit   , "", LEN_SHORT);
-   strlcpy (g_fix     , "", LEN_SHORT);
+   ystrlcpy (g_list    , "", LEN_SHORT);
+   ystrlcpy (g_stats   , "", LEN_SHORT);
+   ystrlcpy (g_report  , "", LEN_SHORT);
+   ystrlcpy (g_check   , "", LEN_SHORT);
+   ystrlcpy (g_audit   , "", LEN_SHORT);
+   ystrlcpy (g_fix     , "", LEN_SHORT);
+   ystrlcpy (g_only    , "", LEN_SHORT);
    /*---(cloud)--------------------------*/
-   strlcpy (g_upload  , "", LEN_SHORT);
-   strlcpy (g_download, "", LEN_SHORT);
+   ystrlcpy (g_upload  , "", LEN_SHORT);
+   ystrlcpy (g_download, "", LEN_SHORT);
    /*---(outgoing)-----------------------*/
-   strlcpy (g_withdraw, "", LEN_SHORT);
-   strlcpy (g_clear   , "", LEN_SHORT);
-   strlcpy (g_remove  , "", LEN_SHORT);
-   strlcpy (g_extract , "", LEN_SHORT);
+   ystrlcpy (g_withdraw, "", LEN_SHORT);
+   ystrlcpy (g_clear   , "", LEN_SHORT);
+   ystrlcpy (g_remove  , "", LEN_SHORT);
+   ystrlcpy (g_extract , "", LEN_SHORT);
    /*---(transfer)-----------------------*/
-   strlcpy (g_upload  , "", LEN_SHORT);
-   strlcpy (g_download, "", LEN_SHORT);
+   ystrlcpy (g_upload  , "", LEN_SHORT);
+   ystrlcpy (g_download, "", LEN_SHORT);
    /*---(execution)----------------------*/
-   strlcpy (g_gather  , "", LEN_SHORT);
-   strlcpy (g_running , "", LEN_LABEL);
-   strlcpy (g_daemony , "", LEN_LABEL);
-   strlcpy (g_daemon  , "", LEN_SHORT);
-   strlcpy (g_prickly , "", LEN_SHORT);
-   strlcpy (g_normal  , "", LEN_SHORT);
-   strlcpy (g_strict  , "", LEN_SHORT);
-   strlcpy (g_reload  , "", LEN_SHORT);
+   ystrlcpy (g_gather  , "", LEN_SHORT);
+   ystrlcpy (g_running , "", LEN_LABEL);
+   ystrlcpy (g_daemony , "", LEN_LABEL);
+   ystrlcpy (g_daemon  , "", LEN_SHORT);
+   ystrlcpy (g_prickly , "", LEN_SHORT);
+   ystrlcpy (g_normal  , "", LEN_SHORT);
+   ystrlcpy (g_strict  , "", LEN_SHORT);
+   ystrlcpy (g_reload  , "", LEN_SHORT);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -261,47 +264,48 @@ yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where)
    --rce;  if (strchr (g_verbose, c) != NULL) return rce;
    /*---(load correctly)-----------------*/
    sprintf (t, "%c", c);
-   strlcat (g_allmode, t, LEN_HUND);
+   ystrlcat (g_allmode, t, LEN_HUND);
    switch (n) {
-   case  0  :   strlcat (g_silent , t, LEN_DESC);    break;
-   case  1  :   strlcat (g_confirm, t, LEN_DESC);    break;
-   case  2  :   strlcat (g_verbose, t, LEN_DESC);    break;
+   case  0  :   ystrlcat (g_silent , t, LEN_DESC);    break;
+   case  1  :   ystrlcat (g_confirm, t, LEN_DESC);    break;
+   case  2  :   ystrlcat (g_verbose, t, LEN_DESC);    break;
    }
-   if (a_run == 'y')        strlcat (g_running, t, LEN_LABEL);
+   if (a_run == 'y')        ystrlcat (g_running, t, LEN_LABEL);
    switch (a_where) {
-   case  YJOBS_LOCAL    :   strlcat (g_local  , t, LEN_DESC);    break;
-   case  YJOBS_CENTRAL  :   strlcat (g_central, t, LEN_DESC);    break;
+   case  YJOBS_LOCAL    :   ystrlcat (g_local  , t, LEN_DESC);    break;
+   case  YJOBS_CENTRAL  :   ystrlcat (g_central, t, LEN_DESC);    break;
    }
    /*---(load by action)-----------------*/
    switch (a_levels [0]) {
 
-   case ACT_VERIFY   :   strlcat (g_verify  , t, LEN_SHORT);   break;
-   case ACT_LOCALRPT :   strlcat (g_localrpt, t, LEN_SHORT);   break;
-   case ACT_REGISTER :   strlcat (g_register, t, LEN_SHORT);   break;
-   case ACT_INSTALL  :   strlcat (g_install , t, LEN_SHORT);   break;
-   case ACT_UPDATE   :   strlcat (g_update  , t, LEN_SHORT);   break;
+   case ACT_VERIFY   :   ystrlcat (g_verify  , t, LEN_SHORT);   break;
+   case ACT_LOCALRPT :   ystrlcat (g_localrpt, t, LEN_SHORT);   break;
+   case ACT_REGISTER :   ystrlcat (g_register, t, LEN_SHORT);   break;
+   case ACT_INSTALL  :   ystrlcat (g_install , t, LEN_SHORT);   break;
+   case ACT_UPDATE   :   ystrlcat (g_update  , t, LEN_SHORT);   break;
 
-   case ACT_STATS    :   strlcat (g_stats   , t, LEN_SHORT);   break;
-   case ACT_LIST     :   strlcat (g_list    , t, LEN_SHORT);   break;
-   case ACT_REPORT   :   strlcat (g_report  , t, LEN_SHORT);   break;
-   case ACT_CHECK    :   strlcat (g_check   , t, LEN_SHORT);   break;
-   case ACT_AUDIT    :   strlcat (g_audit   , t, LEN_SHORT);   break;
-   case ACT_FIX      :   strlcat (g_fix     , t, LEN_SHORT);   break;
+   case ACT_STATS    :   ystrlcat (g_stats   , t, LEN_SHORT);   break;
+   case ACT_LIST     :   ystrlcat (g_list    , t, LEN_SHORT);   break;
+   case ACT_REPORT   :   ystrlcat (g_report  , t, LEN_SHORT);   break;
+   case ACT_CHECK    :   ystrlcat (g_check   , t, LEN_SHORT);   break;
+   case ACT_AUDIT    :   ystrlcat (g_audit   , t, LEN_SHORT);   break;
+   case ACT_FIX      :   ystrlcat (g_fix     , t, LEN_SHORT);   break;
+   case ACT_ONLY     :   ystrlcat (g_only    , t, LEN_SHORT);   break;
 
-   case ACT_UPLOAD   :   strlcat (g_upload  , t, LEN_SHORT);   break;
-   case ACT_DOWNLOAD :   strlcat (g_download, t, LEN_SHORT);   break;
+   case ACT_UPLOAD   :   ystrlcat (g_upload  , t, LEN_SHORT);   break;
+   case ACT_DOWNLOAD :   ystrlcat (g_download, t, LEN_SHORT);   break;
 
-   case ACT_WITHDRAW :   strlcat (g_withdraw, t, LEN_SHORT);   break;
-   case ACT_CLEAR    :   strlcat (g_clear   , t, LEN_SHORT);   break;
-   case ACT_REMOVE   :   strlcat (g_remove  , t, LEN_SHORT);   break;
-   case ACT_EXTRACT  :   strlcat (g_extract , t, LEN_SHORT);   break;
+   case ACT_WITHDRAW :   ystrlcat (g_withdraw, t, LEN_SHORT);   break;
+   case ACT_CLEAR    :   ystrlcat (g_clear   , t, LEN_SHORT);   break;
+   case ACT_REMOVE   :   ystrlcat (g_remove  , t, LEN_SHORT);   break;
+   case ACT_EXTRACT  :   ystrlcat (g_extract , t, LEN_SHORT);   break;
 
-   case ACT_GATHER   :   strlcat (g_gather  , t, LEN_SHORT);   break;
-   case ACT_DAEMON   :   strlcat (g_daemon  , t, LEN_SHORT);   strlcat (g_daemony , t, LEN_LABEL);   break;
-   case ACT_PRICKLY  :   strlcat (g_prickly , t, LEN_SHORT);   strlcat (g_daemony , t, LEN_LABEL);   break;
-   case ACT_NORMAL   :   strlcat (g_normal  , t, LEN_SHORT);   break;
-   case ACT_STRICT   :   strlcat (g_strict  , t, LEN_SHORT);   break;
-   case ACT_RELOAD   :   strlcat (g_reload  , t, LEN_SHORT);   break;
+   case ACT_GATHER   :   ystrlcat (g_gather  , t, LEN_SHORT);   break;
+   case ACT_DAEMON   :   ystrlcat (g_daemon  , t, LEN_SHORT);   ystrlcat (g_daemony , t, LEN_LABEL);   break;
+   case ACT_PRICKLY  :   ystrlcat (g_prickly , t, LEN_SHORT);   ystrlcat (g_daemony , t, LEN_LABEL);   break;
+   case ACT_NORMAL   :   ystrlcat (g_normal  , t, LEN_SHORT);   break;
+   case ACT_STRICT   :   ystrlcat (g_strict  , t, LEN_SHORT);   break;
+   case ACT_RELOAD   :   ystrlcat (g_reload  , t, LEN_SHORT);   break;
 
    }
    /*---(complete)-----------------------*/
@@ -337,10 +341,10 @@ yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
    myJOBS.m_mode = YJOBS_NEITHER;
    if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
    myJOBS.m_flag = '·';
-   strlcpy (myJOBS.m_file, "", LEN_DESC);
-   strlcpy (myJOBS.m_dir , "", LEN_PATH);
-   strlcpy (myJOBS.m_full, "", LEN_PATH);
-   if (r_file  != NULL)   strlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   ystrlcpy (myJOBS.m_file, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
+   ystrlcpy (myJOBS.m_full, "", LEN_PATH);
+   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_DESC);
    g_norun   = YJOBS_NEITHER;
    g_noend   = YJOBS_NEITHER;
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
@@ -361,13 +365,16 @@ yjobs_args__clearmode   (char *r_runas, char *r_mode, char *r_file)
    myJOBS.m_mode = YJOBS_NEITHER;
    if (r_mode  != NULL)  *r_mode = YJOBS_NEITHER;
    myJOBS.m_flag = '·';
-   strlcpy (myJOBS.m_file, "", LEN_DESC);
-   strlcpy (myJOBS.m_dir , "", LEN_PATH);
-   strlcpy (myJOBS.m_full, "", LEN_PATH);
-   if (r_file  != NULL)  strlcpy (r_file, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_file, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
+   ystrlcpy (myJOBS.m_full, "", LEN_PATH);
+   if (r_file  != NULL)  ystrlcpy (r_file, "", LEN_DESC);
    /*---(complete)-----------------------*/
    return 0;
 }
+
+char yJOBS_reset  (char *r_runas, char *r_mode, char *r_file) { return yjobs_args__clearmode (r_runas, r_mode, r_file); }
+
 char
 yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, char *r_mode, char *r_file)
 { 
@@ -382,7 +389,7 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
    DEBUG_YJOBS  yLOG_point   ("r_mode"    , r_mode);
    if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
    DEBUG_YJOBS  yLOG_point   ("r_file"    , r_file);
-   if (r_file  != NULL)   strlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", myJOBS.m_runas, g_valid);
    --rce;  if (yJOBS_ifvalid () == 0) {
@@ -423,11 +430,11 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
-   --rce;  if (myJOBS.m_mode != '-') {
-      yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
-      return rce;
-   }
+   /*> --rce;  if (myJOBS.m_mode != '-') {                                                               <* 
+    *>    yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);   <* 
+    *>    DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);                                                  <* 
+    *>    return rce;                                                                                    <* 
+    *> }                                                                                                 <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -544,6 +551,11 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
       return 1;
    }
+   --rce;  if (myJOBS.m_mode != '-') {
+      yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      return rce;
+   }
    /*---(get file flag)------------------*/
    f = yjobs_who_action (myJOBS.m_runas, n);
    DEBUG_YJOBS  yLOG_char    ("f"         , f);
@@ -566,8 +578,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       if (strchr (g_central, x_act) != NULL) {
          if (strchr (g_etc, myJOBS.m_runas) != NULL) {
             rc = yjobs_who_naming (myJOBS.m_runas, NULL, NULL, NULL, NULL, NULL, x_file);
-            strlcpy (myJOBS.m_file, x_file, LEN_DESC);
-            if (r_file != NULL)  strlcpy (r_file, x_file, LEN_DESC);
+            ystrlcpy (myJOBS.m_file, x_file, LEN_DESC);
+            if (r_file != NULL)  ystrlcpy (r_file, x_file, LEN_DESC);
          }
       }
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
@@ -586,9 +598,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
-   strlcpy (myJOBS.m_file, a_next, LEN_DESC);
+   ystrlcpy (myJOBS.m_file, a_next, LEN_DESC);
    DEBUG_YJOBS  yLOG_info    ("m_file"    , myJOBS.m_file);
-   if (r_file != NULL)  strlcpy (r_file   , a_next, LEN_DESC);
+   if (r_file != NULL)  ystrlcpy (r_file   , a_next, LEN_DESC);
    ++(*b_pos);
    DEBUG_YJOBS  yLOG_value   ("b_pos"     , *b_pos);
    /*---(complete)-----------------------*/
@@ -770,6 +782,7 @@ char  yJOBS_ifreport   (void) { if (strchr (g_report  , myJOBS.m_mode)  != NULL)
 char  yJOBS_ifcheck    (void) { if (strchr (g_check   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 char  yJOBS_ifaudit    (void) { if (strchr (g_audit   , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 char  yJOBS_iffix      (void) { if (strchr (g_fix     , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
+char  yJOBS_ifonly     (void) { if (strchr (g_only    , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 
 char  yJOBS_ifupload   (void) { if (strchr (g_upload  , myJOBS.m_mode)  != NULL)  return 1; else return 0; }
 char  yJOBS_ifdownload (void) { if (strchr (g_download, myJOBS.m_mode)  != NULL)  return 1; else return 0; }

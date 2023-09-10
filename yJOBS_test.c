@@ -29,7 +29,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
       return rce;
    }
    /*---(copy to local)------------------*/
-   strlcpy (x_dir, a_dir, LEN_DESC);
+   ystrlcpy (x_dir, a_dir, LEN_DESC);
    l = strlen (x_dir);
    if (x_dir [l - 1] == '/')  x_dir [--l] = '\0';
    DEBUG_YJOBS   yLOG_complex ("x_dir"     , "%2då%sæ", l, x_dir);
@@ -43,7 +43,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
    DEBUG_YJOBS   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
    yURG_rmdir (x_dir);
    /*---(peal next layer)----------------*/
-   strlcpy (r_dir, x_dir, LEN_DESC);
+   ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
    DEBUG_YJOBS   yLOG_point   ("p"         , p);
    if  (p == NULL) {
@@ -81,7 +81,7 @@ yjobs__unit_mkdir_one   (char *a_dir)
       return rce;
    }
    /*---(copy to local)------------------*/
-   strlcpy (x_dir, a_dir, LEN_DESC);
+   ystrlcpy (x_dir, a_dir, LEN_DESC);
    l = strlen (x_dir);
    if (x_dir [l - 1] == '/')  x_dir [--l] = '\0';
    DEBUG_YJOBS   yLOG_complex ("x_dir"     , "%2då%sæ", l, x_dir);
@@ -92,7 +92,7 @@ yjobs__unit_mkdir_one   (char *a_dir)
       return 0;
    }
    /*---(peal next layer)----------------*/
-   strlcpy (r_dir, x_dir, LEN_DESC);
+   ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
    DEBUG_YJOBS   yLOG_point   ("p"         , p);
    if  (p == NULL) {
@@ -185,16 +185,16 @@ yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user
    char        x_desc      [LEN_DESC]  = "";
    char        x_dir       [LEN_PATH]  = "";
    /*---(default)------------------------*/
-   if (r_user != NULL)  strlcpy (r_user, ""       , LEN_USER);
-   if (r_desc != NULL)  strlcpy (r_desc, ""       , LEN_DESC);
+   if (r_user != NULL)  ystrlcpy (r_user, ""       , LEN_USER);
+   if (r_desc != NULL)  ystrlcpy (r_desc, ""       , LEN_DESC);
    /*---(parse file)---------------------*/
    --rce;  if (a_loc == YJOBS_CENTRAL)   rc = yjobs_central_old (a_runas, '-', a_name, &x_user, &x_uid, &x_desc, x_dir);
    else if    (a_loc == YJOBS_LOCAL  )   rc = yjobs_local_old   (a_runas, a_name, &x_user, &x_uid, &x_desc, x_dir);
    else                                  return rce;
    --rce;  if (rc < 0)                   return rce;
    /*---(save back)----------------------*/
-   if (r_user != NULL)  strlcpy (r_user, x_user, LEN_USER);
-   if (r_desc != NULL)  strlcpy (r_desc, x_desc, LEN_DESC);
+   if (r_user != NULL)  ystrlcpy (r_user, x_user, LEN_USER);
+   if (r_desc != NULL)  ystrlcpy (r_desc, x_desc, LEN_DESC);
    /*---(trouble)------------------------*/
    if (strstr (a_name, "bad") != NULL)  return -10;
    /*---(complete)-----------------------*/
@@ -297,8 +297,9 @@ yjobs__unit             (char *a_question, int n)
       c = yURG_peek_count (myJOBS.w_full);
       if      (c  <  0)  x_exist = '-';
       else               x_exist = 'y';
-      snprintf (unit_answer, LEN_RECD, "yJOBS w_file     : %c  %-10p  %c  %2d  %2då%sæ",
-            (myJOBS.w_file == NULL) ? '-' : 'y', myJOBS.w_file,
+      sprintf (t, "%-10.10p", myJOBS.w_file);
+      snprintf (unit_answer, LEN_RECD, "yJOBS w_file     : %c  %-10.10s  %c  %2d  %2då%sæ",
+            (myJOBS.w_file == NULL) ? '-' : 'y', t,
             x_exist, c, strlen (myJOBS.w_full), myJOBS.w_full);
    }
    else if (strcmp (a_question, "w_entry"   )     == 0) {

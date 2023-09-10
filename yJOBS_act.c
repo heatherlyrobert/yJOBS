@@ -68,6 +68,7 @@ yjobs_act_header        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    case CASE_CHECK    :  yURG_msg ('>', "  option --vcheck    : verify details of centrally installed file");             break;
    case CASE_AUDIT    :  yURG_msg ('>', "  option --vaudit    : check central setup, files, and security");               break;
    case CASE_FIX      :  yURG_msg ('>', "  option --vfix      : repair central directories and security");                break;
+   case CASE_ONLY     :  yURG_msg ('>', "  option --vonly     : execute with single central file");                       break;
                          /*---(epic 3)----------------------*/
                          /*---(elsewhere 2)-----------------*/
                          /*---(outgoing 4)------------------*/
@@ -94,9 +95,9 @@ yjobs_act_header        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
    DEBUG_YJOBS   yLOG_info    ("x_world"   , x_world);
    DEBUG_YJOBS   yLOG_info    ("x_db"      , x_db);
-   if (r_cdir  != NULL)  strlcpy (r_cdir , x_cdir , LEN_PATH);
-   if (r_world != NULL)  strlcpy (r_world, x_world, LEN_LABEL);
-   if (r_db    != NULL)  strlcpy (r_db   , x_db   , LEN_LABEL);
+   if (r_cdir  != NULL)  ystrlcpy (r_cdir , x_cdir , LEN_PATH);
+   if (r_world != NULL)  ystrlcpy (r_world, x_world, LEN_LABEL);
+   if (r_db    != NULL)  ystrlcpy (r_db   , x_db   , LEN_LABEL);
    /*---(get current working dir)--------*/
    p = getcwd (x_cwd, LEN_PATH);
    DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);
@@ -105,7 +106,7 @@ yjobs_act_header        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);
-   if (r_cwd   != NULL)  strlcpy (r_cwd  , x_cwd  , LEN_PATH);
+   if (r_cwd   != NULL)  ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
    if (r_full  != NULL)  sprintf (r_full , "%s/%s", x_cwd, a_name);
    g_fullacts  [ 0] = 'h';
    /*---(complete)-----------------------*/
@@ -134,6 +135,7 @@ yjobs_act_footer        (cchar a_mode)
    case CASE_CHECK    : yURG_msg ('>', "%sSUCCESS, centrally installed file is runable, all lines checked%s"                 , BOLD_GRN, BOLD_OFF);  break;
    case CASE_AUDIT    : yURG_msg ('>', "%sSUCCESS, environment and all central files passed relevent checks%s"               , BOLD_GRN, BOLD_OFF);  break;
    case CASE_FIX      : yURG_msg ('>', "%sSUCCESS, central directory basic security measures confirmed%s"                    , BOLD_GRN, BOLD_OFF);  break;
+   case CASE_ONLY     : yURG_msg ('>', "%sSUCCESS, central execution on single file confirmed%s"                             , BOLD_GRN, BOLD_OFF);  break;
                         /*---(epic 3)----------------------*/
                         /*---(elsewhere 2)-----------------*/
                         /*---(outgoing 4)------------------*/
@@ -267,7 +269,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   strlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
+   ystrlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_char    ("m_runas"   , a_runas);
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
@@ -310,7 +312,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       }
    }
    /*---(verify file)------------------------*/
-   --rce;  if (strcmp (a_file, "") != 0) {
+   --rce;  if (strchr ("béB", a_mode) == NULL && strcmp (a_file, "") != 0) {
       rc = yjobs_local_old  (a_runas, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
       DEBUG_YJOBS   yLOG_value   ("local"     , rc);
       if (rc < 0) {
@@ -330,7 +332,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    }
    /*---(local report)-----------------------*/
    --rce;  if (strchr ("lòL", a_mode) != NULL) {
-      rc = x_callback (YJOBS_LOCALRPT, "");
+      rc = x_callback (YJOBS_LOCALRPT, a_file);
       DEBUG_YJOBS   yLOG_value   ("localrpt"  , rc);
       if (rc < 0) {
          yjobs_act_failure (a_mode, "local report could not complete");
@@ -417,7 +419,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   strlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
+   ystrlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_char    ("m_runas"   , a_runas);
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
@@ -451,7 +453,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       g_fullacts  [ 3] = 'a';
    }
    /*---(load database)----------------------*/
-   --rce;  if (strchr ("#móMaèA", a_mode) != NULL && strcmp (x_db, "") != 0) {
+   --rce;  if (strchr ("móMaèA", a_mode) != NULL && strcmp (x_db, "") != 0) {
       DEBUG_YJOBS   yLOG_note    ("option requires database loaded before");
       rc = x_callback (YJOBS_READ, "");
       DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
@@ -500,7 +502,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       }
    }
    /*---(verify file)------------------------*/
-   --rce;  if (strchr ("cýC", a_mode) != NULL && strcmp (a_file, "") != 0) {
+   --rce;  if (strchr ("cýCoöO", a_mode) != NULL && strcmp (a_file, "") != 0) {
       rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {
@@ -511,7 +513,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       g_fullacts  [ 8] = 'c';
    }
    /*---(verify contents)--------------------*/
-   --rce;  if ((strchr ("cýC", a_mode) != NULL && strcmp (a_file, "") != 0) || (strchr ("cýCaèA", a_mode) != NULL && strstr (x_cdir, "/etc") != NULL)) {
+   --rce;  if ((strchr ("cýCoöO", a_mode) != NULL && strcmp (a_file, "") != 0) || (strchr ("cýCaèA", a_mode) != NULL && strstr (x_cdir, "/etc") != NULL)) {
       rc = x_callback (YJOBS_PULL, myJOBS.f_full);
       DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
       --rce;  if (rc < 0) {
@@ -659,7 +661,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   strlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
+   ystrlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_char    ("m_runas"   , a_runas);
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
@@ -987,7 +989,7 @@ yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix)
       return rce;
    }
    /*---(copy to local)------------------*/
-   strlcpy (x_dir, a_dir, LEN_DESC);
+   ystrlcpy (x_dir, a_dir, LEN_DESC);
    l = strlen (x_dir);
    if (l > 0 && x_dir [l - 1] == '/')  x_dir [--l] = '\0';
    DEBUG_YJOBS   yLOG_complex ("x_dir"     , "%2då%sæ", l, x_dir);
@@ -998,7 +1000,7 @@ yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix)
       return 0;
    }
    /*---(peal next layer)----------------*/
-   strlcpy (r_dir, x_dir, LEN_DESC);
+   ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
    DEBUG_YJOBS   yLOG_point   ("p"         , p);
    if  (p != NULL)   p [0] = '\0';
@@ -1449,7 +1451,7 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
       if (strcmp (x_file->d_name, ".."   ) == 0)  continue;
       /*---(prepare)----------------------------*/
       ++x_total;
-      strlcpy (x_name, x_file->d_name, LEN_DESC);
+      ystrlcpy (x_name, x_file->d_name, LEN_DESC);
       sprintf (x_full, "%s%s", a_cdir, x_file->d_name);
       /*---(verify file)------------------------*/
       rc = yjobs_central_old  (a_runas, a_mode, x_name, NULL, NULL, NULL, NULL);
@@ -1561,10 +1563,12 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    char        x_fdesc     [LEN_DESC]  = "";
    char        x_fdir      [LEN_PATH]  = "";
    char        x_full      [LEN_PATH]  = "";
+   char        x_hdir      [LEN_PATH]  = "";
+   char        x_db        [LEN_LABEL] = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (strchr (g_running, a_mode) != NULL)  strlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
+   if (strchr (g_running, a_mode) != NULL)  ystrlcpy (g_fullacts , "·· ··· ··· ··· ··· ··· ··· ·· ··· ··", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_char    ("m_runas"   , a_runas);
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
@@ -1586,6 +1590,24 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       return rce;
    }
    g_fullacts  [1] = 'l';
+   /*---(check for full database)------------*/
+   rc = yjobs_who_location (a_runas, NULL, x_hdir, NULL, x_db);
+   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
+   --rce;  if (rc <  0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (strcmp (x_db, "") != 0)   {
+      DEBUG_YJOBS   yLOG_note    ("option requires central database loaded before");
+      rc = x_callback (YJOBS_READ, "");
+      DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
+      if (rc < 0) {
+         yjobs_act_failure (a_mode, "central database did not load properly");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      g_fullacts  [20] = 'R';
+   }
    /*---(load all files)---------------------*/
    --rce;  if (strchr ("kK", a_runas) != NULL) {
       DEBUG_YJOBS   yLOG_note    ("option requires all files loaded before");

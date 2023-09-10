@@ -54,8 +54,8 @@ yjobs_prog__prepare     (cchar *a_oneline, void *f_callback)
    }
    /*---(save args)----------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_oneline" , a_oneline);
-   if (a_oneline  == NULL)    strlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
-   else                       strlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
+   if (a_oneline  == NULL)    ystrlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
+   else                       ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
    DEBUG_YJOBS   yLOG_point   ("f_callback", f_callback);
    if (f_callback != NULL)    myJOBS.e_callback   = f_callback;
    else                       myJOBS.e_callback   = NULL;
@@ -96,8 +96,8 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
    }
    /*---(save args)----------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_oneline" , a_oneline);
-   if (a_oneline  == NULL)    strlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
-   else                       strlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
+   if (a_oneline  == NULL)    ystrlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
+   else                       ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
    DEBUG_YJOBS   yLOG_point   ("f_callback", f_callback);
    if (f_callback != NULL)    myJOBS.e_callback   = f_callback;
    else                       myJOBS.e_callback   = NULL;
@@ -152,6 +152,10 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
          rc = yjobs_maintain  ();
          x_done = 'y';
          break;
+      case CASE_ONLY       :
+         rc = yjobs_maintain  ();
+         x_done = 'y';
+         break;
       default              :
          DEBUG_YJOBS   yLOG_note    ("not found in maintain switch");
          break;
@@ -193,6 +197,20 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       }
    }
    /*---(complete)-----------------------*/
+   /*> --rce;  if (x_done != 'y') {                                                   <* 
+    *>    DEBUG_YJOBS   yLOG_note    ("checking for special ONLY");                   <* 
+    *>    switch (myJOBS.m_mode) {                                                    <* 
+    *>    case CASE_ONLY       :                                                      <* 
+    *>       switch (myJOBS.m_mode) {                                                 <* 
+    *>       case  'o' :  myJOBS.m_mode = 'n';  break;                                <* 
+    *>       case  'ö' :  myJOBS.m_mode = 'ô';  break;                                <* 
+    *>       case  'O' :  myJOBS.m_mode = 'N';  break;                                <* 
+    *>       }                                                                        <* 
+    *>       DEBUG_YJOBS   yLOG_note    ("ONLY changes into normal");                 <* 
+    *>       break;                                                                   <* 
+    *>    }                                                                           <* 
+    *> }                                                                              <*/
+   /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc;
 }
@@ -207,7 +225,7 @@ yjobs_prog_about_para   (cchar *a_para)
    uchar       s           [LEN_RECD]  = "";
    int         c           =    0;
    printf ("\n");
-   strlcpy (t, a_para, LEN_RECD);
+   ystrlcpy (t, a_para, LEN_RECD);
    p = strtok (t, q);
    while (p != NULL) {
       if (c == 0) {

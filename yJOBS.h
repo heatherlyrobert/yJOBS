@@ -29,6 +29,7 @@ typedef const  char      cchar;
 #define     IAM_HELIOS       'l'
 #define     IAM_HERMES       'r'
 #define     IAM_THEMIS       't'
+#define     IAM_GREGG        'g'
 /*---(run-as/unit testing)----------------------*/
 #define     IAM_UEOS         'E'
 #define     IAM_UASTRAIOS    'A'
@@ -40,11 +41,12 @@ typedef const  char      cchar;
 #define     IAM_UHELIOS      'L'
 #define     IAM_UHERMES      'R'
 #define     IAM_UTHEMIS      'T'
+#define     IAM_UGREGG       'G'
 /*---(run-as for actions)-----------------------*/
 #define     IAM_DEFAULT      '-'
 #define     IAM_VERIFY       "eayhkpmEAYHKPM"
 #define     IAM_INSTALL      "eayhkpmEAYHKPM"
-#define     IAM_CHECK        "eayhkEAYHK"
+#define     IAM_CHECK        "eayhkgEAYHKG"
 /*---(run-as/done)------------------------------*/
 
 
@@ -133,6 +135,13 @@ typedef const  char      cchar;
 #define     ACT_VFIX        'F'
 #define     IF_FIX          if (yJOBS_iffix     () == 1)
 #define     CASE_FIX        'f' : case 'F' : case 'ü'
+
+/*---(central use)----------*/
+#define     ACT_ONLY        'o'
+#define     ACT_CONLY       'ö'
+#define     ACT_VONLY       'O'
+#define     IF_ONLY         if (yJOBS_ifonly    () == 1)
+#define     CASE_ONLY       'o' : case 'O' : case 'ö'
 
 /*---(cloud upload)---------*/
 #define     ACT_UPLOAD      'y'
@@ -304,6 +313,7 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_onelin
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(arguments)------------*/
+char        yJOBS_reset             (char *r_runas, char *r_mode, char *r_file);
 char        yjobs_args_init         (char *r_runas, char *r_mode, char *r_file);
 /*---(runas checkers)-------*/
 char        yJOBS_ifvalid           (void);
@@ -326,6 +336,7 @@ char        yJOBS_ifreport          (void);
 char        yJOBS_ifcheck           (void);
 char        yJOBS_ifaudit           (void);
 char        yJOBS_iffix             (void);
+char        yJOBS_ifonly            (void);
 /*---(cloud checkers)-------*/
 char        yJOBS_ifupload          (void);
 char        yJOBS_ifdownload        (void);

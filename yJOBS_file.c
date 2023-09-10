@@ -101,8 +101,8 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (r_desc != NULL)  strlcpy (r_desc, "", LEN_DESC);
-   strlcpy (myJOBS.f_desc, "", LEN_DESC);
+   if (r_desc != NULL)  ystrlcpy (r_desc, "", LEN_DESC);
+   ystrlcpy (myJOBS.f_desc, "", LEN_DESC);
    /*---(find)---------------------------*/
    DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
    rc = yjobs_who_naming (a_runas, &x_local, NULL, x_pre, NULL, x_suf, NULL);
@@ -122,7 +122,7 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
       return rce;
    }
    /*---(at least one period)------------*/
-   c = strldcnt (a_name, '.', LEN_RECD);
+   c = ystrldcnt (a_name, '.', LEN_RECD);
    DEBUG_YJOBS   yLOG_value   ("periods"   , c);
    x_beg = a_name;
    x_rem = strlen (a_name);
@@ -139,7 +139,7 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
       }
       p = strchr (a_name, '.');
       l = p - a_name + 1;
-      strlcpy (t, a_name, l + 1);
+      ystrlcpy (t, a_name, l + 1);
       DEBUG_YJOBS   yLOG_info    ("t"         , t);
       --rce;  if (strcmp (t, x_pre) != 0) {
          yURG_err ('f', "name prefix å%sæ does not match local standard å%sæ (illegal)", t, x_pre);
@@ -164,7 +164,7 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
          return rce;
       }
       p = strrchr (a_name, '.');
-      strlcpy (t, p, LEN_LABEL);
+      ystrlcpy (t, p, LEN_LABEL);
       DEBUG_YJOBS   yLOG_info    ("t"         , t);
       if (strcmp (t, x_suf) != 0) {
          yURG_err ('f', "name suffix å%sæ does not match local standard å%sæ (illegal)", t, x_suf);
@@ -189,8 +189,8 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
    DEBUG_YJOBS   yLOG_value   ("x_rem"     , x_rem);
    DEBUG_YJOBS   yLOG_info    ("x_beg"     , x_beg);
    if (x_rem >= 1)  {
-      if (r_desc != NULL)  strlcpy (r_desc, x_beg, x_rem + 1);
-      strlcpy (myJOBS.f_desc, x_beg, x_rem + 1);
+      if (r_desc != NULL)  ystrlcpy (r_desc, x_beg, x_rem + 1);
+      ystrlcpy (myJOBS.f_desc, x_beg, x_rem + 1);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
@@ -216,8 +216,8 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (r_desc != NULL)  strlcpy (r_desc, "", LEN_DESC);
-   strlcpy (myJOBS.f_desc, "", LEN_DESC);
+   if (r_desc != NULL)  ystrlcpy (r_desc, "", LEN_DESC);
+   ystrlcpy (myJOBS.f_desc, "", LEN_DESC);
    /*---(find)---------------------------*/
    DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
    rc = yjobs_who_naming (a_runas, NULL, &x_central, NULL, x_pre, x_suf, x_name);
@@ -237,7 +237,7 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
       return rce;
    }
    /*---(at least one period)------------*/
-   c = strldcnt (a_name, '.', LEN_RECD);
+   c = ystrldcnt (a_name, '.', LEN_RECD);
    DEBUG_YJOBS   yLOG_value   ("periods"   , c);
    x_beg = a_name;
    x_rem = strlen (a_name);
@@ -251,7 +251,7 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
       }
       p = strchr (a_name, '.');
       l = p - a_name + 1;
-      strlcpy (t, a_name, l);
+      ystrlcpy (t, a_name, l);
       rc = yEXEC_userdata (t, NULL, NULL, NULL, NULL);
       DEBUG_YJOBS   yLOG_value   ("userdata"  , rc);
       --rce;  if (rc < 0) {
@@ -275,7 +275,7 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
       }
       p = strchr (a_name, '.');
       l = p - a_name + 1;
-      strlcpy (t, a_name, l + 1);
+      ystrlcpy (t, a_name, l + 1);
       DEBUG_YJOBS   yLOG_info    ("t"         , t);
       --rce;  if (strcmp (t, x_pre) != 0) {
          yURG_err ('f', "name prefix å%sæ does not match central standard å%sæ (illegal)", t, x_pre);
@@ -300,7 +300,7 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
          return rce;
       }
       p = strrchr (a_name, '.');
-      strlcpy (t, p, LEN_LABEL);
+      ystrlcpy (t, p, LEN_LABEL);
       DEBUG_YJOBS   yLOG_info    ("t"         , t);
       if (strcmp (t, x_suf) != 0) {
          yURG_err ('f', "name suffix å%sæ does not match central standard å%sæ (illegal)", t, x_suf);
@@ -341,8 +341,8 @@ yjobs__name_central     (cchar a_runas, cchar *a_name, uchar *r_desc)
    DEBUG_YJOBS   yLOG_value   ("x_rem"     , x_rem);
    DEBUG_YJOBS   yLOG_info    ("x_beg"     , x_beg);
    if (x_rem >= 1)  {
-      if (r_desc != NULL)  strlcpy (r_desc, x_beg, x_rem + 1);
-      strlcpy (myJOBS.f_desc, x_beg, x_rem + 1);
+      if (r_desc != NULL)  ystrlcpy (r_desc, x_beg, x_rem + 1);
+      ystrlcpy (myJOBS.f_desc, x_beg, x_rem + 1);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
@@ -362,7 +362,7 @@ yjobs__naming           (cchar a_runas, cchar a_loc, cchar *a_name, uchar *r_des
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (r_desc != NULL)  strlcpy (r_desc, "", LEN_DESC);
+   if (r_desc != NULL)  ystrlcpy (r_desc, "", LEN_DESC);
    /*---(name quality)-------------------*/
    rc = yjobs__name_quality (a_name);
    DEBUG_YJOBS   yLOG_value   ("quality"   , rc);
@@ -492,7 +492,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   strlcat (r_dir, "/", LEN_PATH);
+   ystrlcat (r_dir, "/", LEN_PATH);
    DEBUG_YJOBS   yLOG_info    ("r_dir"     , r_dir);
    yURG_msg ('-', "current working directory is å%sæ", r_dir);
    /*---(check normal install)-----------*/
@@ -506,7 +506,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      strlcpy (r_fuser, a_muser, LEN_USER);
+      ystrlcpy (r_fuser, a_muser, LEN_USER);
       yURG_msg ('-', "normal user file in or below their own home directory");
    }
    /*---(check root install)-------------*/
@@ -517,16 +517,16 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
       DEBUG_YJOBS   yLOG_complex ("cdir"      , "%2d å%sæ vs å%sæ", l, t, r_dir);
       if (strncmp (r_dir, t, l) == 0) {
          DEBUG_YJOBS   yLOG_note    ("root in root user home directory tree");
-         strlcpy (r_fuser, "root", LEN_USER);
+         ystrlcpy (r_fuser, "root", LEN_USER);
          yURG_msg ('-', "root user file in or below årootæ home directory");
       } else {
          sprintf (t, "%s", a_home);
          l = strlen (t);
          if (strncmp (r_dir, t, l) == 0) {
             DEBUG_YJOBS   yLOG_note    ("root in another user home directory tree");
-            strlcpy  (s, r_dir + l, LEN_PATH);
-            strldchg (s, '/', '\0', LEN_PATH);
-            strlcpy (r_fuser, s, LEN_USER);
+            ystrlcpy  (s, r_dir + l, LEN_PATH);
+            ystrldchg (s, '/', '\0', LEN_PATH);
+            ystrlcpy (r_fuser, s, LEN_USER);
             DEBUG_YJOBS   yLOG_info    ("r_fuser"   , r_fuser);
             if (strcmp (r_fuser, "") == 0) {
                DEBUG_YJOBS   yLOG_note    ("not within a user directory");
@@ -534,7 +534,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
                return rce;
             } else if (strcmp (r_fuser, "machine") == 0) {
                DEBUG_YJOBS   yLOG_note    ("change machine user to root");
-               strlcpy (r_fuser, "root", LEN_USER);
+               ystrlcpy (r_fuser, "root", LEN_USER);
                yURG_msg ('-', "root user file in or below å%sæ home directory, so use årootæ as user", s);
             } else {
                yURG_msg ('-', "root user file in or below å%sæ home directory", s);
@@ -575,13 +575,13 @@ yjobs__loc_central      (cchar a_runas, uchar *a_name, char *r_fuser, char *r_di
    switch (a_runas) {
    case IAM_HERACLES  : case IAM_UHERACLES :
    case IAM_KHRONOS   : case IAM_UKHRONOS  :
-      strlcpy  (s      , a_name   , LEN_USER);
-      strldchg (s      , '.', '\0', LEN_USER);
-      strlcpy  (r_fuser, s        , LEN_USER);
+      ystrlcpy  (s      , a_name   , LEN_USER);
+      ystrldchg (s      , '.', '\0', LEN_USER);
+      ystrlcpy  (r_fuser, s        , LEN_USER);
       yURG_msg ('-', "central file prefix is å%sæ", r_fuser);
       break;
    default :
-      strlcpy  (r_fuser, "root"   , LEN_USER);
+      ystrlcpy  (r_fuser, "root"   , LEN_USER);
       yURG_msg ('-', "all non-job files require root access");
       break;
    }
@@ -728,6 +728,7 @@ yjobs__stat_local       (tSTAT *a_stat, int a_muid, int a_uid)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(file vs dir owner)--------------*/
+   DEBUG_YJOBS  yLOG_complex ("owner"     , "%4d vs %4d", a_stat->st_uid, a_uid);
    --rce;  if (a_stat->st_uid != a_uid) {
       yURG_err ('f', "file owner does not match directory owner (security risk)");
       DEBUG_YJOBS  yLOG_note    ("file owner does not match directory owner (security risk)");
@@ -746,13 +747,13 @@ yjobs__stat_local       (tSTAT *a_stat, int a_muid, int a_uid)
       return rce;
    }
    /*---(user-group match)---------------*/
-   --rce;  if (a_stat->st_uid != a_stat->st_gid) {
-      yURG_err ('f', "file owner and group do not match (security risk)");
-      DEBUG_YJOBS  yLOG_note    ("central file owner and group do not match (security risk)");
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   yURG_msg ('-', "file owner and group match");
+   /*> --rce;  if (a_stat->st_uid != a_stat->st_gid) {                                               <* 
+    *>    yURG_err ('f', "file owner and group do not match (security risk)");                       <* 
+    *>    DEBUG_YJOBS  yLOG_note    ("central file owner and group do not match (security risk)");   <* 
+    *>    DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);                                             <* 
+    *>    return rce;                                                                                <* 
+    *> }                                                                                             <* 
+    *> yURG_msg ('-', "file owner and group match");                                                 <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -877,12 +878,12 @@ yjobs_saveback           (cchar a_loc, cchar *a_fuser, int a_fuid, char *a_fdesc
 {
    /*---(globals)-------------------------*/
    myJOBS.f_loc  = a_loc;
-   strlcpy (myJOBS.f_user, a_fuser, LEN_USER);
+   ystrlcpy (myJOBS.f_user, a_fuser, LEN_USER);
    myJOBS.f_uid  = a_fuid;
-   strlcpy (myJOBS.f_desc, a_fdesc, LEN_DESC);
-   strlcpy (myJOBS.f_file, a_fname, LEN_DESC);
-   strlcpy (myJOBS.f_dir , a_fdir , LEN_PATH);
-   strlcpy (myJOBS.f_full, a_full , LEN_PATH);
+   ystrlcpy (myJOBS.f_desc, a_fdesc, LEN_DESC);
+   ystrlcpy (myJOBS.f_file, a_fname, LEN_DESC);
+   ystrlcpy (myJOBS.f_dir , a_fdir , LEN_PATH);
+   ystrlcpy (myJOBS.f_full, a_full , LEN_PATH);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -934,13 +935,13 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
       return rce;
    }
    /*---(update globals)-----------------*/
-   if (r_fuser != NULL)  strlcpy (r_fuser, x_fuser, LEN_USER);
+   if (r_fuser != NULL)  ystrlcpy (r_fuser, x_fuser, LEN_USER);
    if (r_fuid  != NULL) {
       *r_fuid = x_fuid;
       DEBUG_YJOBS   yLOG_value   ("*r_fuid"   , *r_fuid);
    }
-   if (r_fdesc != NULL)  strlcpy (r_fdesc, x_fdesc, LEN_DESC);
-   if (r_dir   != NULL)  strlcpy (r_dir  , x_cwd, LEN_PATH);
+   if (r_fdesc != NULL)  ystrlcpy (r_fdesc, x_fdesc, LEN_DESC);
+   if (r_dir   != NULL)  ystrlcpy (r_dir  , x_cwd, LEN_PATH);
    sprintf (x_full, "%s%s", x_cwd, a_file);
    yjobs_saveback  (YJOBS_LOCAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
    /*---(finish)-------------------------*/
@@ -959,10 +960,10 @@ yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_senter  (__FUNCTION__);
    /*---(default)------------------------*/
-   strlcpy (myJOBS.m_root, "", LEN_DESC);
-   strlcpy (myJOBS.m_home, "", LEN_DESC);
-   if (r_root != NULL) strlcpy (r_root, "", LEN_DESC);
-   if (r_home != NULL) strlcpy (r_home, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_root, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_home, "", LEN_DESC);
+   if (r_root != NULL) ystrlcpy (r_root, "", LEN_DESC);
+   if (r_home != NULL) ystrlcpy (r_home, "", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_spoint  (r_root);
    --rce;  if (r_root == NULL) {
@@ -991,8 +992,8 @@ yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)
    }
    /*---(save globally)------------------*/
    DEBUG_YJOBS  yLOG_snote   ("globals");
-   strlcpy (r_root, myJOBS.m_root, LEN_DESC);
-   strlcpy (r_home, myJOBS.m_home, LEN_DESC);
+   ystrlcpy (r_root, myJOBS.m_root, LEN_DESC);
+   ystrlcpy (r_home, myJOBS.m_home, LEN_DESC);
    /*---(report-out)---------------------*/
    DEBUG_YJOBS  yLOG_snote   (r_root);
    DEBUG_YJOBS  yLOG_snote   (r_home);
@@ -1029,7 +1030,7 @@ yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fu
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   strlcpy (myJOBS.m_user, x_user, LEN_USER);
+   ystrlcpy (myJOBS.m_user, x_user, LEN_USER);
    myJOBS.m_uid = x_uid;
    /*---(check local file)---------------*/
    rc = yjobs_local_full (a_runas, x_home, x_root, a_file, x_user, x_uid, r_fuser, r_fuid, r_fdesc, r_dir);
@@ -1101,10 +1102,10 @@ yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar 
       return rce;
    }
    /*---(update globals)-----------------*/
-   if (r_fuser != NULL)  strlcpy (r_fuser, x_fuser, LEN_USER);
+   if (r_fuser != NULL)  ystrlcpy (r_fuser, x_fuser, LEN_USER);
    if (r_fuid  != NULL)  *r_fuid = x_fuid;
-   if (r_fdesc != NULL)  strlcpy (r_fdesc, x_fdesc, LEN_DESC);
-   /*> if (r_fdesc != NULL)  strlcpy (r_fdesc, a_file + strlen (x_fuser) + 1 , LEN_DESC);   <*/
+   if (r_fdesc != NULL)  ystrlcpy (r_fdesc, x_fdesc, LEN_DESC);
+   /*> if (r_fdesc != NULL)  ystrlcpy (r_fdesc, a_file + strlen (x_fuser) + 1 , LEN_DESC);   <*/
    sprintf (x_full, "%s%s", x_cwd, a_file);
    yjobs_saveback  (YJOBS_CENTRAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
    /*---(finish)-------------------------*/
@@ -1131,9 +1132,9 @@ yjobs_central_dirs      (cchar a_runas, cchar a_mode, cchar *a_file, cchar *a_us
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   strlcpy (myJOBS.m_dir , "", LEN_PATH);
-   if (r_cdir != NULL)  strlcpy (r_cdir , "", LEN_PATH);
-   if (r_new  != NULL)  strlcpy (r_new  , "", LEN_DESC);
+   ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
+   if (r_cdir != NULL)  ystrlcpy (r_cdir , "", LEN_PATH);
+   if (r_new  != NULL)  ystrlcpy (r_new  , "", LEN_DESC);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_point   ("r_cdir"    , r_cdir);
    --rce;  if (r_cdir  == NULL) {
@@ -1152,8 +1153,8 @@ yjobs_central_dirs      (cchar a_runas, cchar a_mode, cchar *a_file, cchar *a_us
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   strlcpy (myJOBS.m_dir , x_cdir, LEN_PATH);
-   if (r_cdir != NULL)  strlcpy (r_cdir , x_cdir, LEN_PATH);
+   ystrlcpy (myJOBS.m_dir , x_cdir, LEN_PATH);
+   if (r_cdir != NULL)  ystrlcpy (r_cdir , x_cdir, LEN_PATH);
    /*---(check if file too)--------------*/
    if (r_new  == NULL) {
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -1177,7 +1178,7 @@ yjobs_central_dirs      (cchar a_runas, cchar a_mode, cchar *a_file, cchar *a_us
    /*---(fixed central name)-------------*/
    --rce;  if (strcmp (x_name, "") != 0) {
       DEBUG_YJOBS   yLOG_note    ("central name is specific and fixed");
-      strlcpy (r_new , x_name, LEN_DESC);
+      ystrlcpy (r_new , x_name, LEN_DESC);
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
@@ -1225,7 +1226,7 @@ yjobs_central_old       (cchar a_runas, cchar a_mode, cchar *a_file, char *r_fus
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   if (r_cdir  != NULL)  strlcpy (r_cdir, x_cdir, LEN_PATH);
+   if (r_cdir  != NULL)  ystrlcpy (r_cdir, x_cdir, LEN_PATH);
    /*---(get security data)--------------*/
    rc = yEXEC_whoami (NULL, NULL, &x_uid, NULL, &x_user, 'n');
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
@@ -1234,7 +1235,7 @@ yjobs_central_old       (cchar a_runas, cchar a_mode, cchar *a_file, char *r_fus
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   strlcpy (myJOBS.m_user, x_user, LEN_USER);
+   ystrlcpy (myJOBS.m_user, x_user, LEN_USER);
    myJOBS.m_uid = x_uid;
    /*---(check central file)-------------*/
    rc = yjobs_central_full (a_runas, x_cdir, x_new, x_user, x_uid, r_fuser, r_fuid, r_fdesc);
@@ -1268,12 +1269,12 @@ yJOBS_filedata          (char *r_runas, char *r_mode, char *r_floc, char *r_fnam
    if (r_runas != NULL)  *r_runas  = myJOBS.m_runas;
    if (r_mode  != NULL)  *r_mode   = myJOBS.m_mode;
    if (r_floc  != NULL)  *r_floc   = myJOBS.f_loc;
-   if (r_fname != NULL)  strlcpy (r_fname, myJOBS.f_file, LEN_DESC);
-   if (r_fuser != NULL)  strlcpy (r_fuser, myJOBS.f_user, LEN_USER);
+   if (r_fname != NULL)  ystrlcpy (r_fname, myJOBS.f_file, LEN_DESC);
+   if (r_fuser != NULL)  ystrlcpy (r_fuser, myJOBS.f_user, LEN_USER);
    if (r_fuid  != NULL)  *r_fuid   = myJOBS.f_uid;
-   if (r_fdesc != NULL)  strlcpy (r_fdesc, myJOBS.f_desc, LEN_DESC);
-   if (r_fdir  != NULL)  strlcpy (r_fdir , myJOBS.f_dir , LEN_PATH);
-   if (r_full  != NULL)  strlcpy (r_full , myJOBS.f_full, LEN_PATH);
+   if (r_fdesc != NULL)  ystrlcpy (r_fdesc, myJOBS.f_desc, LEN_DESC);
+   if (r_fdir  != NULL)  ystrlcpy (r_fdir , myJOBS.f_dir , LEN_PATH);
+   if (r_full  != NULL)  ystrlcpy (r_full , myJOBS.f_full, LEN_PATH);
    return 0;
 }
 
