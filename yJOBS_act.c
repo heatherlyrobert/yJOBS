@@ -502,7 +502,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
       }
    }
    /*---(verify file)------------------------*/
-   --rce;  if (strchr ("cýCoöO", a_mode) != NULL && strcmp (a_file, "") != 0) {
+   --rce;  if (strchr ("cýCaèAoöO", a_mode) != NULL && strcmp (a_file, "") != 0) {
       rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {

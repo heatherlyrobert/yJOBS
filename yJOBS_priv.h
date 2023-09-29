@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0g"
-#define     P_VERTXT    "fixes due to changed str functions to ¶ystr¶ in ySTR"
+#define     P_VERNUM    "1.0h"
+#define     P_VERTXT    "tiny wording changes and little yJOBS_maintain update"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

@@ -112,10 +112,10 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    { "help"     , "3··", "present a simple help message"                ,   2, '-', YJOBS_NEITHER  },
    /*---(incomming 5)--------------------*/
    { "verify"   , "vÑV", "verify local file for correctness"            ,   4, '-', YJOBS_LOCAL    },
-   { "local"    , "lòL", "report on local content"                      ,   5, '-', YJOBS_LOCAL    },
+   { "local"    , "lòL", "report on local file content"                 ,   5, '-', YJOBS_LOCAL    },
    { "register" , "béB", "verify local file and register centrally"     ,   6, '-', YJOBS_LOCAL    },
-   { "update"   , "uûU", "update central with single file"              ,   7, '-', YJOBS_LOCAL    },
-   { "install"  , "iðI", "verify local file, then install centrally"    ,   8, '-', YJOBS_LOCAL    },
+   { "update"   , "uûU", "update central with single local file"        ,   7, '-', YJOBS_LOCAL    },
+   { "install"  , "iðI", "verify local file, then update centrally"     ,   8, '-', YJOBS_LOCAL    },
    /*---(maintain 6)---------------------*/
    { "stats"    , "#··", "information about database and environment"   ,  10, '-', YJOBS_CENTRAL  },
    { "list"     , "=··", "list of executable content"                   ,  11, '-', YJOBS_CENTRAL  },
@@ -134,7 +134,7 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    /*---(outgoing 4)---------------------*/
    { "withdraw" , "qþQ", "unregister centrally"                         ,  25, '-', YJOBS_CENTRAL  },
    { "clear"    , "xõX", "clear file from central location"             ,  26, '-', YJOBS_CENTRAL  },
-   { "remove"   , "røR", "remove file from central location"            ,  27, '-', YJOBS_CENTRAL  },
+   { "remove"   , "røR", "unregister and clear from central location"   ,  27, '-', YJOBS_CENTRAL  },
    { "extract"  , "eìE", "extract a central file to local copy"         ,  28, '-', YJOBS_CENTRAL  },
    /*---(execution)----------------------*/
    { "gather"   , "gêG", "execute system-wide data gather"              ,  30, '-', YJOBS_NEITHER  },
