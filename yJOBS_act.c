@@ -320,6 +320,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
+      if (rc == 1)  strlcpy (x_full, a_file, LEN_PATH);
       g_fullacts  [ 7] = 'l';
    }
    /*---(verify contents)--------------------*/

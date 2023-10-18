@@ -18,6 +18,7 @@ yjobs__name_quality     (cchar *a_name)
    int         l           =    0;
    int         i           =    0;
    uchar      *p           = NULL;
+   int         c           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
@@ -31,19 +32,25 @@ yjobs__name_quality     (cchar *a_name)
    DEBUG_YJOBS   yLOG_info    ("a_name"    , a_name);
    yURG_msg ('-', "name å%sæ is not empty/null", a_name);
    /*---(path)---------------------------*/
+   l = strlen (a_name);
+   DEBUG_YJOBS   yLOG_value   ("l"         , l);
+   c = ystrldcnt (a_name, '/', LEN_PATH);
+   DEBUG_YJOBS   yLOG_value   ("c"         , c);
    p = strchr (a_name, '/');
    DEBUG_YJOBS   yLOG_point   ("/"         , p);
    --rce;  if (p != NULL) {
-      yURG_err ('f', "file name can not include relative/absolute path (security risk)");
-      DEBUG_YJOBS   yLOG_note    ("file name can not include relative/absolute path (security risk)");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      if (c == 1 && p == a_name + l - 1) {
+         DEBUG_YJOBS   yLOG_note    ("ended in / which means directory");
+      } else {
+         yURG_err ('f', "file name can not include relative/absolute path (security risk)");
+         DEBUG_YJOBS   yLOG_note    ("file name can not include relative/absolute path (security risk)");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
    DEBUG_YJOBS   yLOG_note    ("file name is pathless/local");
    yURG_msg ('-', "file name is pathless/local");
    /*---(name length)--------------------*/
-   l = strlen (a_name);
-   DEBUG_YJOBS   yLOG_value   ("l"         , l);
    --rce;  if (l <  7) {
       yURG_err ('f', "file name can not be shorter than 7 chars (lazy)");
       DEBUG_YJOBS   yLOG_note    ("file name can not be shorter than 7 chars (lazy)");
@@ -78,6 +85,11 @@ yjobs__name_quality     (cchar *a_name)
       return rce;
    }
    yURG_msg ('-', "file is not hidden, no lead period");
+   /*---(check directory)----------------*/
+   if (c == 1) {
+      DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+      return 1;
+   }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -355,10 +367,6 @@ yjobs__naming           (cchar a_runas, cchar a_loc, cchar *a_name, uchar *r_des
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   int         l           =    0;
-   int         i           =    0;
-   int         c           =    0;
-   uchar      *p           = NULL;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
@@ -369,6 +377,12 @@ yjobs__naming           (cchar a_runas, cchar a_loc, cchar *a_name, uchar *r_des
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
+   }
+   --rce;  if (rc == 1) {
+      DEBUG_YJOBS   yLOG_note    ("short-cut for directory");
+      DEBUG_YJOBS   yLOG_info    ("a_name"    , a_name);
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      return 1;
    }
    /*---(check local)--------------------*/
    --rce;  if (a_loc == YJOBS_LOCAL) {
@@ -917,6 +931,12 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if (rc == 1) {
+      DEBUG_YJOBS   yLOG_note    ("short-cut for directory");
+      DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      return 1;
+   }
    /*---(verify user)--------------------*/
    rc = yjobs__location (a_runas, YJOBS_LOCAL, a_home, a_root, a_file, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
    DEBUG_YJOBS  yLOG_value   ("location"  , rc);
@@ -1038,6 +1058,12 @@ yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fu
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
+   }
+   if (rc == 1) {
+      DEBUG_YJOBS   yLOG_note    ("short-cut for directory");
+      DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      return 1;
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
