@@ -3,6 +3,7 @@
 #define YJOBS_hguard loaded
 
 
+#include    <ySTR_solo.h>
 
 typedef long   long      llong;
 typedef const  int       cint;
@@ -47,6 +48,8 @@ typedef const  char      cchar;
 #define     IAM_VERIFY       "eayhkpmEAYHKPM"
 #define     IAM_INSTALL      "eayhkpmEAYHKPM"
 #define     IAM_CHECK        "eayhkgEAYHKG"
+#define     IAM_FILES        "eayhkmEAYHKM"
+#define     IAM_DIRS         "pmPM"
 /*---(run-as/done)------------------------------*/
 
 
@@ -257,6 +260,7 @@ typedef const  char      cchar;
 #define     YJOBS_AUDIT     'a'
 #define     YJOBS_REPORT    ' '
 #define     YJOBS_LOCALRPT  '´'
+#define     YJOBS_LOCAL     '´'
 #define     YJOBS_EXTRACT   'e'
 #define     YJOBS_WRITE     'Õ'
 #define     YJOBS_PURGE     'P'
@@ -278,6 +282,7 @@ char        yJOBS_final             (int a_uid);  /* DEPRICATED */
 char        yJOBS_wrap              (void);
 
 char        yJOBS_filedata          (char *r_runas, char *r_mode, char *r_floc, char *r_fname, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir, char *r_full);
+char        yJOBS_file_audit        (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND]);
 
 
 /*===[[ DEBUGGING ]]==========================================================*/
@@ -292,8 +297,6 @@ char        yJOBS_rmdirs            (void);
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(local)----------------*/
-/*> char        yjobs_verify            (void);                                       <*/
-char        yJOBS_act_install       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name, void *a_assimilate);
 /*---(central)--------------*/
 char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name, void *a_assimilate);
 char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);

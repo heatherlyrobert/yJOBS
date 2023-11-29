@@ -2,6 +2,14 @@
 #include   "yJOBS.h"
 #include   "yJOBS_priv.h"
 
+/*
+ * METIS § ga4·· § modify world to call gather directly if no world file                  § N9N747 §  · §
+ *
+ *
+ *
+ *
+ *
+ */
 
 #define     B_WORLD     'w'
 char   g_print       [LEN_RECD]  = "";
@@ -307,7 +315,7 @@ yjobs_world__open       (cchar a_runas, cchar *a_opt)
       return rce;
    }
    /*---(get localtion)------------------*/
-   rc = yjobs_who_location (a_runas, NULL, x_hdir, x_world, NULL);
+   rc = yjobs_who_location (a_runas, NULL, x_hdir, x_world, NULL, NULL);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -746,21 +754,22 @@ yjobs_world_register    (cchar a_runas, cchar *a_file)
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(verify header)------------------*/
    yURG_msg ('>', "register in world file...");
+   g_acts_score  [G_SCORE_WORLD + 1] = G_SCORE_FAIL;
    /*---(check file)---------------------*/
-   --rce;  switch (a_runas) {
-   case IAM_POLYMNIA  : case IAM_UPOLYMNIA :
-      if (strcmp (a_file, "") != 0) {
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return  rce;
-      }
-      break;
-   case IAM_METIS     : case IAM_UMETIS    :
-      if (strcmp (a_file, "") == 0) {
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return  rce;
-      }
-      break;
-   }
+   /*> --rce;  switch (a_runas) {                                                     <* 
+    *> case IAM_POLYMNIA  : case IAM_UPOLYMNIA :                                      <* 
+    *>    if (strcmp (a_file, "") != 0) {                                             <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>       return  rce;                                                             <* 
+    *>    }                                                                           <* 
+    *>    break;                                                                      <* 
+    *> case IAM_METIS     : case IAM_UMETIS    :                                      <* 
+    *>    if (strcmp (a_file, "") == 0) {                                             <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>       return  rce;                                                             <* 
+    *>    }                                                                           <* 
+    *>    break;                                                                      <* 
+    *> }                                                                              <*/
    /*---(get the home)-------------------*/
    rc = yjobs_world__home (ACT_REGISTER, a_file, x_path);
    DEBUG_YJOBS   yLOG_value   ("home"      , rc);
@@ -783,6 +792,7 @@ yjobs_world_register    (cchar a_runas, cchar *a_file)
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_note    ("no existing file");
    }
+   g_acts_score  [G_SCORE_WORLD + 1] = 'Ô';
    /*---(look for existing)--------------*/
    rc = yjobs_world__by_path (x_path, &x_world);
    if (x_world != NULL) {
@@ -791,6 +801,7 @@ yjobs_world_register    (cchar a_runas, cchar *a_file)
       return 1;
    }
    /*---(add new one)--------------------*/
+   g_acts_score  [G_SCORE_WORLD + 3] = G_SCORE_FAIL;
    rc = yjobs_world__add    (x_path);
    --rce;  if (rc < 0) {
       yURG_err ('f', "project could not be added");
@@ -798,7 +809,9 @@ yjobs_world_register    (cchar a_runas, cchar *a_file)
       return rce;
    }
    yURG_msg ('-', "project is new to registry, added");
+   g_acts_score  [G_SCORE_WORLD + 3] = 'r';
    /*---(export)-------------------------*/
+   g_acts_score  [G_SCORE_WORLD + 5] = G_SCORE_FAIL;
    rc = yjobs_world__export (a_runas);
    DEBUG_YJOBS   yLOG_value   ("export"    , rc);
    --rce;  if (rc < 0) {
@@ -812,6 +825,7 @@ yjobs_world_register    (cchar a_runas, cchar *a_file)
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
+   g_acts_score  [G_SCORE_WORLD + 5] = 'Õ';
    /*---(mute)---------------------------*/
    yURG_msg ('-', "success, current project confirmed in world file");
    yURG_msg (' ', "");
@@ -833,6 +847,7 @@ yjobs_world_withdraw    (cchar a_runas, cchar *a_file)
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(verify header)------------------*/
    yURG_msg ('>', "withdraw project from world file...");
+   g_acts_score  [G_SCORE_WORLD + 1] = G_SCORE_FAIL;
    /*---(get the home)-------------------*/
    rc = yjobs_world__home (ACT_WITHDRAW, a_file, x_path);
    DEBUG_YJOBS   yLOG_value   ("home"      , rc);
@@ -856,21 +871,27 @@ yjobs_world_withdraw    (cchar a_runas, cchar *a_file)
       DEBUG_YJOBS   yLOG_note    ("no existing file");
       return  rce;
    }
+   g_acts_score  [G_SCORE_WORLD + 1] = 'Ô';
    /*---(look for existing)--------------*/
    rc = yjobs_world__by_path (x_path, &x_world);
    if (x_world == NULL) {
       yURG_err ('w', "entry does not exist in registry, nothing to do");
+      g_acts_score  [G_SCORE_WORLD + 4] = G_SCORE_SKIP;
+      g_acts_score  [G_SCORE_WORLD + 5] = G_SCORE_SKIP;
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 1;
    }
    /*---(remove)-------------------------*/
+   g_acts_score  [G_SCORE_WORLD + 4] = G_SCORE_FAIL;
    rc = yjobs_world__remove (x_path);
    --rce;  if (rc < 0) {
       yURG_err ('f', "path could not be withdrawn");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   g_acts_score  [G_SCORE_WORLD + 4] = 'u';
    /*---(export)-------------------------*/
+   g_acts_score  [G_SCORE_WORLD + 5] = G_SCORE_FAIL;
    rc = yjobs_world__export (a_runas);
    DEBUG_YJOBS   yLOG_value   ("export"    , rc);
    --rce;  if (rc < 0) {
@@ -887,13 +908,14 @@ yjobs_world_withdraw    (cchar a_runas, cchar *a_file)
    /*---(mute)---------------------------*/
    yURG_msg ('-', "success, current project withdrawn from world file");
    yURG_msg (' ', "");
+   g_acts_score  [G_SCORE_WORLD + 5] = 'Õ';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
-yjobs_world_full        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback)
+yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_file, void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -906,6 +928,8 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    tWORLD     *x_curr      = NULL;
    int         c           =    0;
    char       *p           = NULL;
+   /*---(quick-out)----------------------*/
+   if (a_runas == IAM_HELIOS)  return 0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
@@ -924,7 +948,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, x_db, x_cwd, NULL);
+   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, NULL, x_db, x_cwd, NULL);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -1092,6 +1116,4 @@ yJOBS_world_system       (cchar a_runas, void *a_callback)
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
-
-
 

@@ -37,19 +37,19 @@ tLOCAL myJOBS = { '-', '-' };
 
 const tWHO  g_whos [MAX_WHO] = {
    /* primary--------  unittest-------  name------ , installed----------- , description----------------------------------------    allowed-actions-----------------  */
-   /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vlbui #=mcafo ktw yz qxre gdpnsh -  , loc  cen  ---config-dir------------- , ---testing-dir------------   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- ,  database------------ , */
-   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , ""                    },
-   {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , ""                    },
-   {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , ""                    }, 
-   {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "-·· F··FF --·F--· ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
-   {  IAM_KHRONOS    , IAM_UKHRONOS   , "khronos"  , "/usr/sbin/"         , "khronos-anileis (merciless time)"                  , "--· F··FF --FF--· ··· ·· ·FFF ·----- -" , 'y', 'y', "/var/spool/khronos/"      , "/tmp/spool/khronos/"      , "khronos."   , "(USER)."    , ""           , ""                , "/var/lib/khronos/"        , "/tmp/lib/khronos/"        , ""                    , ""                    }, 
-   {  IAM_POLYMNIA   , IAM_UPOLYMNIA  , "polymnia" , "/usr/local/bin/"    , "polymnia-hymnos (many praises)"                    , "--· ----- --F·--· ··· ·· ---· -··--· -" , '·', '·', ""                         , ""                         , ""           , ""           , ""           , ""                , "/var/lib/polymnia/"       , "/tmp/lib/polymnia/"       , "world.txt"           , "polymnia.db"         }, 
-   {  IAM_METIS      , IAM_UMETIS     , "metis"    , "/usr/local/bin/"    , "metis-okeanides (wise-counsel)"                    , "-·· FFFFF --F---· ··· ·· FFFF -··--· -" , 'y', '·', ""                         , ""                         , ""           , ""           , ".tasks"     , ""                , "/var/lib/metis/"          , "/tmp/lib/metis/"          , "world.txt"           , "metis.db"            },
-   {  IAM_HELIOS     , IAM_UHELIOS    , "helios"   , "/usr/bin/"          , "helios-phaeton (radiant)"                          , "-·· F··FF -·F---· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "helios."    , "helios."    , ".conf"      , "helios.conf"     , "/var/lib/helios/"         , "/tmp/lib/helios/"         , ""                    , "helios.db"           }, 
-   {  IAM_HERMES     , IAM_UHERMES    , "hermes"   , "/sbin/"             , "hermes-diactoros (messenger of gods)"              , "-·· F··FF -·F---· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hermes."    , "hermes."    , ".conf"      , "hermes.conf"     , "/var/lib/hermes/"         , "/tmp/lib/hermes/"         , ""                    , "hermes.db"           }, 
-   {  IAM_THEMIS     , IAM_UTHEMIS    , "themis"   , "/sbin/"             , "themis-euboulos (divine law)"                      , "-·· F··FF -·F---· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "themis."    , "themis."    , ".conf"      , "themis.conf"     , "/var/lib/themis/"         , "/tmp/lib/themis/"         , ""                    , "themis.db"           }, 
-   {  IAM_GREGG      , IAM_UGREGG     , "gregg"    , "/usr/local/bin/"    , "athene-makhanitis (skilled inventor)"              , "-·· ·FF·· --FF--F ··· ·· F··· -··--· -" , 'y', 'y', "/var/lib/gregg/"          , "/tmp/lib/gregg/"          , ""           , ""           , ".dict"      , ""                , "/var/lib/gregg/"          , "/tmp/lib/gregg/"          , "world.txt"           , "gregg.db"            }, 
-   {  0              , 0              , "--end--"  , "--end--"            , "--end--"                                           , "··· ····· ······· ··· ·· ···· ······ ·" , '·', '·', "--end--"                  , "--end--"                  , ""           , ""           , ""           , ""                , ""                         , ""                         , ""                    , ""                    }, 
+   /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vlbui #=mcafo ktw yz qxre gdpnsh -  , loc  cen  ---config-dir------------- , ---testing-dir------------   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- , upd ,  database------------ , */
+   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , '·' , ""                    },
+   {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , '·' , ""                    },
+   {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , '·' , ""                    }, 
+   {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "-·· F··FF --·F--· ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , '·' , ""                    }, 
+   {  IAM_KHRONOS    , IAM_UKHRONOS   , "khronos"  , "/usr/sbin/"         , "khronos-anileis (merciless time)"                  , "--· F··FF --FF--· ··· ·· ·FFF ·----- -" , 'y', 'y', "/var/spool/khronos/"      , "/tmp/spool/khronos/"      , "khronos."   , "(USER)."    , ""           , ""                , "/var/lib/khronos/"        , "/tmp/lib/khronos/"        , ""                    , '·' , ""                    }, 
+   {  IAM_POLYMNIA   , IAM_UPOLYMNIA  , "polymnia" , "/usr/local/bin/"    , "polymnia-hymnos (many praises)"                    , "--· FFFFF --F·--· ··· ·· ---· -··--· -" , '·', '·', ""                         , ""                         , ""           , ""           , ""           , ""                , "/var/lib/polymnia/"       , "/tmp/lib/polymnia/"       , "world.ctrl"          , 'U' , "polymnia.db"         }, 
+   {  IAM_METIS      , IAM_UMETIS     , "metis"    , "/usr/local/bin/"    , "metis-okeanides (wise-counsel)"                    , "-·· FFFFF --F---· ··· ·· FFFF -··--· -" , 'y', '·', ""                         , ""                         , ""           , ""           , ".tasks"     , ""                , "/var/lib/metis/"          , "/tmp/lib/metis/"          , "world.ctrl"          , 'o' , "metis.db"            },
+   {  IAM_HELIOS     , IAM_UHELIOS    , "helios"   , "/usr/bin/"          , "helios-phaeton (radiant)"                          , "-·· F··FF -·----· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "helios."    , "helios."    , ".conf"      , "helios.conf"     , "/var/lib/helios/"         , "/tmp/lib/helios/"         , ""                    , 'o' , "helios.db"           }, 
+   {  IAM_HERMES     , IAM_UHERMES    , "hermes"   , "/sbin/"             , "hermes-diactoros (messenger of gods)"              , "-·· F··FF -·F---· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hermes."    , "hermes."    , ".conf"      , "hermes.conf"     , "/var/lib/hermes/"         , "/tmp/lib/hermes/"         , ""                    , 'o' , "hermes.db"           }, 
+   {  IAM_THEMIS     , IAM_UTHEMIS    , "themis"   , "/sbin/"             , "themis-euboulos (divine law)"                      , "-·· F··FF -·F---· ··· ·· ···- -··--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "themis."    , "themis."    , ".conf"      , "themis.conf"     , "/var/lib/themis/"         , "/tmp/lib/themis/"         , ""                    , 'o' , "themis.db"           }, 
+   {  IAM_GREGG      , IAM_UGREGG     , "gregg"    , "/usr/local/bin/"    , "athene-makhanitis (skilled inventor)"              , "-·· ·FF·· --FF--F ··· ·· F··· -··--· -" , 'y', 'y', "/var/lib/gregg/"          , "/tmp/lib/gregg/"          , ""           , ""           , ".dict"      , ""                , "/var/lib/gregg/"          , "/tmp/lib/gregg/"          , "world.ctrl"          , '·' , "gregg.db"            }, 
+   {  0              , 0              , "--end--"  , "--end--"            , "--end--"                                           , "··· ····· ······· ··· ·· ···· ······ ·" , '·', '·', "--end--"                  , "--end--"                  , ""           , ""           , ""           , ""                , ""                         , ""                         , ""                    , '·' , ""                    }, 
 };
 
 static const char *g_nada = "";
@@ -58,7 +58,7 @@ static const char *g_nada = "";
 /*====================------------------------------------====================*/
 /*===----                           utility                            ----===*/
 /*====================------------------------------------====================*/
-static void      o___UTILITY_________________o (void) {;}
+static void      o___UTILITY____________o (void) {;}
 
 static char yJOBS_ver [LEN_HUND] = "";
 
@@ -84,7 +84,7 @@ yJOBS_version      (void)
 /*====================------------------------------------====================*/
 /*===----                      who table access                        ----===*/
 /*====================------------------------------------====================*/
-static void      o___WHO_TABLE_______________o (void) {;}
+static void      o___WHO_TABLE__________o (void) {;}
 
 char
 yjobs_who_init          (void)
@@ -141,31 +141,34 @@ yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_
 }
 
 char
-yjobs_who_location      (cchar a_runas, char *a_cdir, char *a_hdir, char *a_world, char *a_db)
+yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         i           =    0;
    /*---(default)------------------------*/
-   if (a_cdir  != NULL)  ystrlcpy (a_cdir , "", LEN_DESC);
-   if (a_hdir  != NULL)  ystrlcpy (a_hdir , "", LEN_DESC);
-   if (a_world != NULL)  ystrlcpy (a_world, "", LEN_LABEL);
-   if (a_db    != NULL)  ystrlcpy (a_db   , "", LEN_LABEL);
+   if (r_cdir   != NULL)  ystrlcpy (r_cdir , "", LEN_DESC);
+   if (r_hdir   != NULL)  ystrlcpy (r_hdir , "", LEN_DESC);
+   if (r_world  != NULL)  ystrlcpy (r_world, "", LEN_LABEL);
+   if (r_update != NULL)  *r_update = '·';
+   if (r_db     != NULL)  ystrlcpy (r_db   , "", LEN_LABEL);
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
       if (g_whos [i].abbr == 0)         break;
       if (a_runas == g_whos [i].abbr) {
-         if (a_cdir  != NULL)  ystrlcpy (a_cdir , g_whos [i].cdir , LEN_DESC);
-         if (a_hdir  != NULL)  ystrlcpy (a_hdir , g_whos [i].hdir , LEN_DESC);
-         if (a_world != NULL)  ystrlcpy (a_world, g_whos [i].world, LEN_LABEL);
-         if (a_db    != NULL)  ystrlcpy (a_db   , g_whos [i].db   , LEN_LABEL);
+         if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].cdir , LEN_DESC);
+         if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].hdir , LEN_DESC);
+         if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);
+         if (r_update != NULL)  *r_update = g_whos [i].update;
+         if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);
          return 0;
       }
       if (a_runas == g_whos [i].unit) {
-         if (a_cdir  != NULL)  ystrlcpy (a_cdir , g_whos [i].udir , LEN_DESC);
-         if (a_hdir  != NULL)  ystrlcpy (a_hdir , g_whos [i].uhdir, LEN_DESC);
-         if (a_world != NULL)  ystrlcpy (a_world, g_whos [i].world, LEN_LABEL);
-         if (a_db    != NULL)  ystrlcpy (a_db   , g_whos [i].db   , LEN_LABEL);
+         if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].udir , LEN_DESC);
+         if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].uhdir, LEN_DESC);
+         if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);
+         if (r_update != NULL)  *r_update = g_whos [i].update;
+         if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);
          return 0;
       }
    }
@@ -238,7 +241,7 @@ yjobs_who_testing       (cchar a_runas)
 /*====================------------------------------------====================*/
 /*===----                      simple identification                   ----===*/
 /*====================------------------------------------====================*/
-static void      o___IDENTIFY________________o (void) {;};
+static void      o___IDENTIFY___________o (void) {;};
 
 char
 yjobs_runas             (cchar *a_name, char *r_runas)
@@ -416,7 +419,7 @@ yJOBS_wrap              (void)
 /*====================------------------------------------====================*/
 /*===----                         unit testing                         ----===*/
 /*====================------------------------------------====================*/
-static void      o___UNITTEST________________o (void) {;};
+static void      o___UNITTEST___________o (void) {;};
 
 char          unit_answer [LEN_RECD];
 

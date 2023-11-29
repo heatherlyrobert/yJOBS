@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0i"
-#define     P_VERTXT    "created a metis-required directory exclusion to file checking"
+#define     P_VERNUM    "1.0j"
+#define     P_VERTXT    "many small updates to assist mayan program"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -51,6 +51,15 @@
 
 /*345678901-12345678901-123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
 
+
+/*
+ * METIS § mg2·· § add GPL headers (from helios) to all files                             § N9N77I §  · §
+ * METIS § dn8·· § catch up all unit testing and pass                                     § N9N77u §  · §
+ *
+ *
+ *
+ *
+ */
 
 
 /*===[[ CUSTOM HEADERS ]]=====================================================*/
@@ -155,6 +164,7 @@ struct cWHO {
    char        hdir        [LEN_DESC];
    char        uhdir       [LEN_DESC];
    char        world       [LEN_LABEL];
+   char        update;
    char        db          [LEN_LABEL];
 };
 extern const tWHO   g_whos [MAX_WHO];
@@ -224,7 +234,25 @@ typedef struct cLIB  tLIB;
 
 
 
-extern      char    g_fullacts      [LEN_DESC];
+extern char    g_acts_empty    [LEN_HUND];
+extern char    g_acts_score    [LEN_HUND];
+extern char    g_fullacts      [LEN_DESC];
+
+#define    G_SCORE_FAIL      '°'
+#define    G_SCORE_SKIP      '-'
+
+#define    G_SCORE_PREPARE    0
+#define    G_SCORE_SECURE     7
+#define    G_SCORE_DATABASE  14
+#define    G_SCORE_LOCAL     24
+#define    G_SCORE_WORLD     32
+#define    G_SCORE_CENTRAL   43
+#define    G_SCORE_ACTION    55
+#define    G_SCORE_BACKEND   63
+#define    G_SCORE_JUDGE     70
+
+
+
 extern      char    unit_answer     [LEN_RECD];
 
 
@@ -237,7 +265,7 @@ char*       yJOBS_version           (void);
 /*---(who-table)------------*/
 char        yjobs_who_init          (void);
 char        yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_lpre, char *a_cpre, char *a_lsuf, char *a_cname);
-char        yjobs_who_location      (cchar a_runas, char *a_cdir, char *a_hdir, char *a_world, char *a_db);
+char        yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL]);
 char        yjobs_who_by_index      (char n, char *a_cdir, char *a_hdir, char *a_world, char *a_db);
 char        yjobs_who_action        (cchar a_runas, cchar a_opt);
 char        yjobs_who_testing       (cchar a_runas);
@@ -297,28 +325,25 @@ char*       yjobs_file__unit        (char *a_question);
 
 /*===[[ yJOBS_act ]]==========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback);
+char        yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
 char        yjobs_incomming         (void);
-char        yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback);
+char        yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
 char        yjobs_maintain          (void);
-char        yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback);
+char        yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
 char        yjobs_outgoing          (void);
 char        yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_callback);
-char        yjobs_running_full      (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback);
+char        yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
 char        yjobs_running           (void);
+char        yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
+char        yjobs_gather            (void);
 
 /*---(obsolete)-------------*/
-char        yjobs_verify_full       (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_name, void *f_callback);
-/*> char        yjobs_verify            (void);                                       <*/
-/*> char        yjobs_register_full     (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_name, void *f_callback);   <*/
-char        yjobs_register          (void);
-char        yJOBS_act_install       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name, void *a_assimilate);
-char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name, void *a_assimilate);
-char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
+char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name, void *a_assimilate);
+char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name);
 char        yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix);
-char        yjobs_act_security      (cchar a_runas, cchar a_act, cchar *a_oneline, char a_fix);
-char        yjobs_act_fix           (cchar a_runas, cchar a_act, cchar *a_oneline);
-char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_muser, int a_muid, cchar *a_regex, void *a_assimilate);
+char        yjobs_act_security      (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], char a_fix);
+char        yjobs_act_fix           (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND]);
+char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar a_muser [LEN_USER], int a_muid, cchar *a_regex, void *a_assimilate);
 
 
 
@@ -326,8 +351,9 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_onelin
 
 /*===[[ yJOBS_act ]]==========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        yjobs_act_header        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_name, char *r_cdir, char *r_world, char *r_update, char *r_db, char *r_cwd, char *r_full);
 char        yjobs_act__filter       (cchar *a_name, cchar *a_prefix, int a_muid);
-char        yjobs_act__prepare      (cchar a_pre, cchar a_act, cchar *a_oneline, cchar *a_muser, cchar *a_regex, char *a_prefix, char *a_dir, void *a_assimilate);
+char        yjobs_act__prepare      (cchar a_pre, cchar a_act, cchar a_oneline [LEN_HUND], cchar a_muser [LEN_USER], cchar *a_regex, char *a_prefix, char *a_dir, void *a_assimilate);
 char        yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc);
 
 char        yjobs_args_info         (char a_mode, char *a_name);
@@ -377,7 +403,7 @@ char        yjobs_world_list        (cchar a_runas);
 char        yjobs_world_register    (cchar a_runas, cchar *a_file);
 char        yjobs_world_withdraw    (cchar a_runas, cchar *a_file);
 /*---(done)-----------------*/
-char        yjobs_world_full        (cchar a_runas, cchar a_mode, cchar *a_oneline, cchar *a_file, void *f_callback);
+char        yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_file, void *f_callback);
 char        yjobs_world             (void);
 /*---(done)-----------------*/
 

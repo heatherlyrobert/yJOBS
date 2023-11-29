@@ -578,7 +578,7 @@ yjobs__loc_central      (cchar a_runas, uchar *a_name, char *r_fuser, char *r_di
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(check directory)----------------*/
-   yjobs_who_location      (a_runas, r_dir, NULL, NULL, NULL);
+   yjobs_who_location      (a_runas, r_dir, NULL, NULL, NULL, NULL);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -973,6 +973,36 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
 }
 
 char
+yJOBS_file_audit  (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_user      [LEN_LABEL] = "";
+   int         x_uid       =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(get security data)--------------*/
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, &x_user, 'n');
+   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
+   --rce;  if (rc < 0) {
+      yURG_err ('f', "could not identify current user (yEXEC_whoami)");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(call verification)--------------*/
+   rc = yjobs_local_full (myJOBS.m_runas, a_path, a_path, a_file, x_user, x_uid, NULL, NULL, NULL, NULL);
+   DEBUG_YJOBS  yLOG_value   ("local"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
 yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -1173,7 +1203,7 @@ yjobs_central_dirs      (cchar a_runas, cchar a_mode, cchar *a_file, cchar *a_us
       return rce;
    }
    /*---(directory)----------------------*/
-   rc = yjobs_who_location      (a_runas, x_cdir, NULL, NULL, NULL);
+   rc = yjobs_who_location      (a_runas, x_cdir, NULL, NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("location"  , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

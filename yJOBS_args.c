@@ -106,7 +106,7 @@ struct cOPTS {
    char        where;
 };
 static const tOPTS   s_opts [MAX_OPTS] = {
-   /*---(informational 3)----------------*/
+   /*---(informational 3)---------------                                  seq  run  file-loc----- */
    { "version"  , "1··", "present a short versioning string"            ,   0, '-', YJOBS_NEITHER  },
    { "about"    , "2··", "key information about program"                ,   1, '-', YJOBS_NEITHER  },
    { "help"     , "3··", "present a simple help message"                ,   2, '-', YJOBS_NEITHER  },

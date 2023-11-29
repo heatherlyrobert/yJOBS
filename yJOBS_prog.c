@@ -79,6 +79,7 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
    int         rc          =    0;
    char        x_done      =  '-';
    char       *p           = NULL;
+   char        x_world     [LEN_LABEL] = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
@@ -182,7 +183,15 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       DEBUG_YJOBS   yLOG_note    ("checking running (gdpsn)");
       switch (myJOBS.m_mode) {
       case CASE_GATHER     :
-         rc = yjobs_world ();
+         /*---(get central files)--------------*/
+         rc = yjobs_who_location (myJOBS.m_runas, NULL, NULL, x_world, NULL, NULL);
+         DEBUG_YJOBS   yLOG_value   ("location"  , rc);
+         if (rc < 0) {
+            DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+            return rce;
+         }
+         if (strlen (x_world) == 0)  rc = yjobs_gather ();
+         else                        rc = yjobs_world  ();
          break;
       case CASE_DAEMON     :
       case CASE_PRICKLY    :

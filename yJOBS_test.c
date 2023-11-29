@@ -251,8 +251,12 @@ yjobs__unit_quiet       (void)
 char       /*----: set up program urgents/debugging --------------------------*/
 yjobs__unit_loud        (void)
 {
-   yLOGS_begin   ("yJOBS", YLOG_SYS, YLOG_NOISE);
-   yURG_by_name  ("yjobs", YURG_ON);
+   int         x_narg       = 3;
+   char       *x_args [ 3]  = {"yJOBS_unit" , "@@kitchen", "@@yjobs"};
+   yURG_logger   (x_narg, x_args);
+   yURG_urgs     (x_narg, x_args);
+   /*> yLOGS_begin   ("yJOBS_unit", YLOG_SYS, YLOG_NOISE);                            <*/
+   /*> yURG_by_name  ("yjobs", YURG_ON);                                              <*/
    yURG_err_none ();
    yURG_msg_none ();
    yjobs_runas ("khronos", NULL);
