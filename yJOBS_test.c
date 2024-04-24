@@ -298,7 +298,7 @@ yjobs__unit             (char *a_question, int n)
       snprintf (unit_answer, LEN_RECD, "yJOBS w_count    : %3dn", yjobs_world__count ());
    }
    else if (strcmp (a_question, "w_file"    )     == 0) {
-      c = yURG_peek_count (myJOBS.w_full);
+      c = yURG_lines (myJOBS.w_full);
       if      (c  <  0)  x_exist = '-';
       else               x_exist = 'y';
       sprintf (t, "%-10.10p", myJOBS.w_file);

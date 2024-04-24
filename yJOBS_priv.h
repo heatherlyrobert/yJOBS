@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0j"
-#define     P_VERTXT    "many small updates to assist mayan program"
+#define     P_VERNUM    "1.0k"
+#define     P_VERTXT    "update after yURG cleanup and testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -118,7 +118,7 @@ struct cLOCAL {
    char      m_runas;
    char      m_mode;
    char      m_flag;
-   char      m_file        [LEN_DESC];      /* source file name                 */
+   char      m_file        [LEN_PATH];      /* source file name                 */
    char      m_dir         [LEN_PATH];      /* source file dir                  */
    char      m_full        [LEN_PATH];      /* source file qualified name       */
    char      m_oneline     [LEN_HUND];      /* program oneline description      */

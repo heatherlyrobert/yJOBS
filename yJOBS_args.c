@@ -341,10 +341,10 @@ yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
    myJOBS.m_mode = YJOBS_NEITHER;
    if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
    myJOBS.m_flag = '·';
-   ystrlcpy (myJOBS.m_file, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_file, "", LEN_PATH);
    ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
    ystrlcpy (myJOBS.m_full, "", LEN_PATH);
-   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_PATH);
    g_norun   = YJOBS_NEITHER;
    g_noend   = YJOBS_NEITHER;
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
@@ -365,10 +365,10 @@ yjobs_args__clearmode   (char *r_runas, char *r_mode, char *r_file)
    myJOBS.m_mode = YJOBS_NEITHER;
    if (r_mode  != NULL)  *r_mode = YJOBS_NEITHER;
    myJOBS.m_flag = '·';
-   ystrlcpy (myJOBS.m_file, "", LEN_DESC);
+   ystrlcpy (myJOBS.m_file, "", LEN_PATH);
    ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
    ystrlcpy (myJOBS.m_full, "", LEN_PATH);
-   if (r_file  != NULL)  ystrlcpy (r_file, "", LEN_DESC);
+   if (r_file  != NULL)  ystrlcpy (r_file, "", LEN_PATH);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -389,7 +389,7 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
    DEBUG_YJOBS  yLOG_point   ("r_mode"    , r_mode);
    if (r_mode  != NULL)   *r_mode  = myJOBS.m_mode;
    DEBUG_YJOBS  yLOG_point   ("r_file"    , r_file);
-   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_DESC);
+   if (r_file  != NULL)   ystrlcpy (r_file, myJOBS.m_file, LEN_PATH);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", myJOBS.m_runas, g_valid);
    --rce;  if (yJOBS_ifvalid () == 0) {
@@ -578,8 +578,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       if (strchr (g_central, x_act) != NULL) {
          if (strchr (g_etc, myJOBS.m_runas) != NULL) {
             rc = yjobs_who_naming (myJOBS.m_runas, NULL, NULL, NULL, NULL, NULL, x_file);
-            ystrlcpy (myJOBS.m_file, x_file, LEN_DESC);
-            if (r_file != NULL)  ystrlcpy (r_file, x_file, LEN_DESC);
+            ystrlcpy (myJOBS.m_file, x_file, LEN_PATH);
+            if (r_file != NULL)  ystrlcpy (r_file, x_file, LEN_PATH);
          }
       }
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
@@ -598,9 +598,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
-   ystrlcpy (myJOBS.m_file, a_next, LEN_DESC);
+   ystrlcpy (myJOBS.m_file, a_next, LEN_PATH);
    DEBUG_YJOBS  yLOG_info    ("m_file"    , myJOBS.m_file);
-   if (r_file != NULL)  ystrlcpy (r_file   , a_next, LEN_DESC);
+   if (r_file != NULL)  ystrlcpy (r_file   , a_next, LEN_PATH);
    ++(*b_pos);
    DEBUG_YJOBS  yLOG_value   ("b_pos"     , *b_pos);
    /*---(complete)-----------------------*/

@@ -196,7 +196,7 @@ static void      o___INCOMMING__________o (void) {;};
  */
 
 char       /* PURPOSE : install a local crontab file -------------------------*/
-yjobs_incomming_move    (cchar a_runas, cchar a_mode, cchar a_file [LEN_HUND], cchar *a_fuser)
+yjobs_incomming_move    (cchar a_runas, cchar a_mode, cchar a_file [LEN_PATH], cchar *a_fuser)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -266,7 +266,7 @@ yjobs_incomming_move    (cchar a_runas, cchar a_mode, cchar a_file [LEN_HUND], c
 }
 
 char
-yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback)
+yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -314,6 +314,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    DEBUG_YJOBS   yLOG_info    ("x_db"      , x_db);
    /*---(database)-----------------------*/
    --rce;  if (strchr (X_INSTALL, a_mode) != NULL) {
+      DEBUG_YJOBS   yLOG_note    ("requested database load");
       if (strcmp (x_db, "") != 0) {
          DEBUG_YJOBS   yLOG_note    ("option requires database loaded before");
          g_acts_score  [G_SCORE_DATABASE + 1] = G_SCORE_FAIL;
@@ -338,6 +339,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    x_len = strlen (a_file);
    g_acts_score  [G_SCORE_LOCAL + 0] = G_SCORE_FAIL;
    --rce;  if (a_file [x_len - 1] == '/') {
+      DEBUG_YJOBS   yLOG_note    ("directory given");
       if (strchr (IAM_DIRS, a_runas) == NULL) {
          yjobs_act_failure (a_mode, "requester (not polymnia/metis) can not request directory");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -345,6 +347,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       }
       g_acts_score  [G_SCORE_LOCAL + 0] = 'd';
    } else {
+      DEBUG_YJOBS   yLOG_note    ("file given");
       if (strchr (IAM_FILES, a_runas) == NULL) {
          yjobs_act_failure (a_mode, "polymnia can only request directory, not a file");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -455,7 +458,7 @@ char yjobs_incomming         (void) { return yjobs_incomming_full   (myJOBS.m_ru
 static void      o___MAINTAIN___________o (void) {;};
 
 char
-yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback)
+yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -768,7 +771,7 @@ yJOBS_act_check         (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
 static void      o___OUTGOING___________o (void) {;};
 
 char
-yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback)
+yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -779,7 +782,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    char        x_full      [LEN_PATH]  = "";
    char       *p           = NULL;
    char      (*x_callback)   (cchar a_req, cchar *a_full);
-   char        x_old       [LEN_DESC]  = "";
+   char        x_old       [LEN_PATH]  = "";
    char        x_cmd       [LEN_RECD]  = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
@@ -859,7 +862,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       if (strcmp (x_db, "") == 0) {
          if (strstr (x_cdir, "/spool/") != NULL) {
             g_acts_score  [G_SCORE_CENTRAL  + 6] = G_SCORE_FAIL;
-            snprintf (x_old, LEN_DESC, "%s%s", x_cdir, a_file);
+            snprintf (x_old, LEN_PATH, "%s%s", x_cdir, a_file);
             snprintf (x_cmd, LEN_RECD, "rm -f %s 2> /dev/null", x_old);
             DEBUG_YJOBS   yLOG_info    ("x_cmd"     , x_cmd);
             rc = system   (x_cmd);
@@ -1732,7 +1735,7 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
  *> }                                                                                 <*/
 
 char
-yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback)
+yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -1830,7 +1833,7 @@ char yjobs_running           (void) { return yjobs_running_full     (myJOBS.m_ru
 
 
 char
-yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback)
+yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;

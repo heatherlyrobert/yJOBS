@@ -31,6 +31,7 @@ typedef const  char      cchar;
 #define     IAM_HERMES       'r'
 #define     IAM_THEMIS       't'
 #define     IAM_GREGG        'g'
+#define     IAM_OUROBOROS    'o'
 /*---(run-as/unit testing)----------------------*/
 #define     IAM_UEOS         'E'
 #define     IAM_UASTRAIOS    'A'
@@ -43,6 +44,7 @@ typedef const  char      cchar;
 #define     IAM_UHERMES      'R'
 #define     IAM_UTHEMIS      'T'
 #define     IAM_UGREGG       'G'
+#define     IAM_UOUROBOROS   'O'
 /*---(run-as for actions)-----------------------*/
 #define     IAM_DEFAULT      '-'
 #define     IAM_VERIFY       "eayhkpmEAYHKPM"
