@@ -107,9 +107,11 @@ yjobs_act_header        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);
    if (r_cwd   != NULL)  ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
    if (r_full  != NULL) {
-      if      (strchr (g_local  , a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cwd , a_name);
+      if      (a_name [0] == '/')                    sprintf (r_full , "%s"   , a_name);
+      else if (strchr (g_local  , a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cwd , a_name);
       else if (strchr (g_central, a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cdir, a_name);
    }
+   DEBUG_YJOBS   yLOG_info    ("r_full"    , r_full);
    g_acts_score  [G_SCORE_PREPARE + 1] = 'l';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

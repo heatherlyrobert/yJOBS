@@ -8,7 +8,7 @@ tLOCAL myJOBS = { '-', '-' };
 
 /*
  *
- *       ƒ€€€€€€€€€€€€€€€€€€€ 10 system daemon/utils designed for yJOBS €€€€€€€€€€€€€€€€€€€€€€€‚
+ *       ƒ€€€€€€€€€€€€€€€€€€€ 11 system daemon/utils designed for yJOBS €€€€€€€€€€€€€€€€€€€€€€€‚
  *       Œ                                                                                     Œ
  *       Œ  eos           system start-up             eos-rhododactylos (rosy-fingered dawn)   Œ
  *       Œ  astraios      system shut-down            astraios-aeolus (sparkling wind-father)  Œ
@@ -19,6 +19,7 @@ tLOCAL myJOBS = { '-', '-' };
  *       Œ                                                                                     Œ
  *       Œ  polymnia      source code analysis        polymnia-hymnos (many praises)           Œ
  *       Œ  metis         task management             metis-okeanides (wise-counsel)           Œ
+ *       Œ  ouroboros     test sequencer              ouroboros-aperantos (tail-eater)         Œ
  *       Œ                                                                                     Œ
  *       Œ  helios        file location               helios-phaeton (radiant)                 Œ
  *       Œ  hermes        executable control          hermes-diactoros (messenger of gods)     Œ

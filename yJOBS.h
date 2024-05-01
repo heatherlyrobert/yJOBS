@@ -51,7 +51,7 @@ typedef const  char      cchar;
 #define     IAM_INSTALL      "eayhkpmEAYHKPM"
 #define     IAM_CHECK        "eayhkgEAYHKG"
 #define     IAM_FILES        "eayhkmEAYHKM"
-#define     IAM_DIRS         "pmPM"
+#define     IAM_DIRS         "pmoPMO"
 /*---(run-as/done)------------------------------*/
 
 
