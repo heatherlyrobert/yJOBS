@@ -729,7 +729,7 @@ yjobs_final             (void)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(action)-------------------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, x_user, 'n');
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);

@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0l"
-#define     P_VERTXT    "small change for ouroboros, need to add to unit testing"
+#define     P_VERNUM    "1.0m"
+#define     P_VERTXT    "update to yEXEC_whoami"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

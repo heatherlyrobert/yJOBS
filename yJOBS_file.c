@@ -983,7 +983,7 @@ yJOBS_file_audit  (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND])
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(get security data)--------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, &x_user, 'n');
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
       yURG_err ('f', "could not identify current user (yEXEC_whoami)");
@@ -1073,7 +1073,7 @@ yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fu
       return rce;
    }
    /*---(get security data)--------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, &x_user, 'n');
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
       yURG_err ('f', "could not identify current user (yEXEC_whoami)");
@@ -1284,7 +1284,7 @@ yjobs_central_old       (cchar a_runas, cchar a_mode, cchar *a_file, char *r_fus
    }
    if (r_cdir  != NULL)  ystrlcpy (r_cdir, x_cdir, LEN_PATH);
    /*---(get security data)--------------*/
-   rc = yEXEC_whoami (NULL, NULL, &x_uid, NULL, &x_user, 'n');
+   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
       yURG_err ('f', "could not identify current user (yEXEC_whoami)");
