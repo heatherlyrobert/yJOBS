@@ -1043,7 +1043,7 @@ yjobs_act__fixdir       (char a_issue, tSTAT *s, char n, cchar *a_dir, int a_per
       yURG_msg ('+', "set to fix, permissions were not %s, attempt to change", t);
       break;
    }
-   yURG_mkdir (a_dir, "root", "root", t);
+   yENV_mkdir (a_dir, "root", "root", t);
    rc = lstat (a_dir, s);
    return rc;
 }

@@ -41,7 +41,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
    }
    /*---(head execute)-------------------*/
    DEBUG_YJOBS   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
-   yURG_rmdir (x_dir);
+   yENV_rmdir (x_dir);
    /*---(peal next layer)----------------*/
    ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
@@ -108,11 +108,11 @@ yjobs__unit_mkdir_one   (char *a_dir)
    /*---(tail execute)-------------------*/
    l = strlen (x_dir);
    DEBUG_YJOBS   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
-   if      (strcmp (x_dir, "/tmp/spool") == 0)  yURG_mkdir (x_dir, "root", "root", "0755");
-   else if (strcmp (x_dir, "/tmp/lib"  ) == 0)  yURG_mkdir (x_dir, "root", "root", "0755");
-   else if (strcmp (x_dir, "/tmp/etc"  ) == 0)  yURG_mkdir (x_dir, "root", "root", "0755");
-   else if (strcmp (x_dir, "/tmp/home" ) == 0)  yURG_mkdir (x_dir, "root", "root", "0755");
-   else                                         yURG_mkdir (x_dir, "root", "root", "0700");
+   if      (strcmp (x_dir, "/tmp/spool") == 0)  yENV_mkdir (x_dir, "root", "root", "0755");
+   else if (strcmp (x_dir, "/tmp/lib"  ) == 0)  yENV_mkdir (x_dir, "root", "root", "0755");
+   else if (strcmp (x_dir, "/tmp/etc"  ) == 0)  yENV_mkdir (x_dir, "root", "root", "0755");
+   else if (strcmp (x_dir, "/tmp/home" ) == 0)  yENV_mkdir (x_dir, "root", "root", "0755");
+   else                                         yENV_mkdir (x_dir, "root", "root", "0700");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -136,11 +136,11 @@ yJOBS_rmdirs            (void)
       yjobs__unit_rmdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yURG_rmdir ("/tmp/root"         );
-   yURG_rmdir ("/tmp/home/member"  );
-   yURG_rmdir ("/tmp/home/machine" );
-   yURG_rmdir ("/tmp/home/monkey"  );
-   yURG_rmdir ("/tmp/home"         );
+   yENV_rmdir ("/tmp/root"         );
+   yENV_rmdir ("/tmp/home/member"  );
+   yENV_rmdir ("/tmp/home/machine" );
+   yENV_rmdir ("/tmp/home/monkey"  );
+   yENV_rmdir ("/tmp/home"         );
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -164,11 +164,11 @@ yJOBS_mkdirs            (void)
       yjobs__unit_mkdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yURG_mkdir ("/tmp/root"         , "root"   , "root"  , "0700");
-   yURG_mkdir ("/tmp/home"         , "root"   , "root"  , "0755");
-   yURG_mkdir ("/tmp/home/member"  , "member" , "users" , "0700");
-   yURG_mkdir ("/tmp/home/machine" , "machine", "users" , "0700");
-   yURG_mkdir ("/tmp/home/monkey"  , "monkey" , "users" , "0700");
+   yENV_mkdir ("/tmp/root"         , "root"   , "root"  , "0700");
+   yENV_mkdir ("/tmp/home"         , "root"   , "root"  , "0755");
+   yENV_mkdir ("/tmp/home/member"  , "member" , "users" , "0700");
+   yENV_mkdir ("/tmp/home/machine" , "machine", "users" , "0700");
+   yENV_mkdir ("/tmp/home/monkey"  , "monkey" , "users" , "0700");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -298,7 +298,7 @@ yjobs__unit             (char *a_question, int n)
       snprintf (unit_answer, LEN_RECD, "yJOBS w_count    : %3dn", yjobs_world__count ());
    }
    else if (strcmp (a_question, "w_file"    )     == 0) {
-      c = yURG_lines (myJOBS.w_full);
+      c = yENV_lines (myJOBS.w_full);
       if      (c  <  0)  x_exist = '-';
       else               x_exist = 'y';
       sprintf (t, "%-10.10p", myJOBS.w_file);

@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0m"
-#define     P_VERTXT    "update to yEXEC_whoami"
+#define     P_VERNUM    "1.0n"
+#define     P_VERTXT    "cleaned up after yURG,yENV migration"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -66,6 +66,7 @@
 /*---(always)---------------*/
 #include    <yLOG.h>         /* CUSTOM : heatherly process logging            */
 #include    <yURG.h>         /* CUSTOM : heatherly debugging framework        */
+#include    <yENV.h>
 /*---(optional)-------------*/
 #include    <ySTR.h>         /* CUSTOM : heatherly string handling            */
 #include    <yEXEC.h>        /* CUSTOM : heatherly process control            */
