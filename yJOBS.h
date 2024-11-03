@@ -282,6 +282,9 @@ char        yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, ch
 char        yJOBS_driver            (cchar *a_oneline, void *f_callback);
 char        yJOBS_final             (int a_uid);  /* DEPRICATED */
 char        yJOBS_wrap              (void);
+char        yJOBS_configured        (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL]);
+
+
 
 char        yJOBS_filedata          (char *r_runas, char *r_mode, char *r_floc, char *r_fname, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir, char *r_full);
 char        yJOBS_file_audit        (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND]);

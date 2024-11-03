@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0n"
-#define     P_VERTXT    "cleaned up after yURG,yENV migration"
+#define     P_VERNUM    "1.0o"
+#define     P_VERTXT    "updates invalidated some unit tests, fixed yJOBS_args 01-04"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -266,6 +266,7 @@ char*       yJOBS_version           (void);
 /*---(who-table)------------*/
 char        yjobs_who_init          (void);
 char        yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_lpre, char *a_cpre, char *a_lsuf, char *a_cname);
+char        yjobs__who_base         (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL]);
 char        yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL]);
 char        yjobs_who_by_index      (char n, char *a_cdir, char *a_hdir, char *a_world, char *a_db);
 char        yjobs_who_action        (cchar a_runas, cchar a_opt);
@@ -359,7 +360,7 @@ char        yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, 
 
 char        yjobs_args_info         (char a_mode, char *a_name);
 char        yjobs_args__empty       (void);
-char        yjobs_args__find        (char *a_arg, char *n, char *r_runas);
+char        yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise);
 char        yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where);
 char        yjobs_args__clearmode   (char *a_runas, char *a_runmode, char *a_runfile);
 char        yjobs_final_full        (int a_uid);

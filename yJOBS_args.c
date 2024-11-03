@@ -369,6 +369,9 @@ yjobs_args__clearmode   (char *r_runas, char *r_mode, char *r_file)
    ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
    ystrlcpy (myJOBS.m_full, "", LEN_PATH);
    if (r_file  != NULL)  ystrlcpy (r_file, "", LEN_PATH);
+   /*---(hide errors again)--------------*/
+   yURG_err_mute ();
+   yURG_msg_mute ();
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -407,6 +410,7 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YJOBS  yLOG_point   ("a_next"    , a_next);
    /*---(check reload)-------------------*/
    if (strcmp (g_silent, "") == 0) {
       DEBUG_YJOBS  yLOG_note    ("first run, will call init");
@@ -441,7 +445,7 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
 }
 
 char
-yjobs_args__find        (char *a_arg, char *n, char *r_runas)
+yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -450,10 +454,12 @@ yjobs_args__find        (char *a_arg, char *n, char *r_runas)
    char       *p           = NULL;
    char        c           =  '?';
    char        x_runas     =  '?';
+   char        x_noise     =  '?';
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (n != NULL)  *n = -1;
+   if (n       != NULL)  *n       = -1;
+   if (r_noise != NULL)  *r_noise = '-';
    /*---(find action)--------------------*/
    for (j = 0; j < MAX_OPTS; ++j) {
       DEBUG_YJOBS  yLOG_value   ("loop"      , j);
@@ -462,16 +468,19 @@ yjobs_args__find        (char *a_arg, char *n, char *r_runas)
       if (strcmp (a_arg + 2, p) == 0) {
          DEBUG_YJOBS  yLOG_info    ("silent"    , s_opts [j].option);
          c = s_opts [j].levels [0];
+         x_noise = '-';
          break;
       }
       if (a_arg [2] == 'c' && strcmp (a_arg + 3, p) == 0) {
          DEBUG_YJOBS  yLOG_info    ("confirm"   , s_opts [j].option);
          c = s_opts [j].levels [1];
+         x_noise = 'c';
          break;
       }
       if (a_arg [2] == 'v' && strcmp (a_arg + 3, p) == 0) {
          DEBUG_YJOBS  yLOG_info    ("verbose"   , s_opts [j].option);
          c = s_opts [j].levels [2];
+         x_noise = 'V';
          break;
       }
    }
@@ -503,7 +512,8 @@ yjobs_args__find        (char *a_arg, char *n, char *r_runas)
       if (r_runas != NULL)  *r_runas = x_runas;
    }
    /*---(save-back)----------------------*/
-   if (n != NULL)  *n = s_opts [j].offset;
+   if (n       != NULL)  *n       = s_opts [j].offset;
+   if (r_noise != NULL)  *r_noise = x_noise;
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return c;
@@ -521,13 +531,14 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    char        n           =   -1;
    char        f           =  '·';
    char        x_file      [LEN_DESC]  = "";
+   char        x_noise     =  '·';
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
    rc = yjobs_args__prepare (b_pos, a_arg, a_next, r_runas, r_mode, r_file);
    DEBUG_YJOBS  yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    --rce;  if (rc == 1) {
@@ -536,7 +547,7 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       return 1;
    }
    /*---(walk options)-------------------*/
-   x_act = yjobs_args__find (a_arg, &n, r_runas);
+   x_act = yjobs_args__find (a_arg, &n, r_runas, &x_noise);
    DEBUG_YJOBS  yLOG_char    ("x_act"     , x_act);
    if (x_act == '?') {
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
@@ -551,9 +562,15 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
       return 1;
    }
+   DEBUG_YJOBS  yLOG_char    ("x_noise"   , x_noise);
+   if (x_noise == 'V') {
+      DEBUG_YJOBS  yLOG_note    ("turn on err and msg live");
+      yURG_msg_live ();
+      yURG_err_live ();
+   }
    --rce;  if (myJOBS.m_mode != '-') {
       yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(get file flag)------------------*/
@@ -575,6 +592,7 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    if (r_mode != NULL)  *r_mode = x_act;
    /*---(handle simple option)-----------*/
    if (f == '-') {
+      DEBUG_YJOBS  yLOG_note    ("simple actions");
       if (strchr (g_central, x_act) != NULL) {
          if (strchr (g_etc, myJOBS.m_runas) != NULL) {
             rc = yjobs_who_naming (myJOBS.m_runas, NULL, NULL, NULL, NULL, NULL, x_file);
@@ -585,17 +603,20 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
       return 1;
    }
+   DEBUG_YJOBS  yLOG_note    ("complex actions");
    /*---(handle file flag)---------------*/
    --rce;  if (f != 'F') {
       yURG_err ('F', "action å%sæ not configured correctly", a_arg);
       yjobs_args__clearmode (r_runas, r_mode, r_file);
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YJOBS  yLOG_point   ("a_next"    , a_next);
    --rce;  if (a_next == NULL) {
+      DEBUG_YJOBS  yLOG_note    ("null a_next option");
       yURG_err ('F', "action å%sæ requires a file name as an argument", a_arg);
       yjobs_args__clearmode (r_runas, r_mode, r_file);
-      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    ystrlcpy (myJOBS.m_file, a_next, LEN_PATH);
@@ -823,10 +844,10 @@ yjobs_args__unit        (char *a_question)
    strncpy  (unit_answer, "ARGS             : question ot understood", LEN_RECD);
    /*---(simple)-------------------------*/
    if      (strcmp (a_question, "args"          )  == 0) {
-      sprintf (s, "%2då%.30sæ", strlen (g_silent) , g_silent);
-      sprintf (t, "%2då%.25sæ", strlen (g_confirm), g_confirm);
-      sprintf (u, "%2då%.25sæ", strlen (g_verbose), g_verbose);
-      snprintf (unit_answer, LEN_RECD, "ARGS args        : %-34.34s %-29.29s %s", s, t, u);
+      sprintf (s, "%2då%.35sæ", strlen (g_silent) , g_silent);
+      sprintf (t, "%2då%.30sæ", strlen (g_confirm), g_confirm);
+      sprintf (u, "%2då%.30sæ", strlen (g_verbose), g_verbose);
+      snprintf (unit_answer, LEN_RECD, "ARGS args        : %-39.39s %-34.34s %s", s, t, u);
    }
    /*---(complete)-----------------------*/
    return unit_answer;

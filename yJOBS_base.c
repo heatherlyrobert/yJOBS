@@ -143,13 +143,17 @@ yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_
 }
 
 char
-yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL])
+yjobs__who_base         (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         i           =    0;
    /*---(default)------------------------*/
+   if (r_unit   != NULL)  *r_unit   = '·';
+   if (r_name   != NULL)  ystrlcpy (r_name , "", LEN_TERSE);
+   if (r_desc   != NULL)  ystrlcpy (r_desc , "", LEN_DESC);
    if (r_cdir   != NULL)  ystrlcpy (r_cdir , "", LEN_DESC);
+   if (r_cname  != NULL)  ystrlcpy (r_cname, "", LEN_LABEL);
    if (r_hdir   != NULL)  ystrlcpy (r_hdir , "", LEN_DESC);
    if (r_world  != NULL)  ystrlcpy (r_world, "", LEN_LABEL);
    if (r_update != NULL)  *r_update = '·';
@@ -158,15 +162,22 @@ yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN
    for (i = 0; i < MAX_WHO; ++i) {
       if (g_whos [i].abbr == 0)         break;
       if (a_runas == g_whos [i].abbr) {
+         if (r_unit   != NULL)  *r_unit   = g_whos [i].unit;
+         if (r_name   != NULL)  ystrlcpy (r_name , g_whos [i].name , LEN_TERSE);
+         if (r_desc   != NULL)  ystrlcpy (r_desc , g_whos [i].desc , LEN_DESC);
          if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].cdir , LEN_DESC);
+         if (r_cname  != NULL)  ystrlcpy (r_cname, g_whos [i].cname, LEN_LABEL);
          if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].hdir , LEN_DESC);
          if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);
-         if (r_update != NULL)  *r_update = g_whos [i].update;
          if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);
          return 0;
       }
       if (a_runas == g_whos [i].unit) {
+         if (r_unit   != NULL)  *r_unit   = g_whos [i].unit;
+         if (r_name   != NULL)  ystrlcpy (r_name , g_whos [i].name , LEN_TERSE);
+         if (r_desc   != NULL)  ystrlcpy (r_desc , g_whos [i].desc , LEN_DESC);
          if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].udir , LEN_DESC);
+         if (r_cname  != NULL)  ystrlcpy (r_cname, g_whos [i].cname, LEN_LABEL);
          if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].uhdir, LEN_DESC);
          if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);
          if (r_update != NULL)  *r_update = g_whos [i].update;
@@ -176,6 +187,49 @@ yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN
    }
    /*---(complete)-----------------------*/
    return rce;
+}
+
+char
+yJOBS_configured        (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL])
+{
+   return yjobs__who_base (a_runas, r_unit, r_name, r_desc, r_cdir, r_cname, r_hdir, r_world, NULL, r_db);
+}
+
+char
+yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL])
+{
+   return yjobs__who_base (a_runas, NULL, NULL, NULL, r_cdir, NULL, r_hdir, r_world, r_update, r_db);
+   /*> /+---(locals)-----------+-----+-----+-+/                                        <* 
+    *> char        rce         =  -10;                                                 <* 
+    *> int         i           =    0;                                                 <* 
+    *> /+---(default)------------------------+/                                        <* 
+    *> if (r_cdir   != NULL)  ystrlcpy (r_cdir , "", LEN_DESC);                        <* 
+    *> if (r_hdir   != NULL)  ystrlcpy (r_hdir , "", LEN_DESC);                        <* 
+    *> if (r_world  != NULL)  ystrlcpy (r_world, "", LEN_LABEL);                       <* 
+    *> if (r_update != NULL)  *r_update = '·';                                         <* 
+    *> if (r_db     != NULL)  ystrlcpy (r_db   , "", LEN_LABEL);                       <* 
+    *> /+---(walk data)----------------------+/                                        <* 
+    *> for (i = 0; i < MAX_WHO; ++i) {                                                 <* 
+    *>    if (g_whos [i].abbr == 0)         break;                                     <* 
+    *>    if (a_runas == g_whos [i].abbr) {                                            <* 
+    *>       if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].cdir , LEN_DESC);    <* 
+    *>       if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].hdir , LEN_DESC);    <* 
+    *>       if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);   <* 
+    *>       if (r_update != NULL)  *r_update = g_whos [i].update;                     <* 
+    *>       if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);   <* 
+    *>       return 0;                                                                 <* 
+    *>    }                                                                            <* 
+    *>    if (a_runas == g_whos [i].unit) {                                            <* 
+    *>       if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].udir , LEN_DESC);    <* 
+    *>       if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].uhdir, LEN_DESC);    <* 
+    *>       if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);   <* 
+    *>       if (r_update != NULL)  *r_update = g_whos [i].update;                     <* 
+    *>       if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);   <* 
+    *>       return 0;                                                                 <* 
+    *>    }                                                                            <* 
+    *> }                                                                               <* 
+    *> /+---(complete)-----------------------+/                                        <* 
+    *> return rce;                                                                     <*/
 }
 
 char
