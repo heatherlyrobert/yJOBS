@@ -56,6 +56,7 @@ typedef const  char      cchar;
 
 
 
+
 /*===[[ ACTIONS ]]=============================*/
 /*---(placeholder)----------*/
 #define     ACT_NONE        '-'
@@ -67,6 +68,9 @@ typedef const  char      cchar;
 #define     IF_VERSION      if (yJOBS_ifversion  () == 1)
 #define     IF_HELP         if (yJOBS_ifhelp     () == 1)
 #define     CASE_ABOUT      '2'
+#define     INDEX_VERSION    0
+#define     INDEX_ABOUT      1
+#define     INDEX_HELP       2
 
 /*---(local verify)---------*/
 #define     ACT_VERIFY      'v'
@@ -74,6 +78,7 @@ typedef const  char      cchar;
 #define     ACT_VVERIFY     'V'
 #define     IF_VERIFY       if (yJOBS_ifverify   () == 1)
 #define     CASE_VERIFY     'v' : case 'V' : case 'Ñ'
+#define     INDEX_VERIFY     4
 
 /*---(local report)---------*/
 #define     ACT_LOCALRPT    'l'
@@ -81,6 +86,7 @@ typedef const  char      cchar;
 #define     ACT_VLOCALRPT   '_'
 #define     IF_LOCALRPT     if (yJOBS_iflocalrpt () == 1)
 #define     CASE_LOCALRPT   'l' : case 'L' : case 'ò'
+#define     INDEX_LOCAL      5
 
 /*---(local register)-------*/
 #define     ACT_REGISTER    'b'
@@ -88,6 +94,7 @@ typedef const  char      cchar;
 #define     ACT_VREGISTER   'B'
 #define     IF_REGISTER     if (yJOBS_ifregister () == 1)
 #define     CASE_REGISTER   'b' : case 'é' : case 'B'
+#define     INDEX_REGISTER   6
 
 /*---(local update)---------*/
 #define     ACT_UPDATE      'u'
@@ -95,6 +102,7 @@ typedef const  char      cchar;
 #define     ACT_VUPDATE     'U'
 #define     IF_UPDATE       if (yJOBS_ifupdate   () == 1)
 #define     CASE_UPDATE     'u' : case 'U' : case 'û'
+#define     INDEX_UPDATE     7
 
 /*---(local install)--------*/
 #define     ACT_INSTALL     'i'
@@ -102,16 +110,19 @@ typedef const  char      cchar;
 #define     ACT_VINSTALL    'I'
 #define     IF_INSTALL      if (yJOBS_ifinstall  () == 1)
 #define     CASE_INSTALL    'i' : case 'I' : case 'ð'
+#define     INDEX_INSTALL    8
 
 /*---(central stats)--------*/
 #define     ACT_STATS       '#'
 #define     IF_STATS        if (yJOBS_ifstats   () == 1)
 #define     CASE_STATS      '#' 
+#define     INDEX_STATS     10
 
 /*---(central list)---------*/
 #define     ACT_LIST        '='
 #define     IF_LIST         if (yJOBS_iflist    () == 1)
 #define     CASE_LIST       '=' 
+#define     INDEX_LIST      11
 
 /*---(central reporting)----*/
 #define     ACT_REPORT      'm'
@@ -119,6 +130,7 @@ typedef const  char      cchar;
 #define     ACT_VREPORT     'M'
 #define     IF_RERORT       if (yJOBS_ifreport  () == 1)
 #define     CASE_REPORT     'm' : case 'M' : case 'ó'
+#define     INDEX_REPORT    12
 
 /*---(central check)--------*/
 #define     ACT_CHECK       'c'
@@ -126,6 +138,7 @@ typedef const  char      cchar;
 #define     ACT_VCHECK      'C'
 #define     IF_CHECK        if (yJOBS_ifcheck   () == 1)
 #define     CASE_CHECK      'c' : case 'C' : case 'ý'
+#define     INDEX_CHECK     13
 
 /*---(central security)-----*/
 #define     ACT_AUDIT       'a'
@@ -133,6 +146,7 @@ typedef const  char      cchar;
 #define     ACT_VAUDIT      'A'
 #define     IF_AUDIT        if (yJOBS_ifaudit   () == 1)
 #define     CASE_AUDIT      'a' : case 'A' : case 'è'
+#define     INDEX_AUDIT     14
 
 /*---(central fix)----------*/
 #define     ACT_FIX         'f'
@@ -140,6 +154,7 @@ typedef const  char      cchar;
 #define     ACT_VFIX        'F'
 #define     IF_FIX          if (yJOBS_iffix     () == 1)
 #define     CASE_FIX        'f' : case 'F' : case 'ü'
+#define     INDEX_FIX       15
 
 /*---(central use)----------*/
 #define     ACT_ONLY        'o'
@@ -147,6 +162,12 @@ typedef const  char      cchar;
 #define     ACT_VONLY       'O'
 #define     IF_ONLY         if (yJOBS_ifonly    () == 1)
 #define     CASE_ONLY       'o' : case 'O' : case 'ö'
+#define     INDEX_ONLY      16
+
+/*---(FUTURE)---------------*/
+#define     INDEX_BACKUP    18
+#define     INDEX_RESTORE   19
+#define     INDEX_PURGE     20
 
 /*---(cloud upload)---------*/
 #define     ACT_UPLOAD      'y'
@@ -154,6 +175,7 @@ typedef const  char      cchar;
 #define     ACT_VUPLOAD     'Y'
 #define     IF_UPLOAD       if (yJOBS_ifupload  () == 1)
 #define     CASE_UPLOAD     'y' : case 'Y' : case 'ï'
+#define     INDEX_UPLOAD    22
 
 /*---(cloud download)-------*/
 #define     ACT_DOWNLOAD    'z'
@@ -161,6 +183,7 @@ typedef const  char      cchar;
 #define     ACT_VDOWNLOAD   'Z'
 #define     IF_DOWNLOAD     if (yJOBS_ifdownload() == 1)
 #define     CASE_DOWNLOAD   'z' : case 'Z' : case 'í'
+#define     INDEX_DOWNLOAD  23
 
 /*---(out withdraw)---------*/
 #define     ACT_WITHDRAW    'q'
@@ -168,6 +191,7 @@ typedef const  char      cchar;
 #define     ACT_VWITHDRAW   'Q'
 #define     IF_WITHDRAW     if (yJOBS_ifwithdraw() == 1)
 #define     CASE_WITHDRAW   'q' : case 'þ' : case 'Q'
+#define     INDEX_WITHDRAW  25
 
 /*---(out clear)------------*/
 #define     ACT_CLEAR       'x'
@@ -175,6 +199,7 @@ typedef const  char      cchar;
 #define     ACT_VCLEAR      'X'
 #define     IF_CLEAR        if (yJOBS_ifclear   () == 1)
 #define     CASE_CLEAR      'x' : case 'X' : case 'õ'
+#define     INDEX_CLEAR     26
 
 /*---(out remove)-----------*/
 #define     ACT_REMOVE      'r'
@@ -182,6 +207,7 @@ typedef const  char      cchar;
 #define     ACT_VREMOVE     'R'
 #define     IF_REMOVE       if (yJOBS_ifremove  () == 1)
 #define     CASE_REMOVE     'r' : case 'R' : case 'ø'
+#define     INDEX_REMOVE    27
 
 /*---(out pull)-------------*/
 #define     ACT_EXTRACT     'e'
@@ -189,6 +215,7 @@ typedef const  char      cchar;
 #define     ACT_VEXTRACT    'E'
 #define     IF_EXTRACT      if (yJOBS_ifextract () == 1)
 #define     CASE_EXTRACT    'e' : case 'E' : case 'ì'
+#define     INDEX_EXTRACT   28
 
 /*---(exec gathre)----------*/
 #define     ACT_GATHER      'g'
@@ -196,6 +223,7 @@ typedef const  char      cchar;
 #define     ACT_VGATHER     'G'
 #define     IF_GATHER       if (yJOBS_ifgather  () == 1)
 #define     CASE_GATHER     'g' : case 'G' : case 'ê'
+#define     INDEX_GATHER    30
 
 /*---(exec daemon)----------*/
 #define     ACT_DAEMON      'd'
@@ -203,6 +231,7 @@ typedef const  char      cchar;
 #define     ACT_VDAEMON     'D'
 #define     IF_DAEMON       if (yJOBS_ifdaemon  () == 1)
 #define     CASE_DAEMON     'd' : case 'D' : case 'ë'
+#define     INDEX_DAEMON    31
 
 /*---(exec prickly daemon)--*/
 #define     ACT_PRICKLY     'p'
@@ -210,6 +239,7 @@ typedef const  char      cchar;
 #define     ACT_VPRICKLY    'P'
 #define     IF_PRICKLY      if (yJOBS_ifprickly () == 1)
 #define     CASE_PRICKLY    'p' : case 'P' : case '÷'
+#define     INDEX_PRICKLY   32
 
 /*---(exec normal)----------*/
 #define     ACT_NORMAL      'n'
@@ -217,6 +247,8 @@ typedef const  char      cchar;
 #define     ACT_VNORMAL     'N'
 #define     IF_NORMAL       if (yJOBS_ifnormal  () == 1)
 #define     CASE_NORMAL     'n' : case 'N' : case 'ô'
+#define     INDEX_NORMAL    33
+
 
 /*---(exec strict normal)---*/
 #define     ACT_STRICT      's'
@@ -224,6 +256,7 @@ typedef const  char      cchar;
 #define     ACT_VSTRICT     'S'
 #define     IF_STRICT       if (yJOBS_ifstrict  () == 1)
 #define     CASE_STRICT     's' : case 'S' : case 'ù'
+#define     INDEX_STRICT    34
 
 /*---(exec reload)----------*/
 #define     ACT_RELOAD      'h'
@@ -231,6 +264,7 @@ typedef const  char      cchar;
 #define     ACT_VRELOAD     'H'
 #define     IF_RELOAD       if (yJOBS_ifreload  () == 1)
 #define     CASE_RELOAD     'h' : case 'H' : case 'î'
+#define     INDEX_RELOAD    35
 
 /*---(combination)----------*/
 #define     IF_SILENT       if (yJOBS_ifsilent  () == 1)
@@ -248,11 +282,14 @@ typedef const  char      cchar;
 
 /*---(unit testing)---------*/
 #define     ACT_TESTING     'j'
+#define     INDEX_TESTING   37
+
+
+
 #define     IF_RUNNING      if (yJOBS_ifrunning () == 1)
 #define     IF_DAEMONY      if (yJOBS_ifdaemony () == 1)
 #define     IF_NORUN        if (yJOBS_ifnorun   () == 1)
 #define     IF_NOEND        if (yJOBS_ifnoend   () == 1)
-
 
 
 
