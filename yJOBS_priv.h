@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0q"
-#define     P_VERTXT    "all unit tests in yJOBS_base are current and passing"
+#define     P_VERNUM    "1.0r"
+#define     P_VERTXT    "all unit tests in yJOBS_file are current and passing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

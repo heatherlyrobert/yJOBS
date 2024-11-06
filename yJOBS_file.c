@@ -84,12 +84,14 @@ yjobs__name_quality     (cchar *a_name)
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   yURG_msg ('-', "file is not hidden, no lead period");
+   yURG_msg ('-', "good, file is not hidden, no lead period");
    /*---(check directory)----------------*/
    if (c == 1) {
+      yURG_msg ('-', "good, file is not hidden, no lead period, with extension");
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
       return 1;
    }
+   yURG_msg ('-', "good, file is not hidden, no lead period, without extension");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
