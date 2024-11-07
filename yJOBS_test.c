@@ -136,11 +136,12 @@ yJOBS_rmdirs            (void)
       yjobs__unit_rmdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yENV_rmdir ("/tmp/root"         );
-   yENV_rmdir ("/tmp/home/member"  );
-   yENV_rmdir ("/tmp/home/machine" );
-   yENV_rmdir ("/tmp/home/monkey"  );
-   yENV_rmdir ("/tmp/home"         );
+   yENV_rmdir ("/tmp/root"                 );
+   yENV_rmdir ("/tmp/home/member/c_quani"  );
+   yENV_rmdir ("/tmp/home/member"          );
+   yENV_rmdir ("/tmp/home/machine"         );
+   yENV_rmdir ("/tmp/home/monkey"          );
+   yENV_rmdir ("/tmp/home"                 );
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -164,11 +165,14 @@ yJOBS_mkdirs            (void)
       yjobs__unit_mkdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yENV_mkdir ("/tmp/root"         , "root"   , "root"  , "0700");
-   yENV_mkdir ("/tmp/home"         , "root"   , "root"  , "0755");
-   yENV_mkdir ("/tmp/home/member"  , "member" , "users" , "0700");
-   yENV_mkdir ("/tmp/home/machine" , "machine", "users" , "0700");
-   yENV_mkdir ("/tmp/home/monkey"  , "monkey" , "users" , "0700");
+   yENV_mkdir ("/tmp/root"                 , "root"   , "root"  , "0700");
+   yENV_mkdir ("/tmp/home"                 , "root"   , "root"  , "0755");
+   yENV_mkdir ("/tmp/home/member"          , "member" , "users" , "0700");
+   /*> yENV_mkdir ("/tmp/home/machine"         , "machine", "users" , "0700");        <*/
+   yENV_mkdir ("/tmp/home/machine"         , "member" , "users" , "0700");
+   /*> yENV_mkdir ("/tmp/home/monkey"          , "monkey" , "users" , "0700");        <*/
+   yENV_mkdir ("/tmp/home/monkey"          , "member" , "users" , "0700");
+   yENV_mkdir ("/tmp/home/member/c_quani"  , "member" , "users" , "0700");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
