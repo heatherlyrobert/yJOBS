@@ -1020,31 +1020,76 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
 static void      o___SECURITY___________o (void) {;}
 
 char
-yjobs_act__fixdir       (char a_issue, tSTAT *s, char n, cchar *a_dir, int a_perms)
+yjobs_act__fixdir       (cchar a_dir [LEN_PATH], char a_issue, int a_perms, tSTAT *r_stat)
 {
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    char        rc          =    0;
-   char        t           [LEN_TERSE] = "";
-   sprintf (t, "%4o", a_perms);
-   switch (a_issue) {
+   char        t           [LEN_LABEL] = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("r_stat"    , r_stat);
+   --rce;  if (r_stat == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_point   ("a_dir"     , a_dir);
+   --rce;  if (a_dir == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(prepare)------------------------*/
+   DEBUG_YJOBS   yLOG_value   ("a_perms"   , a_perms);
+   rc = yENV_perms_data ('i', NULL, &a_perms, t);
+   DEBUG_YJOBS   yLOG_value   ("perms"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("t"         , t);
+   /*---(messages)-----------------------*/
+   DEBUG_YJOBS   yLOG_char    ("a_issue"   , a_issue);
+   --rce;  switch (a_issue) {
    case 'e' :
-      DEBUG_YJOBS  yLOG_note    ("fixdir attempting create");
+      DEBUG_YJOBS   yLOG_note    ("fixdir attempting create");
       yURG_msg ('+', "set to fix, directory does not exist, attempt to create");
       break;
    case 'o' :
-      DEBUG_YJOBS  yLOG_note    ("fixdir attempting change owner");
+      DEBUG_YJOBS   yLOG_note    ("fixdir attempting change owner");
       yURG_msg ('+', "set to fix, owner was not ¶root¶, attempt to change");
       break;
    case 'g' :
-      DEBUG_YJOBS  yLOG_note    ("fixdir attempting change group");
+      DEBUG_YJOBS   yLOG_note    ("fixdir attempting change group");
       yURG_msg ('+', "set to fix, group was not ¶root¶, attempt to change");
       break;
    case 'p' :
-      DEBUG_YJOBS  yLOG_note    ("fixdir attempting change permissions");
+      DEBUG_YJOBS   yLOG_note    ("fixdir attempting change permissions");
       yURG_msg ('+', "set to fix, permissions were not %s, attempt to change", t);
       break;
+   default  :
+      DEBUG_YJOBS   yLOG_note    ("no such a_issue option allowed");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+      break;
    }
-   yENV_mkdir (a_dir, "root", "root", t);
-   rc = lstat (a_dir, s);
+   /*---(handle update)------------------*/
+   rc = yENV_mkdir (a_dir, "root", "root", t);
+   DEBUG_YJOBS   yLOG_char    ("mkdir"     , rc);
+   --rce;  if (rc == '-') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(reset stat)---------------------*/
+   rc = lstat (a_dir, r_stat);
+   DEBUG_YJOBS   yLOG_value   ("lstat"     , rc);
+   DEBUG_YJOBS   yLOG_point   ("r_stat"    , r_stat);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc;
 }
 
@@ -1066,7 +1111,7 @@ yjobs_act_checkdir      (char n, cchar *a_dir, int a_perms, char a_fix)
    rc = lstat (a_dir, &s);
    DEBUG_YJOBS   yLOG_value   ("stat"      , rc);
    --rce;  if (rc < 0) {
-      if (a_fix == 'y') rc = yjobs_act__fixdir ('o', &s, n, a_dir, a_perms);
+      if (a_fix == 'y') rc = yjobs_act__fixdir (a_dir, 'e', a_perms, &s);
       if (rc < 0) {
          yURG_err ('ü', "å%sæ directory does not exist (bad configuration)", a_dir);
          DEBUG_YJOBS   yLOG_note    ("can not open/stat directory");
@@ -1095,7 +1140,7 @@ yjobs_act_checkdir      (char n, cchar *a_dir, int a_perms, char a_fix)
    yURG_msg ('-', "å%sæ directory exists and is not a file/symlink", a_dir);
    /*---(ownership)----------------------*/
    --rce;  if (s.st_uid != 0) {
-      if (a_fix == 'y') rc = yjobs_act__fixdir ('o', &s, n, a_dir, a_perms);
+      if (a_fix == 'y') rc = yjobs_act__fixdir (a_dir, 'o', a_perms, &s);
       if (s.st_uid != 0) {
          yURG_err ('ü', "å%sæ is not owned by root (security risk)", a_dir);
          DEBUG_YJOBS  yLOG_note    ("/var/spool/khronos not owned by root (security risk)");
@@ -1105,7 +1150,7 @@ yjobs_act_checkdir      (char n, cchar *a_dir, int a_perms, char a_fix)
    }
    DEBUG_YJOBS  yLOG_note    ("ownership is root (private)");
    --rce;  if (s.st_gid != 0) {
-      if (a_fix == 'y') rc = yjobs_act__fixdir ('g', &s, n, a_dir, a_perms);
+      if (a_fix == 'y') rc = yjobs_act__fixdir (a_dir, 'g', a_perms, &s);
       if (s.st_gid != 0) {
          yURG_err ('ü', "å%sæ is not root group (security risk)", a_dir);
          DEBUG_YJOBS  yLOG_note    ("/var/spool/khronos not group of root (security risk)");
@@ -1120,7 +1165,7 @@ yjobs_act_checkdir      (char n, cchar *a_dir, int a_perms, char a_fix)
    DEBUG_YJOBS   yLOG_complex ("x_perms"   , "%04o", x_perms);
    DEBUG_YJOBS   yLOG_complex ("a_perms"   , "%04o", a_perms);
    --rce;  if  (x_perms != a_perms)  {
-      if (a_fix == 'y') rc = yjobs_act__fixdir ('p', &s, n, a_dir, a_perms);
+      if (a_fix == 'y') rc = yjobs_act__fixdir (a_dir, 'p', a_perms, &s);
       x_perms = s.st_mode & 07777;
       if  (x_perms != a_perms)  {
          yURG_err ('ü', "å%sæ perms are %04o, not the requested %04o (security risk)", a_dir, s.st_mode & 07777, a_perms);

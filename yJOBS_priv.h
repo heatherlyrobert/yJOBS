@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0s"
-#define     P_VERTXT    "all unit tests in yJOBS_world (except gather) are current and passing"
+#define     P_VERNUM    "1.0t"
+#define     P_VERTXT    "yJOBS_act unit tests for directories (01-03) are current and passing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -343,6 +343,7 @@ char        yjobs_gather            (void);
 char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name, void *a_assimilate);
 char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name);
 char        yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix);
+char        yjobs_act__fixdir       (cchar a_dir [LEN_PATH], char a_issue, int a_perms, tSTAT *r_stat);
 char        yjobs_act_security      (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], char a_fix);
 char        yjobs_act_fix           (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND]);
 char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar a_muser [LEN_USER], int a_muid, cchar *a_regex, void *a_assimilate);

@@ -142,6 +142,7 @@ yJOBS_rmdirs            (void)
    yENV_rmdir ("/tmp/home/machine"         );
    yENV_rmdir ("/tmp/home/monkey"          );
    yENV_rmdir ("/tmp/home"                 );
+   yENV_rmdir ("/tmp/spool"                );
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -168,11 +169,10 @@ yJOBS_mkdirs            (void)
    yENV_mkdir ("/tmp/root"                 , "root"   , "root"  , "0700");
    yENV_mkdir ("/tmp/home"                 , "root"   , "root"  , "0755");
    yENV_mkdir ("/tmp/home/member"          , "member" , "users" , "0700");
-   /*> yENV_mkdir ("/tmp/home/machine"         , "machine", "users" , "0700");        <*/
    yENV_mkdir ("/tmp/home/machine"         , "member" , "users" , "0700");
-   /*> yENV_mkdir ("/tmp/home/monkey"          , "monkey" , "users" , "0700");        <*/
    yENV_mkdir ("/tmp/home/monkey"          , "member" , "users" , "0700");
    yENV_mkdir ("/tmp/home/member/c_quani"  , "member" , "users" , "0700");
+   yENV_mkdir ("/tmp/spool"                , "root"   , "root"  , "0755");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
