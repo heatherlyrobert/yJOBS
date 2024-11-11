@@ -9,7 +9,7 @@
 
 #define     P_FOCUS     "PS (programming support)"
 #define     P_NICHE     "au (process automation)"
-#define     P_SUBJECT   "service daemon framework"
+#define     P_SUBJECT   "common service daemon framework"
 #define     P_PURPOSE   "standardize common daemon requests, actions, and feedback"
 
 #define     P_NAMESAKE  "heracles-promachus (leader in battle)"
@@ -36,9 +36,9 @@
 #define     P_CREATED   "2021-01"
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
-#define     P_VERMINOR  "1.0-, break away from yEXEC"
-#define     P_VERNUM    "1.0u"
-#define     P_VERTXT    "yJOBS_act unit tests through incomming (01-07) are current and passing"
+#define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
+#define     P_VERNUM    "1.1a"
+#define     P_VERTXT    "yJOBS_act unit tests (01-17) are current and passing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -350,11 +350,26 @@ char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar a_oneline
 
 
 
+/*===[[ yJOBS_ends ]]=========================================================*/
+/*·type···· ´···function··········· ´···arguments·····························*/
+/*---(scoring)--------------*/
+char        yjobs_ends_clear        (void);
+char        yjobs_ends_score        (char a_section, char a_offset, uchar a_result);
+/*---(header)---------------*/
+char        yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND]);
+char        yjobs__ends_locations   (char a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL]);
+char        yjobs__ends_cwd         (char a_mode, char a_name [LEN_TERSE], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
+char        yjobs_ends_header       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_name [LEN_TERSE], char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
+/*---(footer)---------------*/
+char        yjobs_ends_footer       (cchar a_mode);
+/*---(failure)--------------*/
+char        yjobs_ends_failure      (cchar a_mode, cchar *a_text);
+/*---(end)------------------*/
+
 
 
 /*===[[ yJOBS_act ]]==========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs_act_header        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_name, char *r_cdir, char *r_world, char *r_update, char *r_db, char *r_cwd, char *r_full);
 char        yjobs_act__filter       (cchar *a_name, cchar *a_prefix, int a_muid);
 char        yjobs_act__prepare      (cchar a_pre, cchar a_act, cchar a_oneline [LEN_HUND], cchar a_muser [LEN_USER], cchar *a_regex, char *a_prefix, char *a_dir, void *a_assimilate);
 char        yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc);

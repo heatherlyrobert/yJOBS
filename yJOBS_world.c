@@ -967,7 +967,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, NULL, x_db, x_cwd, NULL);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, NULL, x_db, x_cwd, NULL);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -983,7 +983,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_READ, "");
       DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central database did not load properly");
+         yjobs_ends_failure (a_mode, "central database did not load properly");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1042,7 +1042,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_WRITE, "");
       DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central database could not save properly");
+         yjobs_ends_failure (a_mode, "central database could not save properly");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1056,7 +1056,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_act_footer (a_mode);
+   rc = yjobs_ends_footer (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;

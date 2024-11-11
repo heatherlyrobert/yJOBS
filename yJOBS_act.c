@@ -23,10 +23,10 @@
  */
 
 
-char    g_acts_empty    [LEN_HUND]  = "∑∑  SE·∑∑  DB·∑∑∑∑∑  LO·∑∑∑  WO·∑∑∑∑∑∑  CE·∑∑∑∑∑∑∑  AC·∑∑∑  BE·∑∑∑∑∑  ∑∑";
-char    g_acts_score    [LEN_HUND]  = "hl  SE·aF  DB·p‘#Û’  LO·l÷Ú  WO·W‘=ru’  CE·mc÷R◊=x  AC·gnd  BE·EUBDR  fy";
+/*> char    g_acts_empty    [LEN_HUND]  = "∑∑  SE·∑∑  DB·∑∑∑∑∑  LO·∑∑∑  WO·∑∑∑∑∑∑  CE·∑∑∑∑∑∑∑  AC·∑∑∑  BE·∑∑∑∑∑  ∑∑";   <*/
+/*> char    g_acts_score    [LEN_HUND]  = "hl  SE·aF  DB·p‘#Û’  LO·l÷Ú  WO·W‘=ru’  CE·mc÷R◊=x  AC·gnd  BE·EUBDR  fy";   <*/
 
-char    g_fullacts      [LEN_DESC]  = "hl a‘’ lc÷ Úmr #=Û WRf BRP UD ◊we fF";
+/*> char    g_fullacts      [LEN_DESC]  = "hl a‘’ lc÷ Úmr #=Û WRf BRP UD ◊we fF";     <*/
 
 static char (*s_assimilate) (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc);
 
@@ -37,147 +37,148 @@ static char (*s_assimilate) (cchar a_runas, cchar a_loc, cchar *a_name, char *r_
 /*====================------------------------------------====================*/
 static void      o___LOCAL_________o (void) {;};
 
-char
-yjobs_act_header        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_name, char *r_cdir, char *r_world, char *r_update, char *r_db, char *r_cwd, char *r_full)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_cdir      [LEN_PATH]  = "";
-   char        x_world     [LEN_LABEL] = "";
-   char        x_db        [LEN_LABEL] = "";
-   char        x_cwd       [LEN_PATH]  = "";
-   char       *p           = NULL;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
-   /*---(pre-header)---------------------*/
-   yURG_msg ('>', "%s", a_oneline);
-   /*---(actual header)------------------*/
-   switch (a_mode) {     /*---(incomming 5)-----------------*/
-   case CASE_VERIFY   :  yURG_msg ('>', "  option --vverify   : check details, but not register, update, or install");    break;
-   case CASE_LOCALRPT :  yURG_msg ('>', "  option --vlocal    : verify and perform a specific report on local data");     break;
-   case CASE_REGISTER :  yURG_msg ('>', "  option --vregister : verify and add to world, but not update or install");     break;
-   case CASE_UPDATE   :  yURG_msg ('>', "  option --vupdate   : verify and update global, but not register");             break;
-   case CASE_INSTALL  :  yURG_msg ('>', "  option --vinstall  : complete intake of verify, update global, and register"); break;
-                         /*---(maintain 6)------------------*/
-   case CASE_STATS    :  break;  /* no verbose option */
-   case CASE_LIST     :  break;  /* no verbose option */
-   case CASE_REPORT   :  yURG_msg ('>', "  option --vreport   : search, process, or report from central information");    break;
-   case CASE_CHECK    :  yURG_msg ('>', "  option --vcheck    : verify details of centrally installed file");             break;
-   case CASE_AUDIT    :  yURG_msg ('>', "  option --vaudit    : check central setup, files, and security");               break;
-   case CASE_FIX      :  yURG_msg ('>', "  option --vfix      : repair central directories and security");                break;
-   case CASE_ONLY     :  yURG_msg ('>', "  option --vonly     : execute with single central file");                       break;
-                         /*---(epic 3)----------------------*/
-                         /*---(elsewhere 2)-----------------*/
-                         /*---(outgoing 4)------------------*/
-   case CASE_WITHDRAW :  yURG_msg ('>', "  option --vwithdraw : remove from world, but not contents/file from central");  break;
-   case CASE_CLEAR    :  yURG_msg ('>', "  option --vclear    : remove contents/file from central, but not world");       break;
-   case CASE_REMOVE   :  yURG_msg ('>', "  option --vremove   : remove both from central contents and world");            break;
-   case CASE_EXTRACT  :  yURG_msg ('>', "  option --vextract  : make a local copy of a central file/entry");              break;
-                         /*---(execution 6)-----------------*/
-   case CASE_GATHER   :  yURG_msg ('>', "  option --vgather   : verify and update all entries from world file");          break;
-   case CASE_DAEMON   :  yURG_msg ('>', "  option --vdaemon   : verbosely launch in daemon mode");                        break;
-   case CASE_PRICKLY  :  yURG_msg ('>', "  option --vprickly  : verbosely launch in prickly daemon mode");                break;
-   case CASE_NORMAL   :  yURG_msg ('>', "  option --vnormal   : verbosely launch in normal mode");                        break;
-   case CASE_STRICT   :  yURG_msg ('>', "  option --vstrict   : verbosely launch in strict normal mode");                 break;
-   }
-   g_acts_score  [G_SCORE_PREPARE + 0] = 'h';
-   /*---(get central files)--------------*/
-   g_acts_score  [G_SCORE_PREPARE + 1] = G_SCORE_FAIL;
-   rc = yjobs_who_location (a_runas, x_cdir, NULL, x_world, NULL, x_db);
-   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
-   DEBUG_YJOBS   yLOG_info    ("x_world"   , x_world);
-   DEBUG_YJOBS   yLOG_info    ("x_db"      , x_db);
-   if (r_cdir  != NULL)  ystrlcpy (r_cdir , x_cdir , LEN_PATH);
-   if (r_world != NULL)  ystrlcpy (r_world, x_world, LEN_LABEL);
-   if (r_db    != NULL)  ystrlcpy (r_db   , x_db   , LEN_LABEL);
-   /*---(get current working dir)--------*/
-   p = getcwd (x_cwd, LEN_PATH);
-   DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);
-   --rce;  if (p == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);
-   if (r_cwd   != NULL)  ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
-   if (r_full  != NULL) {
-      if      (a_name [0] == '/')                    sprintf (r_full , "%s"   , a_name);
-      else if (strchr (g_local  , a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cwd , a_name);
-      else if (strchr (g_central, a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cdir, a_name);
-   }
-   DEBUG_YJOBS   yLOG_info    ("r_full"    , r_full);
-   g_acts_score  [G_SCORE_PREPARE + 1] = 'l';
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                                                                                                   <* 
+ *> yjobs_act_header        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar *a_name, char *r_cdir, char *r_world, char *r_update, char *r_db, char *r_cwd, char *r_full)   <* 
+ *> {                                                                                                                                                                                      <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                                                                                            <* 
+ *>    char        rce         =  -10;                                                                                                                                                     <* 
+ *>    char        rc          =    0;                                                                                                                                                     <* 
+ *>    char        x_cdir      [LEN_PATH]  = "";                                                                                                                                           <* 
+ *>    char        x_world     [LEN_LABEL] = "";                                                                                                                                           <* 
+ *>    char        x_db        [LEN_LABEL] = "";                                                                                                                                           <* 
+ *>    char        x_cwd       [LEN_PATH]  = "";                                                                                                                                           <* 
+ *>    char       *p           = NULL;                                                                                                                                                     <* 
+ *>    /+---(header)-------------------------+/                                                                                                                                            <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                                                                                                           <* 
+ *>    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);                                                                                                                                   <* 
+ *>    /+---(pre-header)---------------------+/                                                                                                                                            <* 
+ *>    yURG_msg (':', "%s", a_oneline);                                                                                                                                                    <* 
+ *>    /+---(actual header)------------------+/                                                                                                                                            <* 
+ *>    switch (a_mode) {     /+---(incomming 5)-----------------+/                                                                                                                         <* 
+ *>    case CASE_VERIFY   :  yURG_msg (':', "  option --vverify   : check details, but not register, update, or install");    break;                                                       <* 
+ *>    case CASE_LOCALRPT :  yURG_msg (':', "  option --vlocal    : verify and perform a specific report on local data");     break;                                                       <* 
+ *>    case CASE_REGISTER :  yURG_msg (':', "  option --vregister : verify and add to world, but not update or install");     break;                                                       <* 
+ *>    case CASE_UPDATE   :  yURG_msg (':', "  option --vupdate   : verify and update global, but not register");             break;                                                       <* 
+ *>    case CASE_INSTALL  :  yURG_msg (':', "  option --vinstall  : complete intake of verify, update global, and register"); break;                                                       <* 
+ *>                          /+---(maintain 6)------------------+/                                                                                                                         <* 
+ *>    case CASE_STATS    :  break;  /+ no verbose option +/                                                                                                                               <* 
+ *>    case CASE_LIST     :  break;  /+ no verbose option +/                                                                                                                               <* 
+ *>    case CASE_REPORT   :  yURG_msg (':', "  option --vreport   : search, process, or report from central information");    break;                                                       <* 
+ *>    case CASE_CHECK    :  yURG_msg (':', "  option --vcheck    : verify details of centrally installed file");             break;                                                       <* 
+ *>    case CASE_AUDIT    :  yURG_msg (':', "  option --vaudit    : check central setup, files, and security");               break;                                                       <* 
+ *>    case CASE_FIX      :  yURG_msg (':', "  option --vfix      : repair central directories and security");                break;                                                       <* 
+ *>    case CASE_ONLY     :  yURG_msg (':', "  option --vonly     : execute with single central file");                       break;                                                       <* 
+ *>                          /+---(epic 3)----------------------+/                                                                                                                         <* 
+ *>                          /+---(elsewhere 2)-----------------+/                                                                                                                         <* 
+ *>                          /+---(outgoing 4)------------------+/                                                                                                                         <* 
+ *>    case CASE_WITHDRAW :  yURG_msg (':', "  option --vwithdraw : remove from world, but not contents/file from central");  break;                                                       <* 
+ *>    case CASE_CLEAR    :  yURG_msg (':', "  option --vclear    : remove contents/file from central, but not world");       break;                                                       <* 
+ *>    case CASE_REMOVE   :  yURG_msg (':', "  option --vremove   : remove both from central contents and world");            break;                                                       <* 
+ *>    case CASE_EXTRACT  :  yURG_msg (':', "  option --vextract  : make a local copy of a central file/entry");              break;                                                       <* 
+ *>                          /+---(execution 6)-----------------+/                                                                                                                         <* 
+ *>    case CASE_GATHER   :  yURG_msg (':', "  option --vgather   : verify and update all entries from world file");          break;                                                       <* 
+ *>    case CASE_DAEMON   :  yURG_msg (':', "  option --vdaemon   : verbosely launch in daemon mode");                        break;                                                       <* 
+ *>    case CASE_PRICKLY  :  yURG_msg (':', "  option --vprickly  : verbosely launch in prickly daemon mode");                break;                                                       <* 
+ *>    case CASE_NORMAL   :  yURG_msg (':', "  option --vnormal   : verbosely launch in normal mode");                        break;                                                       <* 
+ *>    case CASE_STRICT   :  yURG_msg (':', "  option --vstrict   : verbosely launch in strict normal mode");                 break;                                                       <* 
+ *>    }                                                                                                                                                                                   <* 
+ *>    g_acts_score  [G_SCORE_PREPARE + 0] = 'h';                                                                                                                                          <* 
+ *>    /+---(get central files)--------------+/                                                                                                                                            <* 
+ *>    g_acts_score  [G_SCORE_PREPARE + 1] = G_SCORE_FAIL;                                                                                                                                 <* 
+ *>    rc = yjobs_who_location (a_runas, x_cdir, NULL, x_world, NULL, x_db);                                                                                                               <* 
+ *>    DEBUG_YJOBS   yLOG_value   ("location"  , rc);                                                                                                                                      <* 
+ *>    --rce;  if (rc < 0) {                                                                                                                                                               <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                                  <* 
+ *>       return rce;                                                                                                                                                                      <* 
+ *>    }                                                                                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);                                                                                                                                  <* 
+ *>    DEBUG_YJOBS   yLOG_info    ("x_world"   , x_world);                                                                                                                                 <* 
+ *>    DEBUG_YJOBS   yLOG_info    ("x_db"      , x_db);                                                                                                                                    <* 
+ *>    if (r_cdir  != NULL)  ystrlcpy (r_cdir , x_cdir , LEN_PATH);                                                                                                                        <* 
+ *>    if (r_world != NULL)  ystrlcpy (r_world, x_world, LEN_LABEL);                                                                                                                       <* 
+ *>    if (r_db    != NULL)  ystrlcpy (r_db   , x_db   , LEN_LABEL);                                                                                                                       <* 
+ *>    /+---(get current working dir)--------+/                                                                                                                                            <* 
+ *>    p = getcwd (x_cwd, LEN_PATH);                                                                                                                                                       <* 
+ *>    DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);                                                                                                                                       <* 
+ *>    --rce;  if (p == NULL) {                                                                                                                                                            <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                                  <* 
+ *>       return rce;                                                                                                                                                                      <* 
+ *>    }                                                                                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);                                                                                                                                   <* 
+ *>    if (r_cwd   != NULL)  ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);                                                                                                                        <* 
+ *>    if (r_full  != NULL) {                                                                                                                                                              <* 
+ *>       if      (a_name [0] == '/')                    sprintf (r_full , "%s"   , a_name);                                                                                               <* 
+ *>       else if (strchr (g_local  , a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cwd , a_name);                                                                                       <* 
+ *>       else if (strchr (g_central, a_mode) != NULL)   sprintf (r_full , "%s/%s", x_cdir, a_name);                                                                                       <* 
+ *>    }                                                                                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_info    ("r_full"    , r_full);                                                                                                                                  <* 
+ *>    g_acts_score  [G_SCORE_PREPARE + 1] = 'l';                                                                                                                                          <* 
+ *>    /+---(complete)-----------------------+/                                                                                                                                            <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                                                                          <* 
+ *>    return 0;                                                                                                                                                                           <* 
+ *> }                                                                                                                                                                                      <*/
 
-char
-yjobs_act_footer        (cchar a_mode)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
-   if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_live ();
-   g_acts_score  [G_SCORE_JUDGE + 0] = 'f';
-   /*---(write actual header)------------*/
-   switch (a_mode) {    /*---(incomming 5)-----------------*/
-   case CASE_VERIFY   : yURG_msg ('>', "%sSUCCESS, read and verified local, but update/installation not requested%s"         , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_LOCALRPT : yURG_msg ('>', "%sSUCCESS, verified and specific report completed on local data%s"                   , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_REGISTER : yURG_msg ('>', "%sSUCCESS, verified and registered local, but update/installation not requested%s"   , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_UPDATE   : yURG_msg ('>', "%sSUCCESS, verified and updated, but registration not requested%s"                   , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_INSTALL  : yURG_msg ('>', "%sSUCCESS, full install of verification, update, and registration%s"                 , BOLD_GRN, BOLD_OFF);  break;
-                        /*---(central 6)-------------------*/
-   case CASE_CHECK    : yURG_msg ('>', "%sSUCCESS, centrally installed file is runable, all lines checked%s"                 , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_AUDIT    : yURG_msg ('>', "%sSUCCESS, environment and all central files passed relevent checks%s"               , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_FIX      : yURG_msg ('>', "%sSUCCESS, central directory basic security measures confirmed%s"                    , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_ONLY     : yURG_msg ('>', "%sSUCCESS, central execution on single file confirmed%s"                             , BOLD_GRN, BOLD_OFF);  break;
-                        /*---(epic 3)----------------------*/
-                        /*---(elsewhere 2)-----------------*/
-                        /*---(outgoing 4)------------------*/
-   case CASE_WITHDRAW : yURG_msg ('>', "%sSUCCESS, registered local withdrawn from world, but clear/remove not requested%s"  , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_CLEAR    : yURG_msg ('>', "%sSUCCESS, installed file/dir cleared from database, but withdraw not requested%s"   , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_REMOVE   : yURG_msg ('>', "%sSUCCESS, installed file/dir cleared from database and withdrawn from world%s"      , BOLD_GRN, BOLD_OFF);  break;
-   case CASE_EXTRACT  : yURG_msg ('>', "%sSUCCESS, installed file/dir contents extracted to local file%s"                    , BOLD_GRN, BOLD_OFF);  break;
-                        /*---(execution 6)-----------------*/
-   case CASE_GATHER   : yURG_msg ('>', "%sSUCCESS, world registry entries have been gathered/updated in the database%s"      , BOLD_GRN, BOLD_OFF);  break;
-   }
-   if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
-   g_acts_score  [G_SCORE_JUDGE + 1] = 'y';
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                                                                          <* 
+ *> yjobs_act_footer        (cchar a_mode)                                                                                                                        <* 
+ *> {                                                                                                                                                             <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                                                                   <* 
+ *>    char        rce         =  -10;                                                                                                                            <* 
+ *>    char        rc          =    0;                                                                                                                            <* 
+ *>    /+---(header)-------------------------+/                                                                                                                   <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                                                                                  <* 
+ *>    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);                                                                                                          <* 
+ *>    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_live ();                                                                                               <* 
+ *>    g_acts_score  [G_SCORE_JUDGE + 0] = 'f';                                                                                                                   <* 
+ *>    /+---(write actual header)------------+/                                                                                                                   <* 
+ *>    switch (a_mode) {    /+---(incomming 5)-----------------+/                                                                                                 <* 
+ *>    case CASE_VERIFY   : yURG_msg ('>', "%sSUCCESS, read and verified local, but update/installation not requested%s"         , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_LOCALRPT : yURG_msg ('>', "%sSUCCESS, verified and specific report completed on local data%s"                   , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_REGISTER : yURG_msg ('>', "%sSUCCESS, verified and registered local, but update/installation not requested%s"   , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_UPDATE   : yURG_msg ('>', "%sSUCCESS, verified and updated, but registration not requested%s"                   , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_INSTALL  : yURG_msg ('>', "%sSUCCESS, full install of verification, update, and registration%s"                 , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>                         /+---(central 6)-------------------+/                                                                                                 <* 
+ *>    case CASE_CHECK    : yURG_msg ('>', "%sSUCCESS, centrally installed file is runable, all lines checked%s"                 , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_AUDIT    : yURG_msg ('>', "%sSUCCESS, environment and all central files passed relevent checks%s"               , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_FIX      : yURG_msg ('>', "%sSUCCESS, central directory basic security measures confirmed%s"                    , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_ONLY     : yURG_msg ('>', "%sSUCCESS, central execution on single file confirmed%s"                             , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>                         /+---(epic 3)----------------------+/                                                                                                 <* 
+ *>                         /+---(elsewhere 2)-----------------+/                                                                                                 <* 
+ *>                         /+---(outgoing 4)------------------+/                                                                                                 <* 
+ *>    case CASE_WITHDRAW : yURG_msg ('>', "%sSUCCESS, registered local withdrawn from world, but clear/remove not requested%s"  , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_CLEAR    : yURG_msg ('>', "%sSUCCESS, installed file/dir cleared from database, but withdraw not requested%s"   , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_REMOVE   : yURG_msg ('>', "%sSUCCESS, installed file/dir cleared from database and withdrawn from world%s"      , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    case CASE_EXTRACT  : yURG_msg ('>', "%sSUCCESS, installed file/dir contents extracted to local file%s"                    , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>                         /+---(execution 6)-----------------+/                                                                                                 <* 
+ *>    case CASE_GATHER   : yURG_msg ('>', "%sSUCCESS, world registry entries have been gathered/updated in the database%s"      , BOLD_GRN, BOLD_OFF);  break;   <* 
+ *>    }                                                                                                                                                          <* 
+ *>    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();                                                                                               <* 
+ *>    g_acts_score  [G_SCORE_JUDGE + 1] = 'y';                                                                                                                   <* 
+ *>    /+---(complete)-----------------------+/                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                                                 <* 
+ *>    return 0;                                                                                                                                                  <* 
+ *> }                                                                                                                                                             <*/
 
-char
-yjobs_act_failure       (cchar a_mode, cchar *a_text)
-{
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
-   /*---(pre-footer)---------------------*/
-   yURG_msg (' ', "");
-   /*---(actual footer)------------------*/
-   yURG_msg ('>', "%sFAILED, %s, the reasons are shown above%s", BOLD_ERR, a_text, BOLD_OFF);
-   if (strchr (g_confirm , a_mode)  != NULL) {
-      yURG_msg_live ();
-      yURG_msg ('>', "%sFAILED, %s, run verbosely to identify reasons%s" BOLD_ERR, a_text, BOLD_OFF);
-      yURG_msg_mute ();
-   }
-   g_acts_score  [G_SCORE_JUDGE + 1] = '!';
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                    <* 
+ *> yjobs_act_failure       (cchar a_mode, cchar *a_text)                                                   <* 
+ *> {                                                                                                       <* 
+ *>    /+---(header)-------------------------+/                                                             <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                            <* 
+ *>    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);                                                    <* 
+ *>    /+---(pre-footer)---------------------+/                                                             <* 
+ *>    /+---(actual footer)------------------+/                                                             <* 
+ *>    if (strchr (g_verbose , a_mode)  != NULL) {                                                          <* 
+ *>       yURG_msg ('>', "%sFAILED, %s, the reasons are shown above%s", BOLD_ERR, a_text, BOLD_OFF);        <* 
+ *>    }                                                                                                    <* 
+ *>    else if (strchr (g_confirm , a_mode)  != NULL) {                                                     <* 
+ *>       yURG_msg_live ();                                                                                 <* 
+ *>       yURG_msg (':', "%sFAILED, %s, run verbosely to identify reasons%s" BOLD_ERR, a_text, BOLD_OFF);   <* 
+ *>       yURG_msg_mute ();                                                                                 <* 
+ *>    }                                                                                                    <* 
+ *>    g_acts_score  [G_SCORE_JUDGE + 1] = '!';                                                             <* 
+ *>    /+---(complete)-----------------------+/                                                             <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                           <* 
+ *>    return 0;                                                                                            <* 
+ *> }                                                                                                       <*/
 
 
 
@@ -306,7 +307,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, NULL, x_db, NULL, x_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, NULL, x_world, NULL, x_db, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -323,7 +324,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_READ, "");
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central database did not load properly");
+            yjobs_ends_failure (a_mode, "central database did not load properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -334,7 +335,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(security on file)---------------*/
    --rce;  if (a_file == NULL || a_file [0] == '\0') {
-      yjobs_act_failure (a_mode, "local file name is null/empty");
+      yjobs_ends_failure (a_mode, "local file name is null/empty");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -343,7 +344,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (a_file [x_len - 1] == '/') {
       DEBUG_YJOBS   yLOG_note    ("directory given");
       if (strchr (IAM_DIRS, a_runas) == NULL) {
-         yjobs_act_failure (a_mode, "requester (not polymnia/metis) can not request directory");
+         yjobs_ends_failure (a_mode, "requester (not polymnia/metis) can not request directory");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -351,14 +352,14 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    } else {
       DEBUG_YJOBS   yLOG_note    ("file given");
       if (strchr (IAM_FILES, a_runas) == NULL) {
-         yjobs_act_failure (a_mode, "polymnia can only request directory, not a file");
+         yjobs_ends_failure (a_mode, "polymnia can only request directory, not a file");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
       rc = yjobs_local_old  (a_runas, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
       DEBUG_YJOBS   yLOG_value   ("local"     , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "local file not proper and/or secure");
+         yjobs_ends_failure (a_mode, "local file not proper and/or secure");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -370,7 +371,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    rc = x_callback (YJOBS_PULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
    --rce;  if (rc < 0) {
-      yjobs_act_failure (a_mode, "local contents not acceptable");
+      yjobs_ends_failure (a_mode, "local contents not acceptable");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -381,7 +382,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_LOCALRPT, a_file);
       DEBUG_YJOBS   yLOG_value   ("localrpt"  , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "local report could not complete");
+         yjobs_ends_failure (a_mode, "local report could not complete");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -394,7 +395,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_incomming_move (a_runas, a_mode, a_file, x_fuser);
          DEBUG_YJOBS   yLOG_value   ("intake"    , rc);
          --rce; if (rc < 0) {
-            yjobs_act_failure (a_mode, "file could not be moved appopriately");
+            yjobs_ends_failure (a_mode, "file could not be moved appopriately");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -410,7 +411,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_WRITE, "");
          DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central database could not save properly");
+            yjobs_ends_failure (a_mode, "central database could not save properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -426,13 +427,13 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_world_register (a_runas, a_file);
          DEBUG_YJOBS   yLOG_value   ("register"  , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "can not register in world file");
+            yjobs_ends_failure (a_mode, "can not register in world file");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
       } else if (strchr ("bÈB", a_mode) != NULL) {
          g_acts_score  [G_SCORE_WORLD + 0] = G_SCORE_FAIL;
-         yjobs_act_failure (a_mode, "requested register specifically, but no world file");
+         yjobs_ends_failure (a_mode, "requested register specifically, but no world file");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       } else {
@@ -444,7 +445,7 @@ yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_act_footer (a_mode);
+   rc = yjobs_ends_footer (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -495,7 +496,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, x_cdir, x_world, NULL, x_db, NULL, x_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, x_cdir, x_world, NULL, x_db, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -506,11 +507,12 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    DEBUG_YJOBS  yLOG_info    ("x_full"    , x_full);
    /*---(security check)-----------------*/
    --rce;  if (strchr ("aËA", a_mode) != NULL) {
+      yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);
       g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;
       rc = yjobs_act_security (a_runas, a_mode, a_oneline, '-');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central security audit failed");
+         yjobs_ends_failure (a_mode, "central security audit failed");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -524,7 +526,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_READ, "");
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central database did not load properly");
+            yjobs_ends_failure (a_mode, "central database did not load properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -541,7 +543,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_running__pull (a_runas, a_mode, x_cdir, x_callback);
          DEBUG_YJOBS   yLOG_value   ("read files", rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "all central files did not load properly");
+            yjobs_ends_failure (a_mode, "all central files did not load properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -557,7 +559,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_STATS   , "");
       DEBUG_YJOBS   yLOG_value   ("stats"     , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "database could not produce statistics");
+         yjobs_ends_failure (a_mode, "database could not produce statistics");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -569,7 +571,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          g_acts_score  [G_SCORE_WORLD   + 2] = G_SCORE_FAIL;
          rc = yjobs_world_list (a_runas);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "world list did not run");
+            yjobs_ends_failure (a_mode, "world list did not run");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -579,14 +581,14 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          g_acts_score  [G_SCORE_CENTRAL + 5] = G_SCORE_FAIL;
          DEBUG_YJOBS   yLOG_value   ("list"      , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central list did not run");
+            yjobs_ends_failure (a_mode, "central list did not run");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
          g_acts_score  [G_SCORE_CENTRAL + 5] = '=';
       } else {
          g_acts_score  [G_SCORE_CENTRAL + 5] = G_SCORE_FAIL;
-         yjobs_act_failure (a_mode, "program neither file-based or spool based");
+         yjobs_ends_failure (a_mode, "program neither file-based or spool based");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -600,7 +602,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
          DEBUG_YJOBS   yLOG_value   ("central"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central file not proper and/or secure");
+            yjobs_ends_failure (a_mode, "central file not proper and/or secure");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -619,7 +621,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_PULL, x_full);
          DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
          --rce;  if (rc < 0) {
-            yjobs_act_failure (a_mode, "central contents not acceptable");
+            yjobs_ends_failure (a_mode, "central contents not acceptable");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -635,7 +637,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_PULL, x_full);
          DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
          --rce;  if (rc < 0) {
-            yjobs_act_failure (a_mode, "central contents not acceptable");
+            yjobs_ends_failure (a_mode, "central contents not acceptable");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -650,7 +652,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_REPORT, a_file);
       DEBUG_YJOBS   yLOG_value   ("report"    , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central report could not complete");
+         yjobs_ends_failure (a_mode, "central report could not complete");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -663,11 +665,11 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_world_audit (a_runas);
          DEBUG_YJOBS   yLOG_value   ("world"     , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "world file content audit failed");
+            yjobs_ends_failure (a_mode, "world file content audit failed");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
-         g_acts_score  [G_SCORE_WORLD + 0] = 'W';
+         g_acts_score  [G_SCORE_WORLD + 0] = 'w';
       }
    }
    /*---(fix)----------------------------*/
@@ -676,15 +678,15 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = yjobs_act_security (a_runas, a_mode, a_oneline, 'y');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central security fix failed");
+         yjobs_ends_failure (a_mode, "central security fix failed");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      g_acts_score  [G_SCORE_SECURE + 1] = 'F';
+      g_acts_score  [G_SCORE_SECURE + 1] = 'f';
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_act_footer (a_mode);
+   rc = yjobs_ends_footer (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -721,8 +723,8 @@ yJOBS_act_check         (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    /*---(verify)-------------------------*/
    DEBUG_YJOBS  yLOG_point   ("a_act"     , a_act);
    --rce;  IF_CHECK {
-      yURG_msg ('>', "%s", a_oneline);
-      yURG_msg ('>', "  option --vcheck, check details of centrally installed job/khronos file");
+      yURG_msg (':', "%s", a_oneline);
+      yURG_msg (':', "  option --vcheck, check details of centrally installed job/khronos file");
    } else IF_AUDIT   {
       yURG_msg ('>', "CHECKING %s ===================================", a_name);
    } else IF_DAEMON  {
@@ -804,7 +806,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, x_cdir, x_world, NULL, x_db, NULL, x_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, x_cdir, x_world, NULL, x_db, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -818,7 +820,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_READ, "");
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central database did not load properly");
+            yjobs_ends_failure (a_mode, "central database did not load properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -834,7 +836,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_CLEAR, x_full);
          DEBUG_YJOBS   yLOG_value   ("clear"     , rc);
          --rce;  if (rc < 0) {
-            yjobs_act_failure (a_mode, "contents could not be cleared");
+            yjobs_ends_failure (a_mode, "contents could not be cleared");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -850,7 +852,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = yjobs_central_old  (a_runas, a_mode, a_file, NULL, NULL, NULL, NULL);
          DEBUG_YJOBS   yLOG_value   ("central"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central file not proper and/or secure");
+            yjobs_ends_failure (a_mode, "central file not proper and/or secure");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -870,7 +872,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
             rc = system   (x_cmd);
             DEBUG_YJOBS   yLOG_value   ("system"    , rc);
             --rce;  if (rc < 0) {
-               yjobs_act_failure (a_mode, "contents could not be cleared");
+               yjobs_ends_failure (a_mode, "contents could not be cleared");
                DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
                return rce;
             }
@@ -889,7 +891,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_EXTRACT, x_full);
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "could not extract from database");
+            yjobs_ends_failure (a_mode, "could not extract from database");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -903,7 +905,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          /* copy file down */
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "could not copy from central");
+            yjobs_ends_failure (a_mode, "could not copy from central");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -918,7 +920,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_WRITE, "");
          DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
          if (rc < 0) {
-            yjobs_act_failure (a_mode, "central database could not save properly");
+            yjobs_ends_failure (a_mode, "central database could not save properly");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -932,7 +934,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = yjobs_world_withdraw (a_runas, a_file);
       DEBUG_YJOBS   yLOG_value   ("withdraw"  , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "can not withdraw from world file");
+         yjobs_ends_failure (a_mode, "can not withdraw from world file");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -940,7 +942,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_act_footer (a_mode);
+   rc = yjobs_ends_footer (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -969,8 +971,8 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    /*---(remove header)------------------*/
    DEBUG_YJOBS  yLOG_point   ("a_act"     , a_act);
    --rce;  IF_REMOVE {
-      yURG_msg ('>', "%s", a_oneline);
-      yURG_msg ('>', "  option --vremove, remove installed job/khronos file if found");
+      yURG_msg (':', "%s", a_oneline);
+      yURG_msg (':', "  option --vremove, remove installed job/khronos file if found");
       yURG_msg (' ', "");
    } else {
       DEBUG_YJOBS   yLOG_note    ("action requested is not a remove type, trouble");
@@ -982,7 +984,7 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    DEBUG_YJOBS   yLOG_value   ("central"   , rc);
    --rce;  if (rc < 0) {
       if (a_act == ACT_CREMOVE )   yURG_msg_live ();
-      if (a_act == ACT_CREMOVE )   yURG_msg ('>', "FAILED, installed job/khronos file not found/proper, run --vremove to identify reasons");
+      if (a_act == ACT_CREMOVE )   yURG_msg (':', "FAILED, installed job/khronos file not found/proper, run --vremove to identify reasons");
       if (a_act == ACT_VREMOVE )   yURG_msg ('>', "FAILED, installed job/khronos file not found/proper, the reasons are shown above");
       if (a_act == ACT_CREMOVE )   yURG_msg_mute ();
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -998,7 +1000,7 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    DEBUG_YJOBS   yLOG_value   ("wifexited" , WIFEXITED(rc));
    --rce;  if (rc < 0 || WIFEXITED (rc) < 0) {
       if (a_act == ACT_CREMOVE )   yURG_msg_live ();
-      if (a_act == ACT_CREMOVE )   yURG_msg ('>', "FAILED, installed job/khronos file not deleted, run --vremove for reasons");
+      if (a_act == ACT_CREMOVE )   yURG_msg (':', "FAILED, installed job/khronos file not deleted, run --vremove for reasons");
       if (a_act == ACT_VREMOVE )   yURG_msg ('>', "FAILED, installed job/khronos file not deleted, the reasons are shown above");
       if (a_act == ACT_CREMOVE )   yURG_msg_mute ();
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -1688,14 +1690,14 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
       rc = yjobs_central_old  (a_runas, a_mode, x_name, NULL, NULL, NULL, NULL);
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "local file not proper and/or secure");
+         yjobs_ends_failure (a_mode, "local file not proper and/or secure");
          continue;
       }
       /*---(verify contents)--------------------*/
       rc = x_callback (YJOBS_PULL, x_full);
       DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
       --rce;  if (rc < 0) {
-         yjobs_act_failure (a_mode, "local contents not acceptable");
+         yjobs_ends_failure (a_mode, "local contents not acceptable");
          continue;
       }
       /*---(clear old contents)-----------------*/
@@ -1703,7 +1705,7 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
        *>    rc = x_callback (YJOBS_PURGE, NULL);                                     <* 
        *>    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                           <* 
        *>    --rce;  if (rc < 0) {                                                    <* 
-       *>       yjobs_act_failure (a_mode, "could not clear read data");              <* 
+       *>       yjobs_ends_failure (a_mode, "could not clear read data");              <* 
        *>       continue;                                                             <* 
        *>    }                                                                        <* 
        *> }                                                                           <*/
@@ -1814,7 +1816,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, x_cdir, NULL, NULL, NULL, NULL, x_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, x_cdir, NULL, NULL, NULL, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -1832,7 +1834,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_READ, "");
       DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central database did not load properly");
+         yjobs_ends_failure (a_mode, "central database did not load properly");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1850,7 +1852,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central file not proper and/or secure");
+         yjobs_ends_failure (a_mode, "central file not proper and/or secure");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1861,7 +1863,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_PULL, x_full);
       DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
       --rce;  if (rc < 0) {
-         yjobs_act_failure (a_mode, "local contents not acceptable");
+         yjobs_ends_failure (a_mode, "local contents not acceptable");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1869,7 +1871,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(show footer)--------------------*/
    if (strchr (g_running, a_mode) != NULL) {
       if (rc > 0)  yURG_err (' ', "");
-      rc = yjobs_act_footer (a_mode);
+      rc = yjobs_ends_footer (a_mode);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -1913,7 +1915,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_act_header (a_runas, a_mode, a_oneline, a_file, x_cdir, NULL, NULL, NULL, NULL, x_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, x_cdir, NULL, NULL, NULL, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -1931,7 +1933,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_READ, "");
       DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
       if (rc < 0) {
-         yjobs_act_failure (a_mode, "central database did not load properly");
+         yjobs_ends_failure (a_mode, "central database did not load properly");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1943,7 +1945,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       rc = x_callback (YJOBS_GATHER, "");
       DEBUG_YJOBS   yLOG_value   ("gather"    , rc);
       --rce;  if (rc < 0) {
-         yjobs_act_failure (a_mode, "local contents not acceptable");
+         yjobs_ends_failure (a_mode, "local contents not acceptable");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -1952,7 +1954,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(show footer)--------------------*/
    if (strchr (g_running, a_mode) != NULL) {
       if (rc > 0)  yURG_err (' ', "");
-      rc = yjobs_act_footer (a_mode);
+      rc = yjobs_ends_footer (a_mode);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
