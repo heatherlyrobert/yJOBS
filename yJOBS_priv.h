@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1a"
-#define     P_VERTXT    "yJOBS_act unit tests (01-17) are current and passing"
+#define     P_VERNUM    "1.1b"
+#define     P_VERTXT    "all yJOBS_act unit tests (01-18) are current and passing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

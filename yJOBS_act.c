@@ -1007,7 +1007,7 @@ yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
       return rce;
    }
    if (a_act == ACT_CREMOVE )   yURG_msg_live ();
-   yURG_msg ('>', "SUCCESS, installed job/khronos file uninstalled.  restart or --reload to retire");
+   yURG_msg (':', "SUCCESS, installed job/khronos file uninstalled.  restart or --reload to retire");
    if (a_act == ACT_CREMOVE )   yURG_msg_mute ();
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

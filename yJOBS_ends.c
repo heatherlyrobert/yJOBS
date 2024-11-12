@@ -39,7 +39,7 @@ static struct {
    char        s_desc      [LEN_DESC];
 } s_scores [LEN_HUND] = {
 
-   {  0, G_SCORE_PREPARE   , "h·"      , "printing of the title lines"      },
+   {  0, G_SCORE_PREPARE   , "°h-·"    , "printing of the title lines"      },
    {  1, G_SCORE_PREPARE   , "°l·"     , "default location lookup"          },
 
    {  7, G_SCORE_SECURE    , "°a·"     , "general security audit"           },
@@ -79,7 +79,7 @@ static struct {
    { 66, G_SCORE_BACKEND   , "°D-·"    , "download a central file"          },
    { 67, G_SCORE_BACKEND   , "°R-·"    , "restore a central file"           },
 
-   { 70, G_SCORE_JUDGE     , "f·"      , "print footer on output"           },
+   { 70, G_SCORE_JUDGE     , "°f-·"    , "print footer on output"           },
    { 71, G_SCORE_JUDGE     , "°y!·"    , "final judgement"                  },
 
    { -1, -1                , ""        , "end-of-entries"                   },
@@ -175,7 +175,7 @@ yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  0, G_SCORE_SKIP);
+   yjobs_ends_score (G_SCORE_PREPARE,  0, G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
@@ -190,6 +190,7 @@ yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
    }
    DEBUG_YJOBS  yLOG_info    ("g_verbose" , g_verbose);
    if (strchr (g_verbose , a_mode) == NULL) {
+      yjobs_ends_score (G_SCORE_PREPARE,  0, G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
@@ -358,7 +359,6 @@ yjobs_ends_header       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
-   /*---(defaults)-----------------------*/
    /*---(titles)-------------------------*/
    rc = yjobs__ends_titles (a_mode, a_oneline);
    DEBUG_YJOBS   yLOG_value   ("titles"    , rc);
