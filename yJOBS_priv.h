@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1b"
-#define     P_VERTXT    "all yJOBS_act unit tests (01-18) are current and passing"
+#define     P_VERNUM    "1.1c"
+#define     P_VERTXT    "pulled yJOBS_act header and footer to yJOBS_ends, unit tests built and passed"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -358,12 +358,12 @@ char        yjobs_ends_score        (char a_section, char a_offset, uchar a_resu
 /*---(header)---------------*/
 char        yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND]);
 char        yjobs__ends_locations   (char a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL]);
-char        yjobs__ends_cwd         (char a_mode, char a_name [LEN_TERSE], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
-char        yjobs_ends_header       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_name [LEN_TERSE], char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
+char        yjobs__ends_cwd         (char a_mode, char a_file [LEN_TERSE], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
+char        yjobs_ends_header       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_TERSE], char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
 /*---(footer)---------------*/
-char        yjobs_ends_footer       (cchar a_mode);
+char        yjobs_ends_footer       (char a_mode);
 /*---(failure)--------------*/
-char        yjobs_ends_failure      (cchar a_mode, cchar *a_text);
+char        yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND]);
 /*---(end)------------------*/
 
 
