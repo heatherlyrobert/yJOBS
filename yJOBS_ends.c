@@ -148,7 +148,7 @@ yjobs_ends_score        (char a_section, char a_offset, uchar a_result)
       return rce;
    }
    DEBUG_YJOBS  yLOG_info    ("s_valid"   , s_scores [i].s_valid);
-   if (strchr (s_scores [i].s_valid, a_result) == NULL) {
+   if (strchr (s_scores [i].s_valid, (uchar) a_result) == NULL) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -323,11 +323,11 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
    }
    DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
    DEBUG_YJOBS  yLOG_point   ("a_cdir"    , a_cdir);
-   --rce;  if (a_cdir    == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_info    ("a_cdir"    , a_cdir);
+   /*> --rce;  if (a_cdir    == NULL) {                                               <* 
+    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <* 
+    *> DEBUG_YJOBS  yLOG_info    ("a_cdir"    , a_cdir);                              <*/
    /*---(get current working dir)--------*/
    p = getcwd (x_cwd, LEN_PATH);
    DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);
@@ -337,7 +337,9 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
    }
    DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);
    /*---(save-back)----------------------*/
-   if (r_cwd   != NULL)  ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
+   if (r_cwd   != NULL) {
+      ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
+   }
    if (r_full  != NULL) {
       if      (a_file [0] == '/')                    snprintf (r_full , LEN_PATH, "%s"   , a_file);
       else if (strchr (g_local  , a_mode) != NULL)   snprintf (r_full , LEN_PATH, "%s/%s", x_cwd , a_file);
