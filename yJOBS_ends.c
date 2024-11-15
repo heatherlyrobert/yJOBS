@@ -473,14 +473,16 @@ yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND])
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      /*> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <*/
+      /*> return rce;                                                                 <*/
+      a_mode = ACT_CVERIFY;
    }
    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
    --rce;  if (strchr (g_allmode , a_mode) == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+      /*> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <*/
+      /*> return rce;                                                                 <*/
+      a_mode = ACT_CVERIFY;
    }
    DEBUG_YJOBS  yLOG_point   ("a_hint"    , a_hint);
    --rce;  if (a_hint == NULL) {
@@ -499,8 +501,8 @@ yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND])
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_live ();
    if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (' ', "");
    /*---(actual footer)------------------*/
-   if (strchr (g_verbose , a_mode)  != NULL) yURG_msg (':', "%sFAILED, %s, the reasons are shown above%s"      , BOLD_ERR, a_hint, BOLD_OFF);
-   else                                      yURG_msg (':', "%sFAILED, %s, run verbosely to identify reasons%s", BOLD_ERR, a_hint, BOLD_OFF);
+   if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (':', "%sFAILED, %s, the reasons are shown above%s"      , BOLD_ERR, a_hint, BOLD_OFF);
+   else                                       yURG_msg (':', "%sFAILED, %s, run verbosely to identify reasons%s", BOLD_ERR, a_hint, BOLD_OFF);
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(score)--------------------------*/

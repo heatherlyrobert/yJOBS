@@ -29,6 +29,7 @@ yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
+   char        x_error     [LEN_HUND]  = "";
    /*---(default)------------------------*/
    strcpy (g_acts_score, g_acts_empty);
    s_callback = NULL;
@@ -38,30 +39,36 @@ yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
    DEBUG_YJOBS   yLOG_info    ("g_valid"   , g_valid);
    if (a_runas == 0 || strchr (g_valid, a_runas)  == NULL) {
+      sprintf (x_error, "runas (%c) not recognized or valid", ychrvisible (a_runas));
+      yjobs_ends_failure (a_mode, x_error);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_info    ("g_allmode" , g_allmode);
    if (a_mode  == 0 || strchr (g_allmode, a_mode) == NULL) {
+      sprintf (x_error, "mode (%c) not recognized or valid", ychrvisible (a_mode));
+      yjobs_ends_failure (a_mode, x_error);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline == NULL) {
+      yjobs_ends_failure (a_mode, "descriptive \"oneline\" string is NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_info    ("a_oneline" , a_oneline);
    DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
    --rce;  if (a_file    == NULL) {
+      yjobs_ends_failure (a_mode, "local file/directory is NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
-   DEBUG_YJOBS  yLOG_point   ("e_callback", f_callback);
+   DEBUG_YJOBS  yLOG_point   ("f_callback", f_callback);
    --rce;  if (f_callback == NULL) {
-      yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "host program callback function is NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -213,6 +220,9 @@ yjobs__in_verify        (char a_runas, char a_mode, char a_file [LEN_PATH], char
 char
 yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
 {
+   /*---(design notes)-------------------*/
+   /*   all local files are always read, even if only to verify
+   */
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
@@ -231,10 +241,10 @@ yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
    }
    /*---(call)---------------------------*/
    x_callback = f_callback;
-   rc = s_callback (YJOBS_PULL, a_full);
+   rc = x_callback (YJOBS_LOCALRPT, a_full);
    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "local contents not acceptable");
+      yjobs_ends_failure (a_mode, "local file unreadable or contents unacceptable");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -247,8 +257,48 @@ yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
 }
 
 char
-yjobs__in_report        (void)
+yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH])
 {
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (X_REPORT, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (X_REPORT);
+      DEBUG_YJOBS   yLOG_note    ("local report not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   rc = yjobs_ends_score (G_SCORE_LOCAL,  2, G_SCORE_FAIL);
+   DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
+   /*---(check call-back)----------------*/
+   DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
+   --rce;  if (f_callback == NULL) {
+      yjobs_ends_failure (a_mode, "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(call)---------------------------*/
+   x_callback = f_callback;
+   rc = x_callback (YJOBS_LOCALRPT, a_full);
+   DEBUG_YJOBS   yLOG_value   ("report"    , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "local report could not complete");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(score)--------------------------*/
+   rc = yjobs_ends_score (G_SCORE_LOCAL,  2, 'ò');
+   DEBUG_YJOBS   yLOG_value   ("score"     , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
 }
 
 char       /* PURPOSE : install a local crontab file -------------------------*/
@@ -322,13 +372,116 @@ yjobs__in_move          (cchar a_runas, cchar a_mode, cchar a_file [LEN_PATH], c
 }
 
 char
-yjobs__in_writedb       (void)
+yjobs__in_writedb       (char a_mode, char a_db [LEN_LABEL], void *f_callback)
 {
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (X_INSTALL, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (X_INSTALL);
+      DEBUG_YJOBS   yLOG_note    ("database write not required");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(no-database)--------------------*/
+   if (a_db == NULL || strcmp (a_db, "") == 0) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_SKIP);
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   DEBUG_YJOBS   yLOG_note    ("mode requires database written after");
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_FAIL);
+   /*---(check call-back)----------------*/
+   DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
+   --rce;  if (f_callback == NULL) {
+      yjobs_ends_failure (a_mode, "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(call)---------------------------*/
+   DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
+   x_callback = f_callback;
+   rc = x_callback (YJOBS_WRITE, "");
+   DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "central database did not save properly");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(score)--------------------------*/
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, 'Õ');
+   DEBUG_YJOBS   yLOG_value   ("score"     , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
 }
 
 char
-yjobs__in_register      (void)
+yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_world [LEN_LABEL], void *f_testcall)
 {
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_testcall)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (X_REGISTER, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (X_REGISTER);
+      DEBUG_YJOBS   yLOG_note    ("register not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(no-database)--------------------*/
+   if (a_world == NULL || strcmp (a_world, "") == 0) {
+      if (strchr ("béB", a_mode) != NULL) {
+         DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+         DEBUG_YJOBS   yLOG_note    ("host program requested register specifcally, but does not use world file");
+         yjobs_ends_score (G_SCORE_WORLD   ,  0, G_SCORE_FAIL);
+         yjobs_ends_failure (a_mode, "requested register, but host does not use world file");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_snote   ("host program does not use world file");
+      /*> yjobs_ends_score (G_SCORE_WORLD   ,  0, G_SCORE_SKIP);                      <* 
+       *> yjobs_ends_score (G_SCORE_WORLD   ,  1, G_SCORE_SKIP);                      <* 
+       *> yjobs_ends_score (G_SCORE_WORLD   ,  3, G_SCORE_SKIP);                      <* 
+       *> yjobs_ends_score (G_SCORE_WORLD   ,  4, G_SCORE_SKIP);                      <*/
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   /*---(call)---------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("f_testcall", f_testcall);
+   if (f_testcall != NULL) {  /* special testing outlet */
+      x_testcall = f_testcall;
+      rc = x_testcall (ACT_REGISTER, "");
+   }
+   else {
+      rc = yjobs_world_register (a_runas, a_file);
+   }
+   /*---(handle trouble)-----------------*/
+   DEBUG_YJOBS   yLOG_value   ("register"  , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "can not register in world file");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
 }
 
 char
@@ -519,6 +672,21 @@ yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH])
 {
    switch (a_req) {
    case YJOBS_READ   :
+      return 1;
+      break;
+   case YJOBS_PULL   :
+      if (a_full == NULL)  return -1;
+      return 2;
+      break;
+   case YJOBS_WRITE  :
+      return 3;
+      break;
+   case ACT_REGISTER :
+      return 4;
+      break;
+   case YJOBS_LOCALRPT :
+      if (a_full == NULL)  return -1;
+      return 5;
       break;
    default           :
       return -1;

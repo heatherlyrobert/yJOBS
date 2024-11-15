@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1d"
-#define     P_VERTXT    "pulled yJOBS_act incomming to yJOBS_in, unit test tested verify/readdb"
+#define     P_VERNUM    "1.1e"
+#define     P_VERTXT    "all sub-functions in yJOBS_in are unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -433,12 +433,18 @@ char        yjobs_callback          (cchar a_req, cchar *a_data);
 
 /*===[[ yJOBS_in.c ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-/*---(program)--------------*/
+/*---(partial)--------------*/
 char        yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
 char        yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs__in_verify        (char a_runas, char a_mode, char a_file [LEN_PATH], char r_fuser [LEN_USER], char r_fdir [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH]);
+char        yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH]);
+char        yjobs__in_writedb       (char a_mode, char a_db [LEN_LABEL], void *f_callback);
+char        yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_world [LEN_LABEL], void *f_testcall);
+/*---(main)-----------------*/
+/*---(unittest)-------------*/
 char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
+/*---(done)-----------------*/
 
 
 
