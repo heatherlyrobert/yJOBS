@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1e"
-#define     P_VERTXT    "all sub-functions in yJOBS_in are unit tested"
+#define     P_VERNUM    "1.1f"
+#define     P_VERTXT    "all yJOBS_in are updated to modular functions and unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -327,8 +327,8 @@ char*       yjobs_file__unit        (char *a_question);
 
 /*===[[ yJOBS_act ]]==========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
-char        yjobs_incomming         (void);
+/*> char        yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);   <*/
+/*> char        yjobs_incomming         (void);                                       <*/
 char        yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
 char        yjobs_maintain          (void);
 char        yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_HUND], void *f_callback);
@@ -439,9 +439,12 @@ char        yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f
 char        yjobs__in_verify        (char a_runas, char a_mode, char a_file [LEN_PATH], char r_fuser [LEN_USER], char r_fdir [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH]);
 char        yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH]);
+char        yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char a_db [LEN_LABEL], char a_fuser [LEN_USER]);
 char        yjobs__in_writedb       (char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_world [LEN_LABEL], void *f_testcall);
 /*---(main)-----------------*/
+char        yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback);
+char        yjobs_in                (void);
 /*---(unittest)-------------*/
 char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 /*---(done)-----------------*/

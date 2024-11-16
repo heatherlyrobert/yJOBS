@@ -132,7 +132,8 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       case CASE_REGISTER   :
       case CASE_UPDATE     :
       case CASE_INSTALL    :
-         rc = yjobs_incomming ();
+         /*> rc = yjobs_incomming ();                                                 <*/
+         rc = yjobs_in ();
          x_done = 'y';
          break;
       default              :
