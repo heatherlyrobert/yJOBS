@@ -15,7 +15,7 @@
  *
  */
 
-static char      (*s_callback)   (char a_req, char a_full [LEN_PATH]) = NULL;
+/*> static char      (*s_callback)   (char a_req, char a_full [LEN_PATH]) = NULL;     <*/
 
 static char       *X_REPORT    = "lòL";
 static char       *X_INSTALL   = "uûUiðI";
@@ -28,66 +28,8 @@ static char       *X_REGISTER  = "béBiðI";
 /*====================------------------------------------====================*/
 static void      o___SUBS__________o (void) {;};
 
-char
-yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH])
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   int         rc          =    0;
-   char        x_error     [LEN_HUND]  = "";
-   /*---(default)------------------------*/
-   strcpy (g_acts_score, g_acts_empty);
-   s_callback = NULL;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
-   DEBUG_YJOBS   yLOG_info    ("g_valid"   , g_valid);
-   if (a_runas == 0 || strchr (g_valid, a_runas)  == NULL) {
-      sprintf (x_error, "runas (%c) not recognized or valid", ychrvisible (a_runas));
-      yjobs_ends_failure (a_mode, x_error);
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
-   DEBUG_YJOBS   yLOG_info    ("g_allmode" , g_allmode);
-   if (a_mode  == 0 || strchr (g_allmode, a_mode) == NULL) {
-      sprintf (x_error, "mode (%c) not recognized or valid", ychrvisible (a_mode));
-      yjobs_ends_failure (a_mode, x_error);
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
-   --rce;  if (a_oneline == NULL) {
-      yjobs_ends_failure (a_mode, "descriptive \"oneline\" string is NULL");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_info    ("a_oneline" , a_oneline);
-   DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
-   --rce;  if (a_file    == NULL) {
-      yjobs_ends_failure (a_mode, "local file/directory is NULL");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
-   DEBUG_YJOBS  yLOG_point   ("f_callback", f_callback);
-   --rce;  if (f_callback == NULL) {
-      yjobs_ends_failure (a_mode, "host program callback function is NULL");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(show header)--------------------*/
-   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, NULL, NULL, r_world, r_db, NULL, r_full);
-   DEBUG_YJOBS   yLOG_value   ("header"    , rc);
-   if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 1;
-}
+
+char yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]) { return yjobs__share_prepare ('i', a_runas, a_mode, a_oneline, a_file, f_callback, r_cdir, r_world, r_db, r_full); }
 
 char
 yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f_callback)
@@ -531,7 +473,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs__in_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, x_world, x_db, x_full);
+   rc = yjobs__in_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, NULL, x_world, x_db, x_full);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;

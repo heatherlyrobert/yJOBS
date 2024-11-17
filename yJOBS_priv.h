@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1f"
-#define     P_VERTXT    "all yJOBS_in are updated to modular functions and unit tested"
+#define     P_VERNUM    "1.1g"
+#define     P_VERTXT    "move yJOBS__in_prepare to shared and unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -194,12 +194,17 @@ extern char   g_silent     [LEN_DESC];
 extern char   g_confirm    [LEN_DESC];
 extern char   g_verbose    [LEN_DESC];
 
+/*---(help)-----------------*/
+extern char   G_HLP         [LEN_DESC];
+/*---(incomming)------------*/
+extern char   G_INC         [LEN_DESC];
 extern char   g_verify      [LEN_SHORT];
 extern char   g_localrpt    [LEN_SHORT];
 extern char   g_register    [LEN_SHORT];
 extern char   g_install     [LEN_SHORT];
 extern char   g_update      [LEN_SHORT];
 /*---(central)--------------*/
+extern char   G_CEN         [LEN_DESC];
 extern char   g_stats       [LEN_SHORT];
 extern char   g_list        [LEN_SHORT];
 extern char   g_report      [LEN_SHORT];
@@ -208,14 +213,17 @@ extern char   g_audit       [LEN_SHORT];
 extern char   g_fix         [LEN_SHORT];
 extern char   g_only        [LEN_SHORT];
 /*---(outgoing)-------------*/
+extern char   G_OUT         [LEN_DESC];
 extern char   g_withdraw    [LEN_SHORT];
 extern char   g_clear       [LEN_SHORT];
 extern char   g_remove      [LEN_SHORT];
 extern char   g_extract     [LEN_SHORT];
 /*---(transfer)-------------*/
+extern char   G_EPI         [LEN_DESC];
 extern char   g_upload      [LEN_SHORT];
 extern char   g_download    [LEN_SHORT];
 /*---(execution)------------*/
+extern char   G_GAT         [LEN_DESC];
 extern char   g_gather      [LEN_SHORT];
 extern char   g_running     [LEN_LABEL];
 extern char   g_daemony     [LEN_LABEL];
@@ -377,7 +385,7 @@ char        yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, 
 char        yjobs_args_info         (char a_mode, char *a_name);
 char        yjobs_args__empty       (void);
 char        yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise);
-char        yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where);
+char        yjobs_args__single      (char *a_levels, char a_cat, char n, char a_run, char a_where);
 char        yjobs_args__clearmode   (char *a_runas, char *a_runmode, char *a_runfile);
 char        yjobs_final_full        (int a_uid);
 char        yjobs_final             (void);
@@ -431,10 +439,16 @@ char        yjobs_callback          (cchar a_req, cchar *a_data);
 
 
 
+
+/*===[[ yJOBS_share.c ]]======================================================*/
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        yjobs__share_prepare    (char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+
+
 /*===[[ yJOBS_in.c ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(partial)--------------*/
-char        yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+char        yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
 char        yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs__in_verify        (char a_runas, char a_mode, char a_file [LEN_PATH], char r_fuser [LEN_USER], char r_fdir [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH]);
@@ -449,6 +463,7 @@ char        yjobs_in                (void);
 char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 /*---(done)-----------------*/
 
+char        yjobs__maint_prepare    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
 
 
 #endif

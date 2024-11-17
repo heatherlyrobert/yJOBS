@@ -20,13 +20,17 @@ char          g_allmode     [LEN_HUND]  = "";
 char          g_silent      [LEN_DESC]  = "";
 char          g_confirm     [LEN_DESC]  = "";
 char          g_verbose     [LEN_DESC]  = "";
+/*---(help)-----------------*/
+char          G_HLP         [LEN_DESC]  = "";
 /*---(incomming)------------*/
+char          G_INC         [LEN_DESC]  = "";
 char          g_verify      [LEN_SHORT] = "";
 char          g_localrpt    [LEN_SHORT] = "";
 char          g_register    [LEN_SHORT] = "";
 char          g_install     [LEN_SHORT] = "";
 char          g_update      [LEN_SHORT] = "";
 /*---(central)--------------*/
+char          G_CEN         [LEN_DESC]  = "";
 char          g_stats       [LEN_SHORT] = "";
 char          g_list        [LEN_SHORT] = "";
 char          g_report      [LEN_SHORT] = "";
@@ -35,14 +39,17 @@ char          g_audit       [LEN_SHORT] = "";
 char          g_fix         [LEN_SHORT] = "";
 char          g_only        [LEN_SHORT] = "";
 /*---(outgoing)-------------*/
+char          G_OUT         [LEN_DESC]  = "";
 char          g_withdraw    [LEN_SHORT] = "";
 char          g_clear       [LEN_SHORT] = "";
 char          g_remove      [LEN_SHORT] = "";
 char          g_extract     [LEN_SHORT] = "";
 /*---(transfer)-------------*/
+char          G_EPI         [LEN_DESC]  = "";
 char          g_upload      [LEN_SHORT] = "";
 char          g_download    [LEN_SHORT] = "";
 /*---(execution)------------*/
+char          G_GAT         [LEN_DESC]  = "";
 char          g_gather      [LEN_SHORT] = "";
 char          g_running     [LEN_LABEL] = "";
 char          g_daemony     [LEN_LABEL] = "";
@@ -98,6 +105,7 @@ char          g_reload      [LEN_SHORT] = "";
 #define     MAX_OPTS    60
 typedef struct cOPTS  tOPTS;
 struct cOPTS {
+   char        cat;
    char        option      [LEN_LABEL];
    char        levels      [LEN_SHORT];
    char        desc        [LEN_DESC];
@@ -106,49 +114,49 @@ struct cOPTS {
    char        where;
 };
 static const tOPTS   s_opts [MAX_OPTS] = {
-   /*---(informational 3)---------------                                  seq  run  file-loc----- */
-   { "version"  , "1··", "present a short versioning string"            ,   0, '-', YJOBS_NEITHER  },
-   { "about"    , "2··", "key information about program"                ,   1, '-', YJOBS_NEITHER  },
-   { "help"     , "3··", "present a simple help message"                ,   2, '-', YJOBS_NEITHER  },
-   /*---(incomming 5)--------------------*/
-   { "verify"   , "vÑV", "verify local file for correctness"            ,   4, '-', YJOBS_LOCAL    },
-   { "local"    , "lòL", "report on local file content"                 ,   5, '-', YJOBS_LOCAL    },
-   { "register" , "béB", "verify local file and register centrally"     ,   6, '-', YJOBS_LOCAL    },
-   { "update"   , "uûU", "update central with single local file"        ,   7, '-', YJOBS_LOCAL    },
-   { "install"  , "iðI", "verify local file, then update centrally"     ,   8, '-', YJOBS_LOCAL    },
-   /*---(maintain 6)---------------------*/
-   { "stats"    , "#··", "information about database and environment"   ,  10, '-', YJOBS_CENTRAL  },
-   { "list"     , "=··", "list of executable content"                   ,  11, '-', YJOBS_CENTRAL  },
-   { "report"   , "móM", "report on central database"                   ,  12, '-', YJOBS_CENTRAL  },
-   { "check"    , "cýC", "check central file for correctness"           ,  13, '-', YJOBS_CENTRAL  },
-   { "audit"    , "aèA", "audit central environment and all its files"  ,  14, '-', YJOBS_CENTRAL  },
-   { "fix"      , "füF", "audit central environment and fix issues"     ,  15, '-', YJOBS_CENTRAL  },
-   { "only"     , "oöO", "run on single central data file"              ,  16, 'y', YJOBS_CENTRAL  },
-   /*---(epic)---------------------------*/
-   { "backup"   , "kñK", "backup the central system"                    ,  18, '-', YJOBS_CENTRAL  },
-   { "restore"  , "túT", "restore the central system from backup"       ,  19, '-', YJOBS_CENTRAL  },
-   { "purge"    , "wÿW", "wipe clean entire central system"             ,  20, '-', YJOBS_CENTRAL  },
-   /*---(elsewhere)----------------------*/
-   { "upload"   , "yïY", "from elsewhere to central"                    ,  22, '-', YJOBS_CENTRAL  },
-   { "download" , "zíZ", "from central to elsewhere"                    ,  23, '-', YJOBS_CENTRAL  },
-   /*---(outgoing 4)---------------------*/
-   { "withdraw" , "qþQ", "unregister centrally"                         ,  25, '-', YJOBS_CENTRAL  },
-   { "clear"    , "xõX", "clear file from central location"             ,  26, '-', YJOBS_CENTRAL  },
-   { "remove"   , "røR", "unregister and clear from central location"   ,  27, '-', YJOBS_CENTRAL  },
-   { "extract"  , "eìE", "extract a central file to local copy"         ,  28, '-', YJOBS_CENTRAL  },
-   /*---(execution)----------------------*/
-   { "gather"   , "gêG", "execute system-wide data gather"              ,  30, '-', YJOBS_NEITHER  },
-   { "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31, 'y', YJOBS_NEITHER  },
-   { "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32, 'y', YJOBS_NEITHER  },
-   { "normal"   , "nôN", "execute specific file in normal-mode"         ,  33, 'y', YJOBS_NEITHER  },
-   { "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34, 'y', YJOBS_NEITHER  },
-   { "reload"   , "hîH", "send signal to reload daemon"                 ,  35, '-', YJOBS_NEITHER  },
-   /*---(unit testing)-------------------*/
-   { "testing"  , "j··", "change to test directories"                   ,  37, '-', YJOBS_NEITHER  },
-   { "norun"    , "-··", "daemons only load data"                       ,   0, '-', YJOBS_NEITHER  },
-   /*---(sentinal)-----------------------*/
-   { ""         , "···", ""                                             ,   0, '-', YJOBS_NEITHER  },
-   /*---(done)---------------------------*/
+   /*---(informational 3)---------------------                                  seq  run  file-loc----- */
+   { 'h' , "version"  , "1··", "present a short versioning string"            ,   0, '-', YJOBS_NEITHER  },
+   { 'h' , "about"    , "2··", "key information about program"                ,   1, '-', YJOBS_NEITHER  },
+   { 'h' , "help"     , "3··", "present a simple help message"                ,   2, '-', YJOBS_NEITHER  },
+   /*---(incomming 5)--------------------------*/
+   { 'i' , "verify"   , "vÑV", "verify local file for correctness"            ,   4, '-', YJOBS_LOCAL    },
+   { 'i' , "local"    , "lòL", "report on local file content"                 ,   5, '-', YJOBS_LOCAL    },
+   { 'i' , "register" , "béB", "verify local file and register centrally"     ,   6, '-', YJOBS_LOCAL    },
+   { 'i' , "update"   , "uûU", "update central with single local file"        ,   7, '-', YJOBS_LOCAL    },
+   { 'i' , "install"  , "iðI", "verify local file, then update centrally"     ,   8, '-', YJOBS_LOCAL    },
+   /*---(maintain 6)---------------------------*/
+   { 'm' , "stats"    , "#··", "information about database and environment"   ,  10, '-', YJOBS_CENTRAL  },
+   { 'm' , "list"     , "=··", "list of executable content"                   ,  11, '-', YJOBS_CENTRAL  },
+   { 'm' , "report"   , "móM", "report on central database"                   ,  12, '-', YJOBS_CENTRAL  },
+   { 'm' , "check"    , "cýC", "check central file for correctness"           ,  13, '-', YJOBS_CENTRAL  },
+   { 'm' , "audit"    , "aèA", "audit central environment and all its files"  ,  14, '-', YJOBS_CENTRAL  },
+   { 'm' , "fix"      , "füF", "audit central environment and fix issues"     ,  15, '-', YJOBS_CENTRAL  },
+   { 'm' , "only"     , "oöO", "run on single central data file"              ,  16, 'y', YJOBS_CENTRAL  },
+   /*---(epic)---------------------------------*/
+   { 'e' , "backup"   , "kñK", "backup the central system"                    ,  18, '-', YJOBS_CENTRAL  },
+   { 'e' , "restore"  , "túT", "restore the central system from backup"       ,  19, '-', YJOBS_CENTRAL  },
+   { 'e' , "purge"    , "wÿW", "wipe clean entire central system"             ,  20, '-', YJOBS_CENTRAL  },
+   /*---(elsewhere)----------------------------*/
+   { 'e' , "upload"   , "yïY", "from elsewhere to central"                    ,  22, '-', YJOBS_CENTRAL  },
+   { 'e' , "download" , "zíZ", "from central to elsewhere"                    ,  23, '-', YJOBS_CENTRAL  },
+   /*---(outgoing 4)---------------------------*/
+   { 'o' , "withdraw" , "qþQ", "unregister centrally"                         ,  25, '-', YJOBS_CENTRAL  },
+   { 'o' , "clear"    , "xõX", "clear file from central location"             ,  26, '-', YJOBS_CENTRAL  },
+   { 'o' , "remove"   , "røR", "unregister and clear from central location"   ,  27, '-', YJOBS_CENTRAL  },
+   { 'o' , "extract"  , "eìE", "extract a central file to local copy"         ,  28, '-', YJOBS_CENTRAL  },
+   /*---(execution)----------------------------*/
+   { 'g' , "gather"   , "gêG", "execute system-wide data gather"              ,  30, '-', YJOBS_NEITHER  },
+   { 'g' , "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31, 'y', YJOBS_NEITHER  },
+   { 'g' , "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32, 'y', YJOBS_NEITHER  },
+   { 'g' , "normal"   , "nôN", "execute specific file in normal-mode"         ,  33, 'y', YJOBS_NEITHER  },
+   { 'g' , "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34, 'y', YJOBS_NEITHER  },
+   { 'g' , "reload"   , "hîH", "send signal to reload daemon"                 ,  35, '-', YJOBS_NEITHER  },
+   /*---(unit testing)-------------------------*/
+   { 'u' , "testing"  , "j··", "change to test directories"                   ,  37, '-', YJOBS_NEITHER  },
+   { 'u' , "norun"    , "-··", "daemons only load data"                       ,   0, '-', YJOBS_NEITHER  },
+   /*---(sentinal)-----------------------------*/
+   { '-' , ""         , "···", ""                                             ,   0, '-', YJOBS_NEITHER  },
+   /*---(done)---------------------------------*/
 };
 
 
@@ -203,13 +211,17 @@ yjobs_args__empty       (void)
    ystrlcpy (g_silent  , "", LEN_DESC);
    ystrlcpy (g_confirm , "", LEN_DESC);
    ystrlcpy (g_verbose , "", LEN_DESC);
+   /*---(help)---------------------------*/
+   ystrlcpy (G_HLP     , "", LEN_DESC);
    /*---(incomming)----------------------*/
+   ystrlcpy (G_INC     , "", LEN_DESC);
    ystrlcpy (g_verify  , "", LEN_SHORT);
    ystrlcpy (g_local   , "", LEN_SHORT);
    ystrlcpy (g_register, "", LEN_SHORT);
    ystrlcpy (g_install , "", LEN_SHORT);
    ystrlcpy (g_update  , "", LEN_SHORT);
    /*---(central)------------------------*/
+   ystrlcpy (G_CEN     , "", LEN_DESC);
    ystrlcpy (g_list    , "", LEN_SHORT);
    ystrlcpy (g_stats   , "", LEN_SHORT);
    ystrlcpy (g_report  , "", LEN_SHORT);
@@ -218,17 +230,17 @@ yjobs_args__empty       (void)
    ystrlcpy (g_fix     , "", LEN_SHORT);
    ystrlcpy (g_only    , "", LEN_SHORT);
    /*---(cloud)--------------------------*/
+   ystrlcpy (G_EPI     , "", LEN_DESC);
    ystrlcpy (g_upload  , "", LEN_SHORT);
    ystrlcpy (g_download, "", LEN_SHORT);
    /*---(outgoing)-----------------------*/
+   ystrlcpy (G_OUT     , "", LEN_DESC);
    ystrlcpy (g_withdraw, "", LEN_SHORT);
    ystrlcpy (g_clear   , "", LEN_SHORT);
    ystrlcpy (g_remove  , "", LEN_SHORT);
    ystrlcpy (g_extract , "", LEN_SHORT);
-   /*---(transfer)-----------------------*/
-   ystrlcpy (g_upload  , "", LEN_SHORT);
-   ystrlcpy (g_download, "", LEN_SHORT);
    /*---(execution)----------------------*/
+   ystrlcpy (G_GAT     , "", LEN_DESC);
    ystrlcpy (g_gather  , "", LEN_SHORT);
    ystrlcpy (g_running , "", LEN_LABEL);
    ystrlcpy (g_daemony , "", LEN_LABEL);
@@ -242,7 +254,7 @@ yjobs_args__empty       (void)
 }
 
 char
-yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where)
+yjobs_args__single      (char *a_levels, char a_cat, char n, char a_run, char a_where)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -308,6 +320,15 @@ yjobs_args__single      (cchar *a_levels, cchar n, cchar a_run, cchar a_where)
    case ACT_RELOAD   :   ystrlcat (g_reload  , t, LEN_SHORT);   break;
 
    }
+   /*---(load by category)---------------*/
+   switch (a_cat) {
+   case  'h'         :   ystrlcat (G_HLP     , t, LEN_DESC);   break;
+   case  'i'         :   ystrlcat (G_INC     , t, LEN_DESC);   break;
+   case  'm'         :   ystrlcat (G_CEN     , t, LEN_DESC);   break;
+   case  'o'         :   ystrlcat (G_OUT     , t, LEN_DESC);   break;
+   case  'g'         :   ystrlcat (G_GAT     , t, LEN_DESC);   break;
+   case  'e'         :   ystrlcat (G_EPI     , t, LEN_DESC);   break;
+   }
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -329,11 +350,11 @@ yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
       p = s_opts [i].levels;
       DEBUG_YJOBS  yLOG_complex ("current"   , "%2d, %s, %s", i, s_opts [i].levels, s_opts [i].option);
       if (p [0] == '\0')  break;
-      if (rc >= 0)  rc = yjobs_args__single (p, 0, s_opts [i].run, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, s_opts [i].cat, 0, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("0"         , rc);
-      if (rc >= 0)  rc = yjobs_args__single (p, 1, s_opts [i].run, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, s_opts [i].cat, 1, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("1"         , rc);
-      if (rc >= 0)  rc = yjobs_args__single (p, 2, s_opts [i].run, s_opts [i].where);
+      if (rc >= 0)  rc = yjobs_args__single (p, s_opts [i].cat, 2, s_opts [i].run, s_opts [i].where);
       DEBUG_YJOBS  yLOG_value   ("2"         , rc);
       if (rc <  0)  break;
    }
