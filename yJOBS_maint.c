@@ -8,7 +8,69 @@ static char       *X_AUDIT     = "aèA";
 
 
 
-char yjobs__maint_prepare    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]) { return yjobs__share_prepare ('m', a_runas, a_mode, a_oneline, a_file, f_callback, r_cdir, r_world, r_db, r_full); }
+char yjobs__maint_prepare    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]) { return yjobs_share_prepare (__FUNCTION__, 'm', a_runas, a_mode, a_oneline, a_file, f_callback, r_cdir, r_world, r_db, r_full); }
+
+char yjobs__maint_readdb     (char a_mode, char a_db [LEN_LABEL], void *f_callback) { return yjobs_share_readdb (__FUNCTION__, 'm', a_mode, a_db, f_callback); }
+
+char
+yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_cdir      [LEN_PATH]  = "";
+   char        x_hdir      [LEN_PATH]  = "";
+   char        x_world     [LEN_LABEL] = "";
+   char        x_db        [LEN_LABEL] = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(defense)-------------------------------*/
+   DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
+   --rce;  if (a_oneline    == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(verify)-------------------------*/
+   /*> yURG_msg ('>', "%s", a_oneline);                                                                             <* 
+    *> if (a_mode == ACT_VAUDIT )  yURG_msg ('>', "  option --vaudit, check current central setup and security");    <* 
+    *> if (a_mode == ACT_VDAEMON)  yURG_msg ('>', "  option --vdaemon, verbosely launch in daemon mode");            <* 
+    *> if (a_mode == ACT_VPRICKLY) yURG_msg ('>', "  option --vprickly, verbosely launch in prickly daemon mode");   <* 
+    *> if (a_mode == ACT_VNORMAL)  yURG_msg ('>', "  option --vnormal, verbosely launch in normal mode");            <* 
+    *> if (a_mode == ACT_VSTRICT)  yURG_msg ('>', "  option --vstrict, verbosely launch in strict normal mode");     <* 
+    *> yURG_msg (' ', "");                                                                                          <*/
+   yURG_msg ('>', "central directory setup/security...");
+   /*---(defense)-------------------------------*/
+   /*> rc = yjobs_central_dirs  (a_runas, a_mode, NULL, "n/a", x_orig, NULL);                   <*/
+   rc = yjobs_who_location (a_runas, x_cdir, x_hdir, x_world, NULL, x_db);
+   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
+   --rce;  if (rc <  0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check directories)---------------------*/
+   DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
+   --rce;  if (strcmp (x_cdir, "") != 0) {
+      rc = yjobs_sec_directory (0, x_cdir, a_fix);
+      if (rc <  0) {
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   DEBUG_YJOBS   yLOG_info    ("x_hdir"    , x_hdir);
+   if (strcmp (x_hdir, "") != 0) {
+      rc = yjobs_sec_directory (0, x_hdir, a_fix);
+      if (rc <  0) {
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(complete)------------------------------*/
+   yURG_msg ('-', "SUCCESS, central directory basic security measures confirmed");
+   /*> yURG_msg (' ', "");                                                            <*/
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
 
 char
 yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
@@ -30,7 +92,7 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
    /*---(review)-------------------------*/
-   rc = yjobs_act_security (a_runas, a_mode, a_oneline, '-');
+   rc = yjobs_sec_security (a_runas, a_mode, a_oneline, '-');
    DEBUG_YJOBS   yLOG_value   ("security"  , rc);
    if (rc < 0) {
       yjobs_ends_failure (a_mode, "central security audit failed");
@@ -46,8 +108,90 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
 }
 
 
+
+/*====================------------------------------------====================*/
+/*===----                        main driver                           ----===*/
+/*====================------------------------------------====================*/
+static void      o___DRIVER___________o (void) {;};
+
 char
 yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_cdir      [LEN_DESC]  = "";
+   char        x_world     [LEN_LABEL] = "";
+   char        x_db        [LEN_LABEL] = "";
+   char        x_full      [LEN_PATH]  = "";
+   char        x_fuser     [LEN_USER]  = "";
+   char        x_fdir      [LEN_PATH]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(prepare)------------------------*/
+   rc = yjobs__maint_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, x_cdir, x_world, x_db, x_full);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check security)-----------------*/
+
+   /*---(read database)------------------*/
+   rc = yjobs__maint_readdb   (a_mode, x_db, f_callback);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(verify local)-------------------*/
+   rc = yjobs__in_verify   (a_runas, a_mode, a_file, x_fuser, x_fdir, x_full);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(pull local)---------------------*/
+   rc = yjobs__in_pull     (a_mode, f_callback, x_full);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(write report)-------------------*/
+   rc = yjobs__in_report   (a_mode, f_callback, x_full);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(local to central)---------------*/
+   rc = yjobs__in_intake   (a_runas, a_mode, a_file, x_db, x_fuser);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(pull local)---------------------*/
+   rc = yjobs__in_writedb  (a_mode, x_db, f_callback);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(pull local)---------------------*/
+   rc = yjobs__in_register (a_runas, a_mode, a_file, x_world, NULL);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(footer)-------------------------*/
+   rc = yjobs_ends_footer (a_mode);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+
+char
+yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -95,7 +239,7 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    --rce;  if (strchr ("aèA", a_mode) != NULL) {
       yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);
       g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;
-      rc = yjobs_act_security (a_runas, a_mode, a_oneline, '-');
+      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, '-');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security audit failed");
@@ -261,7 +405,7 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(fix)----------------------------*/
    --rce;  if (strchr ("füF", a_mode) != NULL) {
       g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;
-      rc = yjobs_act_security (a_runas, a_mode, a_oneline, 'y');
+      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, 'y');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security fix failed");

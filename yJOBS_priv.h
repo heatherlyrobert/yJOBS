@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1g"
-#define     P_VERTXT    "move yJOBS__in_prepare to shared and unit tested"
+#define     P_VERNUM    "1.1h"
+#define     P_VERTXT    "yJOBS_sec  does dir check, fix, and secure -- unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -350,9 +350,7 @@ char        yjobs_gather            (void);
 /*---(obsolete)-------------*/
 char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name, void *a_assimilate);
 char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar *a_name);
-char        yjobs_act_directory     (char n, cchar *a_dir, cchar a_fix);
 char        yjobs_act__fixdir       (cchar a_dir [LEN_PATH], char a_issue, int a_perms, tSTAT *r_stat);
-char        yjobs_act_security      (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], char a_fix);
 char        yjobs_act_fix           (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND]);
 char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND], cchar a_muser [LEN_USER], int a_muid, cchar *a_regex, void *a_assimilate);
 
@@ -442,7 +440,8 @@ char        yjobs_callback          (cchar a_req, cchar *a_data);
 
 /*===[[ yJOBS_share.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs__share_prepare    (char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+char        yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+char        yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback);
 
 
 /*===[[ yJOBS_in.c ]]=========================================================*/
@@ -464,6 +463,12 @@ char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 /*---(done)-----------------*/
 
 char        yjobs__maint_prepare    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+char        yjobs__maint_readdb     (char a_mode, char a_db [LEN_LABEL], void *f_callback);
+
+char        yjobs__sec_fixdir       (char a_dir [LEN_PATH], char a_issue, int a_perms, tSTAT *r_stat);
+char        yjobs__sec_checkdir     (char a_level, char a_dir [LEN_PATH], int a_perms, char a_fix);
+char        yjobs_sec_directory     (char a_level, char a_dir [LEN_PATH], char a_fix);
+char        yjobs_sec_security      (char a_runas, char a_act, char a_oneline [LEN_HUND], char a_fix);
 
 
 #endif

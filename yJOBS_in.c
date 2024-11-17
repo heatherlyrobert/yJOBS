@@ -29,7 +29,7 @@ static char       *X_REGISTER  = "béBiðI";
 static void      o___SUBS__________o (void) {;};
 
 
-char yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]) { return yjobs__share_prepare ('i', a_runas, a_mode, a_oneline, a_file, f_callback, r_cdir, r_world, r_db, r_full); }
+char yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]) { return yjobs_share_prepare (__FUNCTION__, 'i', a_runas, a_mode, a_oneline, a_file, f_callback, r_cdir, r_world, r_db, r_full); }
 
 char
 yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f_callback)
@@ -514,7 +514,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(pull local)---------------------*/
+   /*---(register)-----------------------*/
    rc = yjobs__in_register (a_runas, a_mode, a_file, x_world, NULL);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
