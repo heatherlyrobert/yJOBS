@@ -236,7 +236,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (strchr ("aèA", a_mode) != NULL) {
       yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);
       g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;
-      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, '-');
+      rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security audit failed");
@@ -402,7 +402,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(fix)----------------------------*/
    --rce;  if (strchr ("füF", a_mode) != NULL) {
       g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;
-      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, 'y');
+      rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security fix failed");
@@ -895,7 +895,7 @@ yjobs_act__prepare      (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    case ACT_DAEMON     : case ACT_CDAEMON    : case ACT_VDAEMON    :
    case ACT_PRICKLY    : case ACT_CPRICKLY   : case ACT_VPRICKLY   :
    case ACT_NORMAL     : case ACT_CNORMAL    : case ACT_VNORMAL    :
-      rc = yjobs_sec_security (a_runas, a_act, a_oneline, '-');
+      rc = yjobs_dir_review (a_runas, a_act, a_oneline, '-');
       if (rc < 0) {
          IF_CREVIEW   yURG_msg_live ();
          IF_CREVIEW   yURG_msg ('-', "FAILED, central directory insecure, run --vaudit to identify reasons");

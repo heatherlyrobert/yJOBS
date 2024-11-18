@@ -50,7 +50,7 @@ yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(check directories)---------------------*/
    DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
    --rce;  if (strcmp (x_cdir, "") != 0) {
-      rc = yjobs_sec_directory (0, x_cdir, a_fix);
+      rc = yjobs_dir_single (0, x_cdir, a_fix);
       if (rc <  0) {
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
@@ -58,7 +58,7 @@ yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    }
    DEBUG_YJOBS   yLOG_info    ("x_hdir"    , x_hdir);
    if (strcmp (x_hdir, "") != 0) {
-      rc = yjobs_sec_directory (0, x_hdir, a_fix);
+      rc = yjobs_dir_single (0, x_hdir, a_fix);
       if (rc <  0) {
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
@@ -92,7 +92,7 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
    /*---(review)-------------------------*/
-   rc = yjobs_sec_security (a_runas, a_mode, a_oneline, '-');
+   rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');
    DEBUG_YJOBS   yLOG_value   ("security"  , rc);
    if (rc < 0) {
       yjobs_ends_failure (a_mode, "central security audit failed");
@@ -239,7 +239,7 @@ yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    --rce;  if (strchr ("aèA", a_mode) != NULL) {
       yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);
       g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;
-      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, '-');
+      rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security audit failed");
@@ -405,7 +405,7 @@ yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(fix)----------------------------*/
    --rce;  if (strchr ("füF", a_mode) != NULL) {
       g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;
-      rc = yjobs_sec_security (a_runas, a_mode, a_oneline, 'y');
+      rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');
       DEBUG_YJOBS   yLOG_value   ("security"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central security fix failed");
