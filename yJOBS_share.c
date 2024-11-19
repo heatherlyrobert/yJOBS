@@ -2,8 +2,8 @@
 #include   "yJOBS.h"
 #include   "yJOBS_priv.h"
 
-
-static char       *X_READDB    = "#móMuûUiðI";
+/*                               ---in--- -cen-- ----out----       */
+static char       *X_READDB    = "uûUiðI" "#móM" "xõXrøReìE";
 
 char
 yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH])

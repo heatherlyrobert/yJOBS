@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1i"
-#define     P_VERTXT    "yJOBS_sec became yJOBS_dir and all improved and unit tested"
+#define     P_VERNUM    "1.1j"
+#define     P_VERTXT    "added automated validation for which actions to take"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -232,6 +232,15 @@ extern char   g_prickly     [LEN_SHORT];
 extern char   g_normal      [LEN_SHORT];
 extern char   g_strict      [LEN_SHORT];
 extern char   g_reload      [LEN_SHORT];
+/*---(actions)--------------*/
+extern char   g_act_rdb     [LEN_HUND];    /* read db     */
+extern char   g_act_upd     [LEN_HUND];    /* update      */
+extern char   g_act_reg     [LEN_HUND];    /* register    */
+extern char   g_act_rpt     [LEN_HUND];    /* reporting   */
+extern char   g_act_run     [LEN_HUND];    /* run         */
+extern char   g_act_wit     [LEN_HUND];    /* withdraw    */
+extern char   g_act_rem     [LEN_HUND];    /* remove      */
+extern char   g_act_wdb     [LEN_HUND];    /* write db    */
 /*---(done)-----------------*/
 
 extern char   g_print       [LEN_RECD];
