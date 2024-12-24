@@ -263,7 +263,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_ends_footer (a_mode);
+   rc = yjobs_ends_success (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -519,7 +519,7 @@ static void      o___OUTGOING___________o (void) {;};
  *>    }                                                                                                                           <* 
  *>    /+---(show footer)--------------------+/                                                                                    <* 
  *>    if (rc > 0)  yURG_err (' ', "");                                                                                            <* 
- *>    rc = yjobs_ends_footer (a_mode);                                                                                            <* 
+ *>    rc = yjobs_ends_success (a_mode);                                                                                            <* 
  *>    /+---(complete)-----------------------+/                                                                                    <* 
  *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                  <* 
  *>    return 0;                                                                                                                   <* 
@@ -1148,7 +1148,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(show footer)--------------------*/
    if (strchr (g_running, a_mode) != NULL) {
       if (rc > 0)  yURG_err (' ', "");
-      rc = yjobs_ends_footer (a_mode);
+      rc = yjobs_ends_success (a_mode);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -1231,7 +1231,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    /*---(show footer)--------------------*/
    if (strchr (g_running, a_mode) != NULL) {
       if (rc > 0)  yURG_err (' ', "");
-      rc = yjobs_ends_footer (a_mode);
+      rc = yjobs_ends_success (a_mode);
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

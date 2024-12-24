@@ -84,7 +84,7 @@ yjobs__name_quality     (cchar *a_name)
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   yURG_msg ('-', "good, file is not hidden, no lead period");
+   /*> yURG_msg ('-', "good, file is not hidden, no lead period");                    <*/
    /*---(check directory)----------------*/
    if (c == 1) {
       yURG_msg ('-', "good, file is not hidden, no lead period, with extension");
@@ -929,7 +929,7 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    rc = yjobs__naming (a_runas, YJOBS_LOCAL, a_file, &x_fdesc);
    DEBUG_YJOBS  yLOG_value   ("naming"    , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -943,7 +943,7 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    rc = yjobs__location (a_runas, YJOBS_LOCAL, a_home, a_root, a_file, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
    DEBUG_YJOBS  yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -952,7 +952,7 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_file, a_muser, a_muid, x_fuser, x_fuid);
    DEBUG_YJOBS  yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -967,8 +967,8 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    sprintf (x_full, "%s%s", x_cwd, a_file);
    yjobs_saveback  (YJOBS_LOCAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
    /*---(finish)-------------------------*/
-   yURG_msg ('-', "SUCCESS, local file acceptable");
-   yURG_msg (' ', "");
+   yURG_msg ('-', "success, local file acceptable");
+   /*> yURG_msg (' ', "");                                                            <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;

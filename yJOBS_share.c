@@ -2,8 +2,7 @@
 #include   "yJOBS.h"
 #include   "yJOBS_priv.h"
 
-/*                               ---in--- -cen-- ----out----       */
-static char       *X_READDB    = "uûUiðI" "#móM" "xõXrøReìE";
+
 
 char
 yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH])
@@ -99,10 +98,10 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    int         rc          =    0;
    char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
    /*---(quick-out)----------------------*/
-   if (a_mode == 0 || strchr (X_READDB, a_mode) == NULL) {
+   if (a_mode == 0 || strchr (g_act_rdb, a_mode) == NULL) {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
-      DEBUG_YJOBS   yLOG_snote   (X_READDB);
+      DEBUG_YJOBS   yLOG_snote   (g_act_rdb);
       DEBUG_YJOBS   yLOG_note    ("database read not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
@@ -139,6 +138,60 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    }
    /*---(score)--------------------------*/
    rc = yjobs_ends_score (G_SCORE_DATABASE,  1, 'Ô');
+   DEBUG_YJOBS   yLOG_value   ("score"     , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
+}
+
+char
+yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (g_act_wdb, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (g_act_wdb);
+      DEBUG_YJOBS   yLOG_note    ("database write not required");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(no-database)--------------------*/
+   if (a_db == NULL || strcmp (a_db, "") == 0) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_SKIP);
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   DEBUG_YJOBS   yLOG_note    ("mode requires database written after");
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_FAIL);
+   /*---(check call-back)----------------*/
+   DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
+   --rce;  if (f_callback == NULL) {
+      yjobs_ends_failure (a_mode, "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(call)---------------------------*/
+   DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
+   x_callback = f_callback;
+   rc = x_callback (YJOBS_WRITE, "");
+   DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "central database did not save properly");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(score)--------------------------*/
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, 'Õ');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

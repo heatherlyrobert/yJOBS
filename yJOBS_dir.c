@@ -298,4 +298,3 @@ yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], ch
 char yJOBS_security      (void) { return yjobs_dir_review (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, '-'); }
 char yJOBS_fix           (void) { return yjobs_dir_review (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, 'y'); }
 
-

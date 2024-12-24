@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1j"
-#define     P_VERTXT    "added automated validation for which actions to take"
+#define     P_VERNUM    "1.1k"
+#define     P_VERTXT    "cleaned up and tested yJOBS_in, and addid directory validation"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -233,14 +233,21 @@ extern char   g_normal      [LEN_SHORT];
 extern char   g_strict      [LEN_SHORT];
 extern char   g_reload      [LEN_SHORT];
 /*---(actions)--------------*/
-extern char   g_act_rdb     [LEN_HUND];    /* read db     */
-extern char   g_act_upd     [LEN_HUND];    /* update      */
-extern char   g_act_reg     [LEN_HUND];    /* register    */
-extern char   g_act_rpt     [LEN_HUND];    /* reporting   */
-extern char   g_act_run     [LEN_HUND];    /* run         */
-extern char   g_act_wit     [LEN_HUND];    /* withdraw    */
-extern char   g_act_rem     [LEN_HUND];    /* remove      */
-extern char   g_act_wdb     [LEN_HUND];    /* write db    */
+extern char   g_act_rdb     [LEN_HUND];    /* read central database       */
+extern char   g_act_upd     [LEN_HUND];    /* pull data from local file   */
+extern char   g_act_ins     [LEN_HUND];    /* move local file to central  */
+extern char   g_act_reg     [LEN_HUND];    /* register in world file      */
+
+extern char   g_act_sec     [LEN_HUND];    /* audit directory security    */
+extern char   g_act_aud     [LEN_HUND];    /* audit file security         */
+extern char   g_act_rpt     [LEN_HUND];    /* central reporting           */
+extern char   g_act_run     [LEN_HUND];    /* run mode                    */
+extern char   g_act_chk     [LEN_HUND];    /* check a single central file */
+
+extern char   g_act_wit     [LEN_HUND];    /* withdraw from world file    */
+extern char   g_act_clr     [LEN_HUND];    /* clear out of database       */
+extern char   g_act_rem     [LEN_HUND];    /* remove from central (files) */
+extern char   g_act_wdb     [LEN_HUND];    /* write central db            */
 /*---(done)-----------------*/
 
 extern char   g_print       [LEN_RECD];
@@ -376,7 +383,8 @@ char        yjobs__ends_locations   (char a_runas, char r_cdir [LEN_DESC], char 
 char        yjobs__ends_cwd         (char a_mode, char a_file [LEN_TERSE], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs_ends_header       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_TERSE], char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
 /*---(footer)---------------*/
-char        yjobs_ends_footer       (char a_mode);
+char        yjobs_ends_warning      (char a_mode);
+char        yjobs_ends_success      (char a_mode);
 /*---(failure)--------------*/
 char        yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND]);
 /*---(end)------------------*/
@@ -451,19 +459,17 @@ char        yjobs_callback          (cchar a_req, cchar *a_data);
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char        yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
 char        yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback);
-
+char        yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback);
 
 
 /*===[[ yJOBS_in.c ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(partial)--------------*/
-char        yjobs__in_prepare       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
-char        yjobs__in_readdb        (char a_mode, char a_db [LEN_LABEL], void *f_callback);
+char        yjobs__in_dir           (char a_runas, char a_mode, char a_file [LEN_PATH], char r_fuser [LEN_USER], char r_fdir [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs__in_verify        (char a_runas, char a_mode, char a_file [LEN_PATH], char r_fuser [LEN_USER], char r_fdir [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH]);
 char        yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH]);
 char        yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char a_db [LEN_LABEL], char a_fuser [LEN_USER]);
-char        yjobs__in_writedb       (char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_world [LEN_LABEL], void *f_testcall);
 /*---(main)-----------------*/
 char        yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback);
@@ -476,8 +482,7 @@ char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 
 /*===[[ yJOBS_maint.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs__maint_prepare    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
-char        yjobs__maint_readdb     (char a_mode, char a_db [LEN_LABEL], void *f_callback);
+char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
 
 
 

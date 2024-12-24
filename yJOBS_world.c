@@ -1056,7 +1056,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
-   rc = yjobs_ends_footer (a_mode);
+   rc = yjobs_ends_success (a_mode);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
