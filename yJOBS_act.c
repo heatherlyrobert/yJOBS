@@ -928,7 +928,7 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
       return rce;
       break;
    }
-   DEBUG_YJOBS  yLOG_point   ("e_callback", f_callback);
+   DEBUG_YJOBS  yLOG_point   ("f_callback", f_callback);
    --rce;  if (f_callback == NULL) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -1157,88 +1157,5 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
 
 char yjobs_running           (void) { return yjobs_running_full     (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }
 
-
-char
-yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_cdir      [LEN_DESC]  = "";
-   char      (*x_callback)   (cchar a_req, cchar *a_full);
-   char        x_fuser     [LEN_USER]  = "";
-   int         x_fuid      =   -1;
-   char        x_fdesc     [LEN_DESC]  = "";
-   char        x_fdir      [LEN_PATH]  = "";
-   char        x_full      [LEN_PATH]  = "";
-   char        x_hdir      [LEN_PATH]  = "";
-   char        x_update    =  '·';
-   char        x_db        [LEN_LABEL] = "";
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(default)------------------------*/
-   if (strchr (g_running, a_mode) != NULL)  ystrlcpy (g_acts_score, g_acts_empty, LEN_HUND);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS  yLOG_char    ("m_runas"   , a_runas);
-   DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
-   --rce;  if (a_oneline == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_point   ("e_callback", f_callback);
-   --rce;  if (f_callback == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   x_callback = f_callback;
-   /*---(show header)--------------------*/
-   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, x_cdir, NULL, NULL, NULL, NULL, x_full);
-   DEBUG_YJOBS   yLOG_value   ("header"    , rc);
-   if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(check for full database)------------*/
-   rc = yjobs_who_location (a_runas, NULL, x_hdir, NULL, &x_update, x_db);
-   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
-   --rce;  if (rc <  0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   --rce;  if (x_update == 'U' && strcmp (x_db, "") != 0)   {
-      DEBUG_YJOBS   yLOG_note    ("option requires central database loaded before");
-      rc = x_callback (YJOBS_READ, "");
-      DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
-      if (rc < 0) {
-         yjobs_ends_failure (a_mode, "central database did not load properly");
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-      }
-      g_fullacts  [20] = 'R';
-   }
-   /*---(gather all data)--------------------*/
-   --rce;  if (strchr ("lL", a_runas) != NULL) {
-      DEBUG_YJOBS   yLOG_note    ("option requires all files loaded before");
-      rc = x_callback (YJOBS_GATHER, "");
-      DEBUG_YJOBS   yLOG_value   ("gather"    , rc);
-      --rce;  if (rc < 0) {
-         yjobs_ends_failure (a_mode, "local contents not acceptable");
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-      }
-      /*> g_fullacts  [20] = 'R';                                                     <*/
-   }
-   /*---(show footer)--------------------*/
-   if (strchr (g_running, a_mode) != NULL) {
-      if (rc > 0)  yURG_err (' ', "");
-      rc = yjobs_ends_success (a_mode);
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-
-char yjobs_gather            (void) { return yjobs_gather_full      (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }
 
 

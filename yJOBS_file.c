@@ -968,7 +968,6 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    yjobs_saveback  (YJOBS_LOCAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
    /*---(finish)-------------------------*/
    yURG_msg ('-', "success, local file acceptable");
-   /*> yURG_msg (' ', "");                                                            <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -1167,8 +1166,7 @@ yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar 
    sprintf (x_full, "%s%s", x_cwd, a_file);
    yjobs_saveback  (YJOBS_CENTRAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
    /*---(finish)-------------------------*/
-   yURG_msg ('-', "SUCCESS, job/khronos file acceptable");
-   yURG_msg (' ', "");
+   yURG_msg ('-', "success, central file acceptable");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;

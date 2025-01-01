@@ -142,38 +142,8 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(verify local)-------------------*/
-   rc = yjobs__in_verify     (a_runas, a_mode, a_file, x_fuser, x_fdir, x_full);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(pull local)---------------------*/
-   rc = yjobs__in_pull       (a_mode, f_callback, x_full);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(write report)-------------------*/
-   rc = yjobs__in_report     (a_mode, f_callback, x_full);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(local to central)---------------*/
-   rc = yjobs__in_intake    (a_runas, a_mode, a_file, x_db, x_fuser);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
    /*---(pull local)---------------------*/
    rc = yjobs_share_writedb ("yjobs__maint_writedb", 'm', a_mode, x_db, f_callback);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(pull local)---------------------*/
-   rc = yjobs__in_register  (a_runas, a_mode, a_file, x_world, NULL);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;

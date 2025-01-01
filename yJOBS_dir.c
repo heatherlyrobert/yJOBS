@@ -265,7 +265,7 @@ yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], ch
       return rce;
    }
    /*---(check configuration dir)---------------*/
-   yURG_msg ('>', "CONF_DIR, configuration directory setup/security review...");
+   yURG_msg ('>', "configuration directory setup/security review...");
    DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
    --rce;  if (strcmp (x_cdir, "") != 0) {
       rc = yjobs_dir_single (0, x_cdir, a_fix);
@@ -273,12 +273,12 @@ yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], ch
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      yURG_msg ('-', "SUCCESS, configuration directory basic security measures confirmed");
+      yURG_msg ('-', "success, configuration directory basic security measures confirmed");
    } else {
-      yURG_msg ('-', "SKIPPING, no configuration directory specified, nothing to do");
+      yURG_msg ('-', "skipping, no configuration directory specified for application");
    }
    /*---(check central data dir)----------------*/
-   yURG_msg ('>', "DATA_DIR, central data directory setup/security review...");
+   yURG_msg ('>', "central data directory setup/security review...");
    DEBUG_YJOBS   yLOG_info    ("x_hdir"    , x_hdir);
    if (strcmp (x_hdir, "") != 0) {
       rc = yjobs_dir_single (0, x_hdir, a_fix);
@@ -286,9 +286,9 @@ yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], ch
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      yURG_msg ('-', "SUCCESS, central data directory basic security measures confirmed");
+      yURG_msg ('-', "success, central data directory basic security measures confirmed");
    } else {
-      yURG_msg ('-', "SKIPPING, no central data directory specified, nothing to do");
+      yURG_msg ('-', "skipping, no central data directory specified for application");
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

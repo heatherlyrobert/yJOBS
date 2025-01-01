@@ -211,36 +211,50 @@ yjobs_callback          (cchar a_req, cchar *a_data)
    switch (a_req) {
    case YJOBS_READ      :
       g_fullacts  [ 4] = 'Ô';
+      return YJOBS_RC_READ;
       break;
    case YJOBS_STATS     :
       g_fullacts  [15] = '#';
+      return YJOBS_RC_STATS;
       break;
    case YJOBS_WRITE     :
       g_fullacts  [ 5] = 'Õ';
+      return YJOBS_RC_WRITE;
       break;
    case YJOBS_PULL      :
+      if (a_data == NULL)  return -1;
+      yURG_msg ('>', "verify the contents of a source/configuration file (pull)...");
+      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       g_fullacts  [ 9] = 'Ö';
+      return YJOBS_RC_PULL;
       break;
    case YJOBS_CLEAR     :
       g_fullacts  [30] = '×';
+      return YJOBS_RC_CLEAR;
       break;
    case YJOBS_LOCALRPT  :
+      if (a_data == NULL)  return -1;
       g_fullacts  [11] = 'ò';
+      return YJOBS_RC_LOCALRPT;
       break;
    case YJOBS_REPORT    :
       g_fullacts  [17] = 'ó';
+      return YJOBS_RC_REPORT;
       break;
    case YJOBS_EXTRACT   :
       g_fullacts  [32] = 'e';
+      return YJOBS_RC_EXTRACT;
       break;
    case YJOBS_PURGE     :
       g_fullacts  [25] = 'P';
+      return YJOBS_RC_PURGE;
+      break;
+   default           :
+      return -1;
       break;
    }
    return 0;
 }
-
-
 
 char       /*----: set up program urgents/debugging --------------------------*/
 yjobs__unit_quiet       (void)
