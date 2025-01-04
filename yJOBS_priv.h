@@ -36,9 +36,9 @@
 #define     P_CREATED   "2021-01"
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
-#define     P_VERMINOR  "1.1-, breaking down action functions for better testing"
-#define     P_VERNUM    "1.1l"
-#define     P_VERTXT    "returned to update unit testing for yJBOS_args, base, dir, ends, and file"
+#define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
+#define     P_VERNUM    "1.2a"
+#define     P_VERTXT    "fixed little defense that kept eos from booting"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -502,6 +502,7 @@ char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char        yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND]);
 char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
+char        yjobs__maint_stats      (char a_mode, void *f_callback);
 
 
 

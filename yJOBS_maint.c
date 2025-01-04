@@ -6,6 +6,30 @@
 
 static char       *X_AUDIT     = "aèA";
 
+   /*> --rce;  if (strchr ("aèA", a_mode) != NULL) {                                  <* 
+    *>    yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);                        <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;                          <* 
+    *>    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');                    <* 
+    *>    DEBUG_YJOBS   yLOG_value   ("security"  , rc);                              <* 
+    *>    if (rc < 0) {                                                               <* 
+    *>       yjobs_ends_failure (a_mode, "central security audit failed");            <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>       return rce;                                                              <* 
+    *>    }                                                                           <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 0] = 'a';                                   <* 
+    *> }                                                                              <*/
+
+   /*> --rce;  if (strchr ("füF", a_mode) != NULL) {                                  <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;                          <* 
+    *>    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');                    <* 
+    *>    DEBUG_YJOBS   yLOG_value   ("security"  , rc);                              <* 
+    *>    if (rc < 0) {                                                               <* 
+    *>       yjobs_ends_failure (a_mode, "central security fix failed");              <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>       return rce;                                                              <* 
+    *>    }                                                                           <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 1] = 'f';                                   <* 
+    *> }                                                                              <*/
 
 
 char
@@ -14,29 +38,36 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
+   char        x_fix       =  '-';
    /*---(quick-out)----------------------*/
-   if (a_mode == 0 || strchr (X_AUDIT, a_mode) == NULL) {
+   if (a_mode == 0 || strchr (g_act_aud, a_mode) == NULL) {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
-      DEBUG_YJOBS   yLOG_snote   (X_AUDIT);
-      DEBUG_YJOBS   yLOG_note    ("security review not requested");
+      DEBUG_YJOBS   yLOG_snote   (g_act_aud);
+      DEBUG_YJOBS   yLOG_note    ("security review/fix not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
-   rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
+   /*---(prepare)------------------------*/
+   if (strchr (g_fix, a_mode) != NULL)  x_fix = 'y';
+   DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
+   if (x_fix != 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
+   else               rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, G_SCORE_FAIL);
    /*---(review)-------------------------*/
-   rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');
+   rc = yjobs_dir_review (a_runas, a_mode, a_oneline, x_fix);
    DEBUG_YJOBS   yLOG_value   ("security"  , rc);
    if (rc < 0) {
-      yjobs_ends_failure (a_mode, "central security audit failed");
+      if (x_fix != 'y')  yjobs_ends_failure (a_mode, "central security audit failed");
+      else               yjobs_ends_failure (a_mode, "central security fix failed");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, 'a');
+   if (x_fix != 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, 'a');
+   else               rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, 'f');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -103,6 +134,53 @@ yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    return 0;
 }
 
+char
+yjobs__maint_stats      (char a_mode, void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode != ACT_STATS) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_schar   (a_mode);
+      DEBUG_YJOBS   yLOG_schar   (ACT_STATS);
+      DEBUG_YJOBS   yLOG_note    ("statistics not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   /*---(default)------------------------*/
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  2, G_SCORE_FAIL);
+   DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
+   /*---(check call-back)----------------*/
+   DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
+   --rce;  if (f_callback == NULL) {
+      yjobs_ends_failure (a_mode, "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(call)---------------------------*/
+   DEBUG_YJOBS   yLOG_note    ("request to produce database/central file statistics");
+   x_callback = f_callback;
+   rc = x_callback (YJOBS_STATS, "");
+   DEBUG_YJOBS   yLOG_value   ("stats"     , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "database could not produce statistics");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(score)--------------------------*/
+   rc = yjobs_ends_score (G_SCORE_DATABASE,  2, '#');
+   DEBUG_YJOBS   yLOG_value   ("score"     , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
+}
+
 
 
 /*====================------------------------------------====================*/
@@ -138,12 +216,6 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    }
    /*---(read database)------------------*/
    rc = yjobs_share_readdb   ("yjobs__maint_readdb", 'm', a_mode, x_db, f_callback);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(pull local)---------------------*/
-   rc = yjobs_share_writedb ("yjobs__maint_writedb", 'm', a_mode, x_db, f_callback);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -219,22 +291,22 @@ yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
     *>    g_acts_score  [G_SCORE_SECURE + 0] = 'a';                                   <* 
     *> }                                                                              <*/
    /*---(database)-----------------------*/
-   --rce;  if (strchr (X_ALLDATA, a_mode) != NULL) {
-      g_acts_score  [G_SCORE_DATABASE + 1] = G_SCORE_FAIL;
-      if (strcmp (x_db, "") != 0) {
-         DEBUG_YJOBS   yLOG_note    ("option requires database loaded before");
-         rc = x_callback (YJOBS_READ, "");
-         DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
-         if (rc < 0) {
-            yjobs_ends_failure (a_mode, "central database did not load properly");
-            DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-            return rce;
-         }
-         g_acts_score  [G_SCORE_DATABASE + 1] = 'Ô';
-      } else {
-         g_acts_score  [G_SCORE_DATABASE + 1] = G_SCORE_SKIP;
-      }
-   }
+   /*> --rce;  if (strchr (X_ALLDATA, a_mode) != NULL) {                                 <* 
+    *>    g_acts_score  [G_SCORE_DATABASE + 1] = G_SCORE_FAIL;                           <* 
+    *>    if (strcmp (x_db, "") != 0) {                                                  <* 
+    *>       DEBUG_YJOBS   yLOG_note    ("option requires database loaded before");      <* 
+    *>       rc = x_callback (YJOBS_READ, "");                                           <* 
+    *>       DEBUG_YJOBS   yLOG_value   ("read db"   , rc);                              <* 
+    *>       if (rc < 0) {                                                               <* 
+    *>          yjobs_ends_failure (a_mode, "central database did not load properly");   <* 
+    *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>          return rce;                                                              <* 
+    *>       }                                                                           <* 
+    *>       g_acts_score  [G_SCORE_DATABASE + 1] = 'Ô';                                 <* 
+    *>    } else {                                                                       <* 
+    *>       g_acts_score  [G_SCORE_DATABASE + 1] = G_SCORE_SKIP;                        <* 
+    *>    }                                                                              <* 
+    *> }                                                                                 <*/
    /*---(load all files)-----------------*/
    --rce;  if (strchr (X_ALLDATA, a_mode) != NULL) {
       g_acts_score  [G_SCORE_CENTRAL + 3] = G_SCORE_FAIL;
@@ -373,17 +445,17 @@ yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       }
    }
    /*---(fix)----------------------------*/
-   --rce;  if (strchr ("füF", a_mode) != NULL) {
-      g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;
-      rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');
-      DEBUG_YJOBS   yLOG_value   ("security"  , rc);
-      if (rc < 0) {
-         yjobs_ends_failure (a_mode, "central security fix failed");
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-      }
-      g_acts_score  [G_SCORE_SECURE + 1] = 'f';
-   }
+   /*> --rce;  if (strchr ("füF", a_mode) != NULL) {                                  <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;                          <* 
+    *>    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');                    <* 
+    *>    DEBUG_YJOBS   yLOG_value   ("security"  , rc);                              <* 
+    *>    if (rc < 0) {                                                               <* 
+    *>       yjobs_ends_failure (a_mode, "central security fix failed");              <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
+    *>       return rce;                                                              <* 
+    *>    }                                                                           <* 
+    *>    g_acts_score  [G_SCORE_SECURE + 1] = 'f';                                   <* 
+    *> }                                                                              <*/
    /*---(show footer)--------------------*/
    if (rc > 0)  yURG_err (' ', "");
    rc = yjobs_ends_success (a_mode);

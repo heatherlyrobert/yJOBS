@@ -317,9 +317,13 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
       return rce;
    }
    DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
-   --rce;  if (a_file    == NULL || a_file [0] == '\0') {
+   --rce;  if (a_file    == NULL) {
+      DEBUG_YJOBS   yLOG_note    ("a_file is null (FATAL)");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
+   }
+   --rce;  if (a_file [0] == '\0') {
+      DEBUG_YJOBS   yLOG_note    ("a_file is empty (warning)");
    }
    DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
    DEBUG_YJOBS  yLOG_point   ("a_cdir"    , a_cdir);
