@@ -41,7 +41,7 @@ tLOCAL myJOBS = { '-', '-' };
 const tWHO  g_whos [MAX_WHO] = {
    /* primary--------  unittest-------  name------ , installed----------- , description----------------------------------------    allowed-actions-----------------  */
    /* 123456789-12345, 123456789-12345,  123456789 ,  123456789-123456789 ,  123456789-123456789-123456789-123456789-123456789- ,  123 vlbui #=mcafo ktw yz qxre gdpnsh -  , loc  cen  ---config-dir------------- , ---testing-dir------------   lpre--------   cpre--------   lsuf--------   cname------------   home-dir------------------ , unit-home-dir------------- , world-file----------- , upd ,  database------------ , */
-   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "-·· F··FF ·-·---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , '·' , ""                    },
+   {  IAM_EOS        , IAM_UEOS       , "eos"      , "/sbin/"             , "eos-rhododactylos (rosy-fingered dawn)"            , "-·· F··FF ···---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "eos."       , "eos."       , ".conf"      , "eos.conf"        , ""                         , ""                         , ""                    , '·' , ""                    },
    {  IAM_ASTRAIOS   , IAM_UASTRAIOS  , "astraios" , "/sbin/"             , "astraios-aeolus (sparkling wind-father)"           , "-·· F··FF ·-·---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "astraios."  , "astraios."  , ".conf"      , "astraios.conf"   , ""                         , ""                         , ""                    , '·' , ""                    },
    {  IAM_HYPNOS     , IAM_UHYPNOS    , "hypnos"   , "/sbin/"             , "hypnos-epidotes (giver of sleep)"                  , "-·· F··FF ·-·---· ··· ·· ···- ···--· -" , 'y', 'y', "/etc/"                    , "/tmp/etc/"                , "hypnos."    , "hypnos."    , ".conf"      , "hypnos.conf"     , ""                         , ""                         , ""                    , '·' , ""                    }, 
    {  IAM_HERACLES   , IAM_UHERACLES  , "heracles" , "/sbin/"             , "heracles-promachus (leader in battle)"             , "-·· F··FF --·F--· ··· ·· ·FFF ···--· -" , 'y', 'y', "/var/spool/heracles/"     , "/tmp/spool/heracles/"     , "job."       , "(USER)."    , ""           , ""                , ""                         , ""                         , ""                    , '·' , ""                    }, 
@@ -102,11 +102,11 @@ yjobs_who_init          (void)
    ystrlcat (g_etc     , "", LEN_DESC);
    /*---(load)---------------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
-      sprintf (t, "%c", g_whos [i].abbr);
+      if (g_whos [i].w_abbr == 0)         break;
+      sprintf (t, "%c", g_whos [i].w_abbr);
       ystrlcat (g_valid, t, LEN_DESC);
       if (strcmp ("/etc/", g_whos [i].cdir) == 0) ystrlcat (g_etc, t, LEN_DESC);
-      sprintf (t, "%c", g_whos [i].unit);
+      sprintf (t, "%c", g_whos [i].w_unit);
       ystrlcat (g_valid, t, LEN_DESC);
       ystrlcat (g_unit , t, LEN_DESC);
       if (strcmp ("/etc/", g_whos [i].cdir) == 0) ystrlcat (g_etc, t, LEN_DESC);
@@ -129,8 +129,8 @@ yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_
    if (a_cname   != NULL)  ystrlcpy (a_cname, "", LEN_DESC);
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
-      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+      if (g_whos [i].w_abbr == 0)         break;
+      if      (a_runas == g_whos [i].w_abbr || a_runas == g_whos [i].w_unit) {
          if (a_local   != NULL)  *a_local   = g_whos [i].local;
          if (a_central != NULL)  *a_central = g_whos [i].central;
          if (a_lpre    != NULL)  ystrlcpy (a_lpre , g_whos [i].lpre , LEN_LABEL);
@@ -162,9 +162,9 @@ yjobs__who_base         (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], c
    if (r_db     != NULL)  ystrlcpy (r_db   , "", LEN_LABEL);
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
-      if (a_runas == g_whos [i].abbr) {
-         if (r_unit   != NULL)  *r_unit   = g_whos [i].unit;
+      if (g_whos [i].w_abbr == 0)         break;
+      if (a_runas == g_whos [i].w_abbr) {
+         if (r_unit   != NULL)  *r_unit   = g_whos [i].w_unit;
          if (r_name   != NULL)  ystrlcpy (r_name , g_whos [i].name , LEN_TERSE);
          if (r_desc   != NULL)  ystrlcpy (r_desc , g_whos [i].desc , LEN_DESC);
          if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].cdir , LEN_DESC);
@@ -174,8 +174,8 @@ yjobs__who_base         (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], c
          if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);
          return 0;
       }
-      if (a_runas == g_whos [i].unit) {
-         if (r_unit   != NULL)  *r_unit   = g_whos [i].unit;
+      if (a_runas == g_whos [i].w_unit) {
+         if (r_unit   != NULL)  *r_unit   = g_whos [i].w_unit;
          if (r_name   != NULL)  ystrlcpy (r_name , g_whos [i].name , LEN_TERSE);
          if (r_desc   != NULL)  ystrlcpy (r_desc , g_whos [i].desc , LEN_DESC);
          if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].udir , LEN_DESC);
@@ -212,8 +212,8 @@ yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN
     *> if (r_db     != NULL)  ystrlcpy (r_db   , "", LEN_LABEL);                       <* 
     *> /+---(walk data)----------------------+/                                        <* 
     *> for (i = 0; i < MAX_WHO; ++i) {                                                 <* 
-    *>    if (g_whos [i].abbr == 0)         break;                                     <* 
-    *>    if (a_runas == g_whos [i].abbr) {                                            <* 
+    *>    if (g_whos [i].w_abbr == 0)         break;                                     <* 
+    *>    if (a_runas == g_whos [i].w_abbr) {                                            <* 
     *>       if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].cdir , LEN_DESC);    <* 
     *>       if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].hdir , LEN_DESC);    <* 
     *>       if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);   <* 
@@ -221,7 +221,7 @@ yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN
     *>       if (r_db     != NULL)  ystrlcpy (r_db   , g_whos [i].db   , LEN_LABEL);   <* 
     *>       return 0;                                                                 <* 
     *>    }                                                                            <* 
-    *>    if (a_runas == g_whos [i].unit) {                                            <* 
+    *>    if (a_runas == g_whos [i].w_unit) {                                            <* 
     *>       if (r_cdir   != NULL)  ystrlcpy (r_cdir , g_whos [i].udir , LEN_DESC);    <* 
     *>       if (r_hdir   != NULL)  ystrlcpy (r_hdir , g_whos [i].uhdir, LEN_DESC);    <* 
     *>       if (r_world  != NULL)  ystrlcpy (r_world, g_whos [i].world, LEN_LABEL);   <* 
@@ -247,7 +247,7 @@ yjobs_who_by_index      (char n, char *a_cdir, char *a_hdir, char *a_world, char
    if (a_db    != NULL)  ystrlcpy (a_db   , "", LEN_LABEL);
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
+      if (g_whos [i].w_abbr == 0)         break;
       if (i != n)                       continue;
       if (a_cdir  != NULL)  ystrlcpy (a_cdir , g_whos [i].udir , LEN_DESC);
       if (a_hdir  != NULL)  ystrlcpy (a_hdir , g_whos [i].uhdir, LEN_DESC);
@@ -269,9 +269,9 @@ yjobs_who_action        (cchar a_runas, cchar a_opt)
    if (a_opt > 35)  return '·';
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
-      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
-         return g_whos [i].acts [a_opt];
+      if (g_whos [i].w_abbr == 0)         break;
+      if      (a_runas == g_whos [i].w_abbr || a_runas == g_whos [i].w_unit) {
+         return g_whos [i].w_acts [a_opt];
       }
    }
    /*---(complete)-----------------------*/
@@ -285,9 +285,9 @@ yjobs_who_testing       (cchar a_runas)
    int         i           =    0;
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0)         break;
-      if      (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
-         return g_whos [i].unit;
+      if (g_whos [i].w_abbr == 0)         break;
+      if      (a_runas == g_whos [i].w_abbr || a_runas == g_whos [i].w_unit) {
+         return g_whos [i].w_unit;
       }
    }
    /*---(complete)-----------------------*/
@@ -333,7 +333,7 @@ yjobs_runas             (cchar *a_name, char *r_runas)
    DEBUG_YJOBS  yLOG_info    ("a_name"    , a_name);
    /*---(walk data)----------------------*/
    --rce;  for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0) {
+      if (g_whos [i].w_abbr == 0) {
          DEBUG_YJOBS  yLOG_note    ("runas entry never found");
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
@@ -346,36 +346,36 @@ yjobs_runas             (cchar *a_name, char *r_runas)
       DEBUG_YJOBS  yLOG_complex ("naming"    , "%s, %s, %s, %s, %s, %s", g_whos [i].inst, g_whos [i].name, x_qual, x_debug, x_quald, x_unit);
       /*---(normal)----------------------*/
       if (strcmp (a_name, g_whos [i].name) == 0) {
-         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
-         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].w_abbr, g_whos [i].w_unit);
+         myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("normal"    , myJOBS.m_runas);
          break;
       }
       /*---(qualified)-------------------*/
       if (strcmp (a_name, x_qual) == 0) {
-         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
-         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].w_abbr, g_whos [i].w_unit);
+         myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("qualified" , myJOBS.m_runas);
          break;
       }
       /*---(debug)-----------------------*/
       if (strcmp (a_name, x_debug) == 0) {
-         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
-         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].w_abbr, g_whos [i].w_unit);
+         myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("debug"     , myJOBS.m_runas);
          break;
       }
       /*---(qualified)-------------------*/
       if (strcmp (a_name, x_quald) == 0) {
-         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
-         myJOBS.m_runas = g_whos [i].abbr;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].w_abbr, g_whos [i].w_unit);
+         myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("qualified" , myJOBS.m_runas);
          break;
       }
       /*---(unittest)--------------------*/
       if (strcmp (a_name, x_unit) == 0) {
-         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].abbr, g_whos [i].unit);
-         myJOBS.m_runas = g_whos [i].unit;
+         DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].name, g_whos [i].w_abbr, g_whos [i].w_unit);
+         myJOBS.m_runas = g_whos [i].w_unit;
          DEBUG_YJOBS  yLOG_char    ("unittest"  , myJOBS.m_runas);
          break;
       }
@@ -435,8 +435,8 @@ yjobs_iam               (char a_runas)
    ystrlcpy (g_print, "unknown"         , LEN_HUND);
    /*---(walk data)----------------------*/
    --rce;  for (i = 0; i < MAX_WHO; ++i) {
-      if (g_whos [i].abbr == 0) g_print;
-      if (a_runas == g_whos [i].abbr || a_runas == g_whos [i].unit) {
+      if (g_whos [i].w_abbr == 0) g_print;
+      if (a_runas == g_whos [i].w_abbr || a_runas == g_whos [i].w_unit) {
          ystrlcpy (g_print, g_whos [i].desc, LEN_HUND);
          break;
       }

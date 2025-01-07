@@ -298,6 +298,7 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
    char        rce         =  -10;
    char        x_cwd       [LEN_PATH]  = "";
    char       *p           = NULL;
+   char        l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
@@ -345,9 +346,17 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
       ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
    }
    if (r_full  != NULL) {
-      if      (a_file [0] == '/')                    snprintf (r_full , LEN_PATH, "%s"   , a_file);
-      else if (strchr (g_local  , a_mode) != NULL)   snprintf (r_full , LEN_PATH, "%s/%s", x_cwd , a_file);
-      else if (strchr (g_central, a_mode) != NULL)   snprintf (r_full , LEN_PATH, "%s/%s", a_cdir, a_file);
+      if      (a_file [0] == '/')      snprintf (r_full , LEN_PATH, "%s"   , a_file);
+      else if (strchr (g_local  , a_mode) != NULL) {
+         l = strlen (x_cwd);
+         if (x_cwd  [l - 1] == '/')    snprintf (r_full , LEN_PATH, "%s%s" , x_cwd , a_file);
+         else                          snprintf (r_full , LEN_PATH, "%s/%s", x_cwd , a_file);
+      }
+      else if (strchr (g_central, a_mode) != NULL) {
+         l = strlen (a_cdir);
+         if (a_cdir [l - 1] == '/')    snprintf (r_full , LEN_PATH, "%s%s" , a_cdir, a_file);
+         else                          snprintf (r_full , LEN_PATH, "%s/%s", a_cdir, a_file);
+      }
    }
    DEBUG_YJOBS   yLOG_info    ("r_full"    , r_full);
    /*---(update score)-------------------*/

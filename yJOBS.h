@@ -315,6 +315,7 @@ typedef const  char      cchar;
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char*       yJOBS_version           (void);
 char        yJOBS_runas             (cchar *a_name, char *r_runas, ...);
+char        yJOBS_noise             (char a_argc, char *a_argv []);
 char        yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas, char *r_mode, char *r_file);
 char        yJOBS_driver            (cchar *a_oneline, void *f_callback);
 char        yJOBS_final             (int a_uid);  /* DEPRICATED */

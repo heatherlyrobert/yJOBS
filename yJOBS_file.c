@@ -1138,7 +1138,7 @@ yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar 
    rc = yjobs__naming (a_runas, YJOBS_CENTRAL, a_file, x_fdesc);
    DEBUG_YJOBS  yLOG_value   ("naming"    , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -1146,7 +1146,7 @@ yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar 
    rc = yjobs__location (a_runas, YJOBS_CENTRAL, "·····", "·····", a_file, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
    DEBUG_YJOBS  yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -1154,7 +1154,7 @@ yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar 
    rc = yjobs__stats (YJOBS_CENTRAL, a_central, a_file, a_muser, a_muid, x_fuser, x_fuid);
    DEBUG_YJOBS  yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
-      yURG_msg (' ', "");
+      /*> yURG_msg (' ', "");                                                         <*/
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }

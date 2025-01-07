@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2a"
-#define     P_VERTXT    "fixed little defense that kept eos from booting"
+#define     P_VERNUM    "1.2b"
+#define     P_VERTXT    "fixed double backslash issue in central directory functions"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -148,12 +148,12 @@ extern  tLOCAL myJOBS;
 #define   MAX_WHO  15
 typedef struct cWHO  tWHO;
 struct cWHO {
-   char        abbr;
-   char        unit;
+   char        w_abbr;
+   char        w_unit;
    char        name        [LEN_TERSE];
    char        inst        [LEN_LABEL];
    char        desc        [LEN_DESC];
-   char        acts        [LEN_DESC];
+   char        w_acts      [LEN_DESC];
    char        local;
    char        central;
    char        cdir        [LEN_DESC];

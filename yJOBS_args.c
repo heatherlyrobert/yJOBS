@@ -599,6 +599,75 @@ yjobs_args_offset       (char a_mode)
 }
 
 char
+yJOBS_noise             (char a_argc, char *a_argv [])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         i           =    0;
+   char       *a           = NULL;          /* current argument               */
+   char        l           =    0;
+   int         j           =    0;
+   char       *p           = NULL;
+   char        x_noise     =  '?';
+   char        x_args      =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS  yLOG_value   ("a_argc"    , a_argc);
+   --rce;  if (a_argc <= 1) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return x_noise;
+   }
+   --rce;  if (a_argv == NULL) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return x_noise;
+   }
+   /*---(walk args)-----------------------------*/
+   --rce;  for (i = 1; i < a_argc; ++i) {
+      /*---(prepare)---------------------*/
+      a = a_argv [i];
+      if (a == NULL) {
+         DEBUG_PROG   yLOG_note    ("FATAL, found a null argument, really bad news");
+         DEBUG_PROG   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      /*---(debugging--------------------*/
+      if (a [0] == '@')       continue;
+      /*---(yJOBS arguments)-------------*/
+      ++x_args;
+      DEBUG_ARGS  yLOG_info     ("argument"  , a);
+      /*---(find action)--------------------*/
+      for (j = 0; j < MAX_OPTS; ++j) {
+         DEBUG_YJOBS  yLOG_value   ("loop"      , j);
+         p = s_opts [j].o_option;
+         if (p [0] == '\0')  break;
+         l = strlen (p);
+         if (l >= 4 && strcmp (a + 2, p) == 0) {
+            DEBUG_YJOBS  yLOG_info    ("silent"    , s_opts [j].o_option);
+            if (x_noise == '?')  x_noise = '·';
+            break;
+         }
+         if (l >= 5 && a [2] == 'c' && strcmp (a + 3, p) == 0) {
+            DEBUG_YJOBS  yLOG_info    ("confirm"   , s_opts [j].o_option);
+            if (x_noise != 'V')  x_noise = 'c';
+            break;
+         }
+         if (l >= 5 && a [2] == 'v' && strcmp (a + 3, p) == 0) {
+            DEBUG_YJOBS  yLOG_info    ("verbose"   , s_opts [j].o_option);
+            x_noise = 'V';
+            break;
+         }
+      }
+      /*---(done)------------------------*/
+   }
+   DEBUG_YJOBS  yLOG_value   ("x_args"    , x_args);
+   DEBUG_YJOBS  yLOG_char    ("x_noise"   , x_noise);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
+   return x_noise;
+}
+
+char
 yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -737,6 +806,7 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    }
    --rce;  if (f == '·') {
       yURG_err ('F', "action å%sæ not allowed for runas (%c)", a_arg, myJOBS.m_runas);
+      DEBUG_YJOBS  yLOG_note    ("not allowed");
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -768,7 +838,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    DEBUG_YJOBS  yLOG_point   ("a_next"    , a_next);
    --rce;  if (a_next == NULL) {
       DEBUG_YJOBS  yLOG_note    ("null a_next option");
+      IF_CONFIRM  yURG_err_live ();
       yURG_err ('F', "action å%sæ requires a file name as an argument", a_arg);
+      IF_CONFIRM  yURG_err_mute ();
       yjobs_args__clearmode (r_runas, r_mode, r_file);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -792,7 +864,7 @@ yjobs_final_full        (int a_uid)
    /*---(setup location)-----------------*/
    if (strchr (g_unit, myJOBS.m_runas) != NULL) {
       DEBUG_YJOBS  yLOG_note    ("unit testing, run output and errors to tmp file");
-      yURG_msg_tmp  ();
+      yURG_msg_atmp ();
       yURG_err_tmp  (); 
    } else {
       DEBUG_YJOBS  yLOG_note    ("normal, run output and errors to stdout, strerr");
