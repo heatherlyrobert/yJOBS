@@ -151,7 +151,8 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       case CASE_CHECK      :
       case CASE_AUDIT      :
       case CASE_FIX        :
-         rc = yjobs_maintain  ();
+         /*> rc = yjobs_maintain  ();                                                 <*/
+         rc = yjobs_maint     ();
          x_done = 'y';
          break;
       case CASE_ONLY       :

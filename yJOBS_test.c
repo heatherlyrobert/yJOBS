@@ -228,6 +228,9 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       g_fullacts  [ 9] = 'Ö';
       return YJOBS_RC_PULL;
       break;
+   case ACT_REGISTER    :
+      return YJOBS_RC_REGISTER;
+      break;
    case YJOBS_CLEAR     :
       g_fullacts  [30] = '×';
       return YJOBS_RC_CLEAR;
@@ -247,6 +250,8 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       break;
    case YJOBS_PURGE     :
       g_fullacts  [25] = 'P';
+      yURG_msg ('>', "verify purging all contents (purge)...");
+      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       return YJOBS_RC_PURGE;
       break;
    default           :

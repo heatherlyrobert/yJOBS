@@ -220,7 +220,7 @@ yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
    case CASE_REPORT   :  yURG_msg (':', "  option --vreport   : search, process, or report from central information");    break;
    case CASE_CHECK    :  yURG_msg (':', "  option --vcheck    : verify details of centrally installed file");             break;
    case CASE_AUDIT    :  yURG_msg (':', "  option --vaudit    : check central setup, files, and security");               break;
-   case CASE_FIX      :  yURG_msg (':', "  option --vfix      : repair central directories and security");                break;
+   case CASE_FIX      :  yURG_msg (':', "  option --vfix      : check and repair central setup, files, and security");    break;
    case CASE_ONLY     :  yURG_msg (':', "  option --vonly     : execute with single central file");                       break;
                          /*---(epic 3)----------------------*/
                          /*---(elsewhere 2)-----------------*/
@@ -454,7 +454,7 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
                         /*---(central 6)-------------------*/
    case CASE_CHECK    : yURG_msg (':', "%s%s, centrally installed file is runable, all lines checked%s"                 , a_color, a_prefix, BOLD_OFF);  break;
    case CASE_AUDIT    : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s"               , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_FIX      : yURG_msg (':', "%s%s, central directory basic security measures confirmed%s"                    , a_color, a_prefix, BOLD_OFF);  break;
+   case CASE_FIX      : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s"               , a_color, a_prefix, BOLD_OFF);  break;
    case CASE_ONLY     : yURG_msg (':', "%s%s, central execution on single file confirmed%s"                             , a_color, a_prefix, BOLD_OFF);  break;
                         /*---(epic 3)----------------------*/
                         /*---(elsewhere 2)-----------------*/

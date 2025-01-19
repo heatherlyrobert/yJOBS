@@ -99,23 +99,23 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
    /*---(quick-out)----------------------*/
    if (a_mode == 0 || strchr (g_act_rdb, a_mode) == NULL) {
-      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_senter  (a_func);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_rdb);
-      DEBUG_YJOBS   yLOG_note    ("database read not requested");
-      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_snote   ("database read not requested");
+      DEBUG_YJOBS   yLOG_sexit   (a_func);
       return 0;
    }
    /*---(no-database)--------------------*/
    if (a_db == NULL || strcmp (a_db, "") == 0) {
-      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
-      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      DEBUG_YJOBS   yLOG_senter  (a_func);
+      DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");
       yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_SKIP);
-      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sexit   (a_func);
       return 0;
    }
    /*---(header)-------------------------*/
-   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_enter   (a_func);
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_note    ("mode requires database loaded before");
    rc = yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_FAIL);
@@ -123,7 +123,7 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
       yjobs_ends_failure (a_mode, "host program callback function is NULL");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(call)---------------------------*/
@@ -133,14 +133,14 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
    --rce;  if (rc < 0) {
       yjobs_ends_failure (a_mode, "central database did not load properly");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(score)--------------------------*/
    rc = yjobs_ends_score (G_SCORE_DATABASE,  1, 'Ô');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_exit    (a_func);
    return 1;
 }
 
@@ -153,23 +153,23 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
    /*---(quick-out)----------------------*/
    if (a_mode == 0 || strchr (g_act_wdb, a_mode) == NULL) {
-      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_senter  (a_func);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_wdb);
-      DEBUG_YJOBS   yLOG_note    ("database write not required");
-      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_snote   ("database write not required");
+      DEBUG_YJOBS   yLOG_sexit   (a_func);
       return 0;
    }
    /*---(no-database)--------------------*/
    if (a_db == NULL || strcmp (a_db, "") == 0) {
-      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
-      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      DEBUG_YJOBS   yLOG_senter  (a_func);
+      DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");
       yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_SKIP);
-      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sexit   (a_func);
       return 0;
    }
    /*---(header)-------------------------*/
-   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_enter   (a_func);
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_note    ("mode requires database written after");
    rc = yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_FAIL);
@@ -177,7 +177,7 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
       yjobs_ends_failure (a_mode, "host program callback function is NULL");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(call)---------------------------*/
@@ -187,14 +187,14 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
    --rce;  if (rc < 0) {
       yjobs_ends_failure (a_mode, "central database did not save properly");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(score)--------------------------*/
    rc = yjobs_ends_score (G_SCORE_DATABASE,  4, 'Õ');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_exit    (a_func);
    return 1;
 }
 
@@ -252,7 +252,8 @@ yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], ch
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   int         rc          =    0;
+   char        rc          =    0;
+   char        rc_final    =    0;
    char        x_full      [LEN_PATH]  = "";
    char      (*x_callback)   (cchar a_req, cchar *a_full);
    /*---(header)-------------------------*/
@@ -293,17 +294,22 @@ yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       if (!yJOBS_ifverbose ()) yURG_msg_live ();
       yURG_msg (':', "%s", x_full);
       if (!yJOBS_ifverbose ()) yURG_msg_mute ();
-      rc = 1;
+      rc_final = 1;
       break;
-   default       :
-      rc = x_callback (YJOBS_PULL, x_full);
-      if (rc == 0)  rc = 1;
+   case CASE_FIX   :
+      break;
+   default         :
+      rc = x_callback (YJOBS_PULL , x_full);
+      DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
+      if (rc == 0)  rc_final = 1;
+      rc = x_callback (YJOBS_PURGE, x_full);
+      DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
       break;
    }
-   DEBUG_YJOBS   yLOG_value   ("rc"        , rc);
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return rc;
+   return rc_final;
 }
 
 char
@@ -360,27 +366,50 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);
    /*---(walk files)---------------------*/
    DEBUG_YJOBS   yLOG_note    ("walk through directory files");
-   while ((x_file = readdir (x_dir)) != NULL) {
+   x_file = readdir (x_dir);
+   DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
+   while (x_file != NULL) {
       /*---(header)-----------------------------*/
       DEBUG_YJOBS   yLOG_info    ("d_name"    , x_file->d_name);
       /*---(simple filtering)-------------------*/
-      rc = yjobs_act__filter (x_file->d_name, x_prefix, a_uid);
+      rc = yjobs__share_filter (x_file->d_name, x_prefix, a_uid);
+      DEBUG_YJOBS   yLOG_value   ("filter"    , rc);
       if (rc != 0)  ++x_total;
       if (rc <= 0) {
          DEBUG_YJOBS   yLOG_note    ("not a valid job/khronos file");
+         x_file = readdir (x_dir);
+         DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
          continue;
       }
-      /*---(list)-------------------------------*/
-      if (a_mode == ACT_LIST) {
-         if (!yJOBS_ifverbose ()) yURG_msg_live ();
-         yURG_msg (':', "%s", x_file->d_name);
-         if (!yJOBS_ifverbose ()) yURG_msg_mute ();
-         rc = 0;
-      }
-      /*---(list)-------------------------------*/
-      else {
-         rc = yjobs_central_old  (a_runas, a_mode, x_file->d_name, NULL, NULL, NULL, NULL);
-      }
+      rc = yjobs__share_single   (a_runas, a_mode, a_config, x_file->d_name, a_user, a_uid, f_callback);
+      DEBUG_YJOBS   yLOG_value   ("single"    , rc);
+      /*> rc = yjobs_central_old  (a_runas, a_mode, x_file->d_name, NULL, NULL, NULL, NULL);   <* 
+       *> /+---(list)-------------------------------+/                                         <* 
+       *> rc_final = 0;                                                                        <* 
+       *> switch (a_mode) {                                                                    <* 
+       *> case ACT_LIST :                                                                      <* 
+       *>    if (!yJOBS_ifverbose ()) yURG_msg_live ();                                        <* 
+       *>    yURG_msg (':', "%s", x_file->d_name);                                             <* 
+       *>    if (!yJOBS_ifverbose ()) yURG_msg_mute ();                                        <* 
+       *>    rc_final = 1;                                                                     <* 
+       *> case CASE_FIX   :                                                                    <* 
+       *>    break;                                                                            <* 
+       *> default         :                                                                    <* 
+       *>    rc = x_callback (YJOBS_PULL , x_full);                                            <* 
+       *>    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);                                    <* 
+       *>    if (rc == 0)  rc_final = 1;                                                       <* 
+       *>    rc = x_callback (YJOBS_PURGE, x_full);                                            <* 
+       *>    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                    <* 
+       *>    break;                                                                            <* 
+       *> }                                                                                    <* 
+       *> /+---(list)-------------------------------+/                                         <* 
+       *> else {                                                                               <* 
+       *>    rc = x_callback (YJOBS_PULL , x_full);                                            <* 
+       *>    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);                                    <* 
+       *>    if (rc == 0)  rc_final = 1;                                                       <* 
+       *>    rc = x_callback (YJOBS_PURGE, x_full);                                            <* 
+       *>    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                    <* 
+       *> }                                                                                    <*/
       /*---(actions)----------------------------*/
       /*> else switch (a_mode) {                                                                            <* 
        *> case ACT_AUDIT     : case ACT_CAUDIT    : case ACT_VAUDIT    :                                    <* 
@@ -394,6 +423,9 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       ++x_count;
       if (rc >= 0)  ++x_pass;
       DEBUG_YJOBS   yLOG_complex ("counts"    , "%d total, %d count, %d pass", x_total, x_count, x_pass);
+      /*---(next)------------------------*/
+      x_file = readdir (x_dir);
+      DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
       /*---(done)------------------------*/
    }
    /*---(summary)------------------------*/
@@ -436,7 +468,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    int         x_count     =    0;
    int         x_pass      =    0;
    /*---(header)-------------------------*/
-   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_enter   (a_func);
    /*---(header)-------------------------*/
    yURG_msg ('>', "configuration directory file review...");
    /*---(running as)---------------------*/
@@ -444,7 +476,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
       yURG_err ('f', "could not identify current user (yEXEC_whoami)");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    yURG_msg ('-', "currently running as å%sæ (%d)", x_user, x_uid);
@@ -453,7 +485,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    --rce;  if (rc <  0) {
       yURG_err ('f', "could not identify configuration directory");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    yURG_msg ('-', "configuration directory is å%sæ", x_config);
@@ -463,7 +495,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    DEBUG_YJOBS   yLOG_value   ("naming"    , rc);
    --rce;  if (rc <  0) {
       yURG_err ('f', "could not identify configuration file name");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    yURG_msg ('-', "configuration file name is å%sæ", x_cname);
@@ -471,7 +503,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    /*---(handle zero)---------------------------*/
    if (strcmp (x_config, "") == 0) {
       yURG_msg ('-', "skipping, zero configuration for application");
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_exit    (a_func);
       return 0;
    }
    /*---(handle file)---------------------------*/
@@ -480,10 +512,10 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
       rc = yjobs__share_single   (a_runas, a_mode, x_config, x_cname, x_user, x_uid, f_callback);
       DEBUG_YJOBS   yLOG_value   ("single"    , rc);
       if (rc < 0)  {
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
          return rce;
       }
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_exit    (a_func);
       return 1;
    }
    /*---(multiple files)------------------------*/
@@ -491,7 +523,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    rc = yjobs__share_multiple (a_runas, a_mode, x_config, x_cname, x_user, x_uid, f_callback);
    DEBUG_YJOBS   yLOG_value   ("multiple"  , rc);
    if (rc < 0)  {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(open dir)-----------------------*/
@@ -499,7 +531,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
     *> DEBUG_YJOBS   yLOG_point   ("x_dir"     , x_dir);                              <* 
     *> --rce;  if (x_dir == NULL) {                                                   <* 
     *>    yURG_err ('f', "could not open configuration directory");                   <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
+    *>    DEBUG_YJOBS   yLOG_exitr   (a_func, rce);                             <* 
     *>    return rce;                                                                 <* 
     *> }                                                                              <* 
     *> yURG_msg ('-', "successfully openned configuration directory");                <*/
@@ -553,7 +585,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    /*> rc = closedir (x_dir);                                                         <* 
     *> DEBUG_YJOBS   yLOG_point   ("close"     , rc);                                 <* 
     *> --rce;  if (rc < 0) {                                                          <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
+    *>    DEBUG_YJOBS   yLOG_exitr   (a_func, rce);                             <* 
     *>    return rce;                                                                 <* 
     *> }                                                                              <*/
    /*---(summary)------------------------*/
@@ -564,7 +596,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    /*> DEBUG_YJOBS   yLOG_value   ("rc"        , rc);                                 <*/
    DEBUG_YJOBS   yLOG_value   ("x_count"   , x_count);
    /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_exit    (a_func);
    return x_count;
 }
 

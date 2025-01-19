@@ -308,6 +308,7 @@ typedef const  char      cchar;
 #define     YJOBS_CLEAR     'x'
 #define     YJOBS_LOCRPT    'l'
 #define     YJOBS_PUSH      'Ö'
+#define     YJOBS_REGISTER  'r'
 
 
 

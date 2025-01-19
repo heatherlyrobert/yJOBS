@@ -66,6 +66,7 @@ char          g_act_reg     [LEN_HUND]  = "";
 
 char          g_act_sec     [LEN_HUND]  = "";
 char          g_act_aud     [LEN_HUND]  = "";
+char          g_act_pul     [LEN_HUND]  = "";
 char          g_act_rpt     [LEN_HUND]  = "";
 char          g_act_run     [LEN_HUND]  = "";
 char          g_act_chk     [LEN_HUND]  = "";
@@ -135,6 +136,7 @@ struct cOPTS {
 
    char        o_secure;
    char        o_audit;
+   char        o_pull;
    char        o_report;
    char        o_run;
    char        o_check;
@@ -149,49 +151,49 @@ struct cOPTS {
    /*---(done)--------------*/
 };
 static const tOPTS   s_opts [MAX_OPTS] = {
-   /*---(informational 3)---------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'h' , "version"  , "1··", "present a short versioning string"            ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'h' , "about"    , "2··", "key information about program"                ,   1,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'h' , "help"     , "3··", "present a simple help message"                ,   2,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   /*---(incomming 5)-------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'i' , "verify"   , "vÑV", "verify local file for correctness"            ,   4,   '·', 'y', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
-   { 'i' , "local"    , "lòL", "report on local file content"                 ,   5,   '·', 'y', '·', '·',   '·', '·', 'y', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
-   { 'i' , "register" , "béB", "verify local file and register centrally"     ,   6,   '·', 'y', '·', 'y',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
-   { 'i' , "update"   , "uûU", "update central with single local file"        ,   7,   'y', 'y', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', 'y',   YJOBS_LOCAL    , "" },
-   { 'i' , "install"  , "iðI", "verify local file, then update centrally"     ,   8,   'y', 'y', 'y', 'y',   'y', '·', '·', '·', '·',   '·', '·', '·', 'y',   YJOBS_LOCAL    , "" },
-   /*---(maintain 5)--------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'm' , "stats"    , "#··", "information about database and environment"   ,  10,   'y', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "list"     , "=··", "list of executable content"                   ,  11,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "report"   , "móM", "report on central database"                   ,  12,   'y', '·', '·', '·',   '·', '·', 'y', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "audit"    , "aèA", "audit central environment and all its files"  ,  14,   '·', '·', '·', '·',   'y', 'y', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "fix"      , "füF", "audit central environment and fix issues"     ,  15,   '·', '·', '·', '·',   'y', 'y', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "check"    , "cýC", "check central file for correctness"           ,  13,   '·', '·', '·', '·',   '·', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'm' , "only"     , "oöO", "run on single central data file"              ,  16,   '·', '·', '·', '·',   '·', '·', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   /*---(epic)--------------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'e' , "backup"   , "kñK", "backup the central system"                    ,  18,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'e' , "restore"  , "túT", "restore the central system from backup"       ,  19,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'e' , "purge"    , "wÿW", "wipe clean entire central system"             ,  20,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   /*---(elsewhere)---------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'e' , "upload"   , "yïY", "from elsewhere to central"                    ,  22,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'e' , "download" , "zíZ", "from central to elsewhere"                    ,  23,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   /*---(outgoing 5)--------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'o' , "withdraw" , "qþQ", "unregister centrally"                         ,  25,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   'y', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   { 'o' , "clear"    , "xõX", "clear file from central location"             ,  26,   'y', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', 'y', '·', 'y',   YJOBS_CENTRAL  , "" },
-   { 'o' , "remove"   , "røR", "unregister and clear from central location"   ,  27,   'y', '·', '·', '·',   '·', '·', '·', '·', '·',   'y', 'y', 'y', 'y',   YJOBS_CENTRAL  , "" },
-   { 'o' , "extract"  , "eìE", "extract a central file to local copy"         ,  28,   'y', '·', '·', '·',   '·', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
-   /*---(execution)---------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'g' , "gather"   , "gêG", "execute system-wide data gather"              ,  30,   'y', '·', '·', '·',   'y', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "if host uses world file (like polymnia), calls successive pulls (ACT_PULL) for world each entry.  if not (like helios), calls gather (ACT_GATHER) once." },
-   { 'g' , "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31,   'y', '·', '·', '·',   'y', '·', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32,   'y', '·', '·', '·',   'y', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "normal"   , "nôN", "execute specific file in normal-mode"         ,  33,   'y', '·', '·', '·',   'y', '·', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34,   'y', '·', '·', '·',   'y', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "reload"   , "hîH", "send signal to reload daemon"                 ,  35,   'y', '·', '·', '·',   'y', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   /*---(unit testing)------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { 'u' , "testing"  , "j··", "change to test directories"                   ,  37,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'u' , "norun"    , "-··", "daemons only load data"                       ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   /*---(sentinal)----------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
-   { '·' , ""         , "···", ""                                             ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   /*---(done)--------------------------------                                  seq    rdb  upd  ins  reg    sec  aud  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   /*---(informational 3)---------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'h' , "version"  , "1··", "present a short versioning string"            ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'h' , "about"    , "2··", "key information about program"                ,   1,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'h' , "help"     , "3··", "present a simple help message"                ,   2,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   /*---(incomming 5)-------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'i' , "verify"   , "vÑV", "verify local file for correctness"            ,   4,   '·', 'y', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
+   { 'i' , "local"    , "lòL", "report on local file content"                 ,   5,   '·', 'y', '·', '·',   '·', '·', '·', 'y', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
+   { 'i' , "register" , "béB", "verify local file and register centrally"     ,   6,   '·', 'y', '·', 'y',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_LOCAL    , "" },
+   { 'i' , "update"   , "uûU", "update central with single local file"        ,   7,   'y', 'y', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', 'y',   YJOBS_LOCAL    , "" },
+   { 'i' , "install"  , "iðI", "verify local file, then update centrally"     ,   8,   'y', 'y', 'y', 'y',   'y', '·', '·', '·', '·', '·',   '·', '·', '·', 'y',   YJOBS_LOCAL    , "" },
+   /*---(maintain 5)--------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'm' , "stats"    , "#··", "information about database and environment"   ,  10,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "list"     , "=··", "list of executable content"                   ,  11,   '·', '·', '·', '·',   '·', '·', 'y', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "report"   , "móM", "report on central database"                   ,  12,   'y', '·', '·', '·',   '·', '·', 'y', 'y', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "audit"    , "aèA", "audit central environment and all its files"  ,  14,   '·', '·', '·', '·',   'y', 'y', 'y', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "fix"      , "füF", "audit central environment and fix issues"     ,  15,   '·', '·', '·', '·',   'y', 'y', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "check"    , "cýC", "check central file for correctness"           ,  13,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'm' , "only"     , "oöO", "run on single central data file"              ,  16,   '·', '·', '·', '·',   '·', '·', '·', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   /*---(epic)--------------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'e' , "backup"   , "kñK", "backup the central system"                    ,  18,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'e' , "restore"  , "túT", "restore the central system from backup"       ,  19,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'e' , "purge"    , "wÿW", "wipe clean entire central system"             ,  20,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   /*---(elsewhere)---------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'e' , "upload"   , "yïY", "from elsewhere to central"                    ,  22,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'e' , "download" , "zíZ", "from central to elsewhere"                    ,  23,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   /*---(outgoing 5)--------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'o' , "withdraw" , "qþQ", "unregister centrally"                         ,  25,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   'y', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   { 'o' , "clear"    , "xõX", "clear file from central location"             ,  26,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', 'y', '·', 'y',   YJOBS_CENTRAL  , "" },
+   { 'o' , "remove"   , "røR", "unregister and clear from central location"   ,  27,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   'y', 'y', 'y', 'y',   YJOBS_CENTRAL  , "" },
+   { 'o' , "extract"  , "eìE", "extract a central file to local copy"         ,  28,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
+   /*---(execution)---------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'g' , "gather"   , "gêG", "execute system-wide data gather"              ,  30,   'y', '·', '·', '·',   'y', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "if host uses world file (like polymnia), calls successive pulls (ACT_PULL) for world each entry.  if not (like helios), calls gather (ACT_GATHER) once." },
+   { 'g' , "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31,   'y', '·', '·', '·',   'y', '·', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32,   'y', '·', '·', '·',   'y', 'y', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "normal"   , "nôN", "execute specific file in normal-mode"         ,  33,   'y', '·', '·', '·',   'y', '·', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34,   'y', '·', '·', '·',   'y', 'y', 'y', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "reload"   , "hîH", "send signal to reload daemon"                 ,  35,   'y', '·', '·', '·',   'y', '·', 'y', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   /*---(unit testing)------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { 'u' , "testing"  , "j··", "change to test directories"                   ,  37,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'u' , "norun"    , "-··", "daemons only load data"                       ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   /*---(sentinal)----------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
+   { '·' , ""         , "···", ""                                             ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   /*---(done)--------------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk    wit  clr  rem  wdb    file-loc----- */
 };
 
 
@@ -292,6 +294,7 @@ yjobs_args__empty       (void)
 
    ystrlcpy (g_act_sec , "", LEN_HUND);
    ystrlcpy (g_act_aud , "", LEN_HUND);
+   ystrlcpy (g_act_pul , "", LEN_HUND);
    ystrlcpy (g_act_rpt , "", LEN_HUND);
    ystrlcpy (g_act_run , "", LEN_HUND);
    ystrlcpy (g_act_chk , "", LEN_HUND);
@@ -450,6 +453,7 @@ yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
 
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_secure   , s_opts [i].o_levels, g_act_sec);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_audit    , s_opts [i].o_levels, g_act_aud);
+      yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_pull     , s_opts [i].o_levels, g_act_pul);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_report   , s_opts [i].o_levels, g_act_rpt);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_run      , s_opts [i].o_levels, g_act_run);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_check    , s_opts [i].o_levels, g_act_chk);
@@ -641,7 +645,7 @@ yJOBS_noise             (char a_argc, char *a_argv [])
          DEBUG_YJOBS  yLOG_value   ("loop"      , j);
          p = s_opts [j].o_option;
          if (p [0] == '\0')  break;
-         l = strlen (p);
+         l = strlen (a);
          if (l >= 4 && strcmp (a + 2, p) == 0) {
             DEBUG_YJOBS  yLOG_info    ("silent"    , s_opts [j].o_option);
             if (x_noise == '?')  x_noise = '·';

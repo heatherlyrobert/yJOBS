@@ -6,30 +6,6 @@
 
 static char       *X_AUDIT     = "aèA";
 
-   /*> --rce;  if (strchr ("aèA", a_mode) != NULL) {                                  <* 
-    *>    yjobs_ends_score (G_SCORE_SECURE,  0, G_SCORE_FAIL);                        <* 
-    *>    g_acts_score  [G_SCORE_SECURE + 0] = G_SCORE_FAIL;                          <* 
-    *>    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, '-');                    <* 
-    *>    DEBUG_YJOBS   yLOG_value   ("security"  , rc);                              <* 
-    *>    if (rc < 0) {                                                               <* 
-    *>       yjobs_ends_failure (a_mode, "central security audit failed");            <* 
-    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
-    *>       return rce;                                                              <* 
-    *>    }                                                                           <* 
-    *>    g_acts_score  [G_SCORE_SECURE + 0] = 'a';                                   <* 
-    *> }                                                                              <*/
-
-   /*> --rce;  if (strchr ("füF", a_mode) != NULL) {                                  <* 
-    *>    g_acts_score  [G_SCORE_SECURE + 1] = G_SCORE_FAIL;                          <* 
-    *>    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, 'y');                    <* 
-    *>    DEBUG_YJOBS   yLOG_value   ("security"  , rc);                              <* 
-    *>    if (rc < 0) {                                                               <* 
-    *>       yjobs_ends_failure (a_mode, "central security fix failed");              <* 
-    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
-    *>       return rce;                                                              <* 
-    *>    }                                                                           <* 
-    *>    g_acts_score  [G_SCORE_SECURE + 1] = 'f';                                   <* 
-    *> }                                                                              <*/
 
 
 char
@@ -44,7 +20,7 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_aud);
-      DEBUG_YJOBS   yLOG_note    ("security review/fix not requested");
+      DEBUG_YJOBS   yLOG_snote   ("security review/fix not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
@@ -54,8 +30,8 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    /*---(prepare)------------------------*/
    if (strchr (g_fix, a_mode) != NULL)  x_fix = 'y';
    DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
-   if (x_fix != 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
-   else               rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, G_SCORE_FAIL);
+   rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
+   if (x_fix == 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, G_SCORE_FAIL);
    /*---(review)-------------------------*/
    rc = yjobs_dir_review (a_runas, a_mode, a_oneline, x_fix);
    DEBUG_YJOBS   yLOG_value   ("security"  , rc);
@@ -66,8 +42,8 @@ yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND])
       return rce;
    }
    /*---(score)--------------------------*/
-   if (x_fix != 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, 'a');
-   else               rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, 'f');
+   rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, 'a');
+   if (x_fix == 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, 'f');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -146,7 +122,7 @@ yjobs__maint_stats      (char a_mode, void *f_callback)
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_schar   (a_mode);
       DEBUG_YJOBS   yLOG_schar   (ACT_STATS);
-      DEBUG_YJOBS   yLOG_note    ("statistics not requested");
+      DEBUG_YJOBS   yLOG_snote   ("statistics not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
@@ -160,6 +136,7 @@ yjobs__maint_stats      (char a_mode, void *f_callback)
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
       yjobs_ends_failure (a_mode, "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_note    ("FATAL, host program callback function is NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -170,12 +147,158 @@ yjobs__maint_stats      (char a_mode, void *f_callback)
    DEBUG_YJOBS   yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
       yjobs_ends_failure (a_mode, "database could not produce statistics");
+      DEBUG_YJOBS   yLOG_note    ("FATAL, database could not produce statistics");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(score)--------------------------*/
    rc = yjobs_ends_score (G_SCORE_DATABASE,  2, '#');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
+}
+
+/*> char                                                                                                        <* 
+ *> yjobs__maint_files      (char a_mode, char a_cdir [LEN_DESC], char a_world [LEN_LABEL], void *f_callback)   <* 
+ *> {                                                                                                           <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                 <* 
+ *>    char        rce         =  -10;                                                                          <* 
+ *>    int         rc          =    0;                                                                          <* 
+ *>    /+---(quick-out)----------------------+/                                                                 <* 
+ *>    if (a_mode == 0 || strchr (g_act_pul, a_mode) == NULL) {                                                 <* 
+ *>       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);                                                            <* 
+ *>       DEBUG_YJOBS   yLOG_schar   (a_mode);                                                                  <* 
+ *>       DEBUG_YJOBS   yLOG_snote   (g_act_pul);                                                               <* 
+ *>       DEBUG_YJOBS   yLOG_snote   ("list not requested");                                                    <* 
+ *>       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                                            <* 
+ *>       return 0;                                                                                             <* 
+ *>    }                                                                                                        <* 
+ *>    /+---(header)-------------------------+/                                                                 <* 
+ *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                                               <* 
+ *>    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);                                                       <* 
+ *>    /+---(config)-------------------------+/                                                                 <* 
+ *>    --rce;  if (strchr ("=", a_mode) != NULL)  {                                                             <* 
+ *>       if (strcmp  (a_world, "") != 0) {                                                                     <* 
+ *>          g_acts_score  [G_SCORE_WORLD   + 2] = G_SCORE_FAIL;                                                <* 
+ *>          rc = yjobs_world_list (a_runas);                                                                   <* 
+ *>          if (rc < 0) {                                                                                      <* 
+ *>             yjobs_ends_failure (a_mode, "world list did not run");                                          <* 
+ *>             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                 <* 
+ *>             return rce;                                                                                     <* 
+ *>          }                                                                                                  <* 
+ *>          g_acts_score  [G_SCORE_WORLD   + 2] = '=';                                                         <* 
+ *>       } else if (strstr  (a_cdir, "/spool/") != NULL) {                                                     <* 
+ *>          /+ run list of central files +/                                                                    <* 
+ *>          g_acts_score  [G_SCORE_CENTRAL + 5] = G_SCORE_FAIL;                                                <* 
+ *>          DEBUG_YJOBS   yLOG_value   ("list"      , rc);                                                     <* 
+ *>          if (rc < 0) {                                                                                      <* 
+ *>             yjobs_ends_failure (a_mode, "central list did not run");                                        <* 
+ *>             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                 <* 
+ *>             return rce;                                                                                     <* 
+ *>          }                                                                                                  <* 
+ *>          g_acts_score  [G_SCORE_CENTRAL + 5] = '=';                                                         <* 
+ *>       } else {                                                                                              <* 
+ *>          g_acts_score  [G_SCORE_CENTRAL + 5] = G_SCORE_FAIL;                                                <* 
+ *>          yjobs_ends_failure (a_mode, "program neither file-based or spool based");                          <* 
+ *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
+ *>          return rce;                                                                                        <* 
+ *>       }                                                                                                     <* 
+ *>    }                                                                                                        <* 
+ *>    /+---(complete)-----------------------+/                                                                 <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                               <* 
+ *>    return 1;                                                                                                <* 
+ *> }                                                                                                           <*/
+
+char
+yjobs__maint_config     (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_world [LEN_LABEL], void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char        x_fix       =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(defense)-------------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_cdir"    , a_cdir);
+   --rce;  if (a_cdir       == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_cdir"    , a_cdir);
+   /*---(title)---------------------------------*/
+   yURG_msg ('>', "configuration directory setup/security review...");
+   /*---(no configuration)----------------------*/
+   if (strcmp (a_cdir, "") == 0) {
+      yURG_msg ('-', "skipping, no configuration directory specified for application");
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(set fix)-------------------------------*/
+   if (strchr (g_fix, a_mode) != NULL)  x_fix = 'y';
+   DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
+   /*---(check directory)-----------------------*/
+   rc = yjobs_dir_single (0, a_cdir, x_fix);
+   DEBUG_YJOBS   yLOG_value   ("single"    , rc);
+   if (rc <  0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   yURG_msg ('-', "success, configuration directory basic security measures confirmed");
+   /*---(check files)---------------------------*/
+   rc = yjobs_share_review (__FUNCTION__, 'm', a_runas, a_mode, f_callback);
+   DEBUG_YJOBS   yLOG_value   ("files"     , rc);
+   if (rc <  0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 1;
+}
+
+char
+yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL], void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char        x_fix       =  '-';
+   char        x_hdir      [LEN_DESC]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(title)---------------------------------*/
+   yURG_msg ('>', "central data directory setup/security review...");
+   /*---(get location data)--------------*/
+   rc = yjobs_who_location (a_runas, NULL, x_hdir, NULL, NULL, NULL);
+   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   if (strcmp (x_hdir, "") == 0) {
+      yURG_msg ('-', "skipping, no central data directory specified for application");
+      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(set fix)-------------------------------*/
+   if (strchr (g_fix, a_mode) != NULL)  x_fix = 'y';
+   DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
+   /*---(check directory)-----------------------*/
+   rc = yjobs_dir_single (0, x_hdir, x_fix);
+   DEBUG_YJOBS   yLOG_value   ("single"    , rc);
+   if (rc <  0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   yURG_msg ('-', "success, central data directory basic security measures confirmed");
+   /*---(check files)---------------------------*/
+   /*> rc = yjobs_share_review (__FUNCTION__, 'm', a_runas, a_mode, f_callback);      <* 
+    *> DEBUG_YJOBS   yLOG_value   ("files"     , rc);                                 <* 
+    *> if (rc <  0) {                                                                 <* 
+    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 1;
@@ -208,14 +331,26 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(check security)-----------------*/
-   rc = yjobs__maint_secure   (a_mode, x_db, f_callback);
+   /*---(check/load config)--------------*/
+   rc = yjobs__maint_config   (a_runas, a_mode, x_cdir, x_world, f_callback);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check/load data)----------------*/
+   rc = yjobs__maint_central  (a_runas, a_mode, "", x_world, f_callback);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(read database)------------------*/
    rc = yjobs_share_readdb   ("yjobs__maint_readdb", 'm', a_mode, x_db, f_callback);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(generate statistics)------------*/
+   rc = yjobs__maint_stats    (a_mode, f_callback);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -325,18 +460,18 @@ yjobs_maint_full_OLD    (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       }
    }
    /*---(database statistics)------------*/
-   --rce;  if (strchr ("#", a_mode) != NULL) {
-      g_acts_score  [G_SCORE_DATABASE + 2] = G_SCORE_FAIL;
-      DEBUG_YJOBS   yLOG_note    ("request to produce database/central file statistics");
-      rc = x_callback (YJOBS_STATS   , "");
-      DEBUG_YJOBS   yLOG_value   ("stats"     , rc);
-      if (rc < 0) {
-         yjobs_ends_failure (a_mode, "database could not produce statistics");
-         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-      }
-      g_acts_score  [G_SCORE_DATABASE + 2] = '#';
-   }
+   /*> --rce;  if (strchr ("#", a_mode) != NULL) {                                              <* 
+    *>    g_acts_score  [G_SCORE_DATABASE + 2] = G_SCORE_FAIL;                                  <* 
+    *>    DEBUG_YJOBS   yLOG_note    ("request to produce database/central file statistics");   <* 
+    *>    rc = x_callback (YJOBS_STATS   , "");                                                 <* 
+    *>    DEBUG_YJOBS   yLOG_value   ("stats"     , rc);                                        <* 
+    *>    if (rc < 0) {                                                                         <* 
+    *>       yjobs_ends_failure (a_mode, "database could not produce statistics");              <* 
+    *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                    <* 
+    *>       return rce;                                                                        <* 
+    *>    }                                                                                     <* 
+    *>    g_acts_score  [G_SCORE_DATABASE + 2] = '#';                                           <* 
+    *> }                                                                                        <*/
    /*---(list)---------------------------*/
    --rce;  if (strchr ("=", a_mode) != NULL)  {
       if (strcmp  (x_world, "") != 0) {

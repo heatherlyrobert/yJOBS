@@ -39,14 +39,14 @@ yjobs__out_remove       (char a_mode, char a_db [LEN_LABEL], void *f_callback)
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_rdb);
-      DEBUG_YJOBS   yLOG_note    ("data content removal not requested");
+      DEBUG_YJOBS   yLOG_snote   ("data content removal not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
    /*---(no-database)--------------------*/
    if (a_db == NULL || strcmp (a_db, "") == 0) {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
-      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");
       yjobs_ends_score (G_SCORE_CENTRAL ,  4, G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
@@ -92,7 +92,7 @@ yjobs__out_withdraw     (char a_runas, char a_mode, char a_file [LEN_PATH], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_wit);
-      DEBUG_YJOBS   yLOG_note    ("withdraw not requested");
+      DEBUG_YJOBS   yLOG_snote   ("withdraw not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }

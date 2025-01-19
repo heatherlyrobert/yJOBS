@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2b"
-#define     P_VERTXT    "fixed double backslash issue in central directory functions"
+#define     P_VERNUM    "1.2d"
+#define     P_VERTXT    "more tiny updates after EOS string-testing on yjobs incomming"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -240,6 +240,7 @@ extern char   g_act_reg     [LEN_HUND];    /* register in world file      */
 
 extern char   g_act_sec     [LEN_HUND];    /* audit directory security    */
 extern char   g_act_aud     [LEN_HUND];    /* audit file security         */
+extern char   g_act_pul     [LEN_HUND];    /* read-in central files       */
 extern char   g_act_rpt     [LEN_HUND];    /* central reporting           */
 extern char   g_act_run     [LEN_HUND];    /* run mode                    */
 extern char   g_act_chk     [LEN_HUND];    /* check a single central file */
@@ -291,6 +292,7 @@ extern char    g_fullacts      [LEN_DESC];
 #define     YJOBS_RC_REPORT    8
 #define     YJOBS_RC_EXTRACT   9
 #define     YJOBS_RC_PURGE    10
+#define     YJOBS_RC_REGISTER 11
 
 
 
@@ -305,7 +307,7 @@ extern      char    unit_answer     [LEN_RECD];
 char*       yJOBS_version           (void);
 /*---(who-table)------------*/
 char        yjobs_who_init          (void);
-char        yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char *a_lpre, char *a_cpre, char *a_lsuf, char *a_cname);
+char        yjobs_who_naming        (cchar a_runas, char *a_local, char *a_central, char a_lpre [LEN_LABEL], char a_cpre [LEN_LABEL], char a_lsuf [LEN_LABEL], char a_cname [LEN_LABEL]);
 char        yjobs__who_base         (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL]);
 char        yjobs_who_location      (cchar a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char *r_update, char r_db [LEN_LABEL]);
 char        yjobs_who_by_index      (char n, char *a_cdir, char *a_hdir, char *a_world, char *a_db);
@@ -492,17 +494,20 @@ char        yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN
 /*---(main)-----------------*/
 char        yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback);
 char        yjobs_in                (void);
-/*---(unittest)-------------*/
-char        yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH]);
 /*---(done)-----------------*/
 
 
 
 /*===[[ yJOBS_maint.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+/*---(partial)--------------*/
 char        yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND]);
 char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
 char        yjobs__maint_stats      (char a_mode, void *f_callback);
+/*---(main)-----------------*/
+char        yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback);
+char        yjobs_maint             (void);
+/*---(done)-----------------*/
 
 
 

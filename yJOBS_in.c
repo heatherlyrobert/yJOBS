@@ -40,14 +40,14 @@ static void      o___SUBS__________o (void) {;};
  *>       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);                                   <* 
  *>       DEBUG_YJOBS   yLOG_sint    (a_mode);                                         <* 
  *>       DEBUG_YJOBS   yLOG_snote   (X_INSTALL);                                      <* 
- *>       DEBUG_YJOBS   yLOG_note    ("database read not required");                   <* 
+ *>       DEBUG_YJOBS   yLOG_snote   ("database read not required");                   <* 
  *>       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                   <* 
  *>       return 0;                                                                    <* 
  *>    }                                                                               <* 
  *>    /+---(no-database)--------------------+/                                        <* 
  *>    if (a_db == NULL || strcmp (a_db, "") == 0) {                                   <* 
  *>       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);                                   <* 
- *>       DEBUG_YJOBS   yLOG_note    ("host program does not use central database");   <* 
+ *>       DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");   <* 
  *>       yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_SKIP);                       <* 
  *>       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                   <* 
  *>       return 0;                                                                    <* 
@@ -339,7 +339,7 @@ yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH])
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (X_REPORT);
-      DEBUG_YJOBS   yLOG_note    ("local report not requested");
+      DEBUG_YJOBS   yLOG_snote   ("local report not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
@@ -390,14 +390,14 @@ yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (X_INSTALL);
-      DEBUG_YJOBS   yLOG_note    ("local to central copy not required");
+      DEBUG_YJOBS   yLOG_snote   ("local to central copy not required");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
    /*---(uses database)------------------*/
    if (a_db != NULL && strcmp (a_db, "") != 0) {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
-      DEBUG_YJOBS   yLOG_note    ("host program uses central database, not files");
+      DEBUG_YJOBS   yLOG_snote   ("host program uses central database, not files");
       yjobs_ends_score (G_SCORE_CENTRAL ,  0, G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
@@ -474,14 +474,14 @@ yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char
  *>       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);                                   <* 
  *>       DEBUG_YJOBS   yLOG_sint    (a_mode);                                         <* 
  *>       DEBUG_YJOBS   yLOG_snote   (X_INSTALL);                                      <* 
- *>       DEBUG_YJOBS   yLOG_note    ("database write not required");                  <* 
+ *>       DEBUG_YJOBS   yLOG_snote   ("database write not required");                  <* 
  *>       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                   <* 
  *>       return 0;                                                                    <* 
  *>    }                                                                               <* 
  *>    /+---(no-database)--------------------+/                                        <* 
  *>    if (a_db == NULL || strcmp (a_db, "") == 0) {                                   <* 
  *>       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);                                   <* 
- *>       DEBUG_YJOBS   yLOG_note    ("host program does not use central database");   <* 
+ *>       DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");   <* 
  *>       yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_SKIP);                       <* 
  *>       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                   <* 
  *>       return 0;                                                                    <* 
@@ -528,7 +528,7 @@ yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_sint    (a_mode);
       DEBUG_YJOBS   yLOG_snote   (g_act_reg);
-      DEBUG_YJOBS   yLOG_note    ("register not requested");
+      DEBUG_YJOBS   yLOG_snote   ("register not requested");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
@@ -662,6 +662,8 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc_warn;
 }
+
+char yjobs_in                (void) { return yjobs_in_full   (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }
 
 /*> char                                                                                                                           <* 
  *> yjobs_incomming_full    (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND], cchar a_file [LEN_PATH], void *f_callback)   <* 
@@ -843,7 +845,6 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
                                                                                                                *>    return 0;                                                                                                                   <* 
                                                                                                                *> }                                                                                                                              <*/
 
-                                                                                                               char yjobs_in                (void) { return yjobs_in_full   (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }
 
 
 
@@ -852,30 +853,3 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
                                                                                                                /*====================------------------------------------====================*/
                                                                                                                static void      o___UNITTEST______o (void) {;};
 
-char
-yjobs_in_fake_callback  (char a_req, char a_full [LEN_PATH])
-{
-   switch (a_req) {
-   case YJOBS_READ   :
-      return 1;
-      break;
-   case YJOBS_PULL   :
-      if (a_full == NULL)  return -1;
-      return 2;
-      break;
-   case YJOBS_WRITE  :
-      return 3;
-      break;
-   case ACT_REGISTER :
-      return 4;
-      break;
-   case YJOBS_LOCALRPT :
-      if (a_full == NULL)  return -1;
-      return 5;
-      break;
-   default           :
-      return -1;
-      break;
-   }
-   return 0;
-}
