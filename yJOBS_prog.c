@@ -156,7 +156,8 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
          x_done = 'y';
          break;
       case CASE_ONLY       :
-         rc = yjobs_maintain  ();
+         rc = yjobs_maint     ();
+         /*> rc = yjobs_maintain  ();                                                 <*/
          x_done = 'y';
          break;
       default              :

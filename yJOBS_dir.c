@@ -80,7 +80,7 @@ yjobs__dir_fix          (char a_dir [LEN_PATH], char a_issue, int a_perms, tSTAT
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return rc;
+   return RC_REPAIR;
 }
 
 char
@@ -89,6 +89,7 @@ yjobs__dir_check         (char a_level, char a_dir [LEN_PATH], int a_perms, char
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
+   char        rc_final    =    1;
    tSTAT       s;
    int         x_perms     =    0;
    /*---(header)-------------------------*/
@@ -108,6 +109,7 @@ yjobs__dir_check         (char a_level, char a_dir [LEN_PATH], int a_perms, char
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
+      rc_final = RC_REPAIR;
    }
    --rce;  if (S_ISLNK (s.st_mode))  {
       yURG_err ('f', "å%sæ actually refers to a symbolic link (security risk)", a_dir);
@@ -137,6 +139,7 @@ yjobs__dir_check         (char a_level, char a_dir [LEN_PATH], int a_perms, char
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
+      rc_final = RC_REPAIR;
    }
    DEBUG_YJOBS  yLOG_note    ("ownership is root (private)");
    --rce;  if (s.st_gid != 0) {
@@ -147,6 +150,7 @@ yjobs__dir_check         (char a_level, char a_dir [LEN_PATH], int a_perms, char
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
+      rc_final = RC_REPAIR;
    }
    yURG_msg ('-', "å%sæ directory owner and group are both root", a_dir);
    DEBUG_YJOBS  yLOG_note    ("owner and group are both root (private)");
@@ -163,12 +167,13 @@ yjobs__dir_check         (char a_level, char a_dir [LEN_PATH], int a_perms, char
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
+      rc_final = RC_REPAIR;
    }
    yURG_msg ('-', "å%sæ directory permissions confirmed as %04o", a_dir, a_perms);
    DEBUG_YJOBS  yLOG_note    ("permissions are appropiate (private)");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return rc_final;
 }
 
 char
@@ -236,7 +241,7 @@ yjobs_dir_single        (char a_level, char a_dir [LEN_PATH], char a_fix)
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return rc;
 }
 
 char
@@ -297,4 +302,75 @@ yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], ch
 
 char yJOBS_security      (void) { return yjobs_dir_review (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, '-'); }
 char yJOBS_fix           (void) { return yjobs_dir_review (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, 'y'); }
+
+
+char
+yjobs_dir_list          (char a_path [LEN_PATH], char r_list [LEN_MASS])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   int         rc_final    =    0;
+   DIR        *x_dir       = NULL;
+   tDIRENT    *x_file      = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_list != NULL)  strcpy (r_list, "");
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_path"    , a_path);
+   --rce;  if (a_path == NULL || a_path [0] == '\0') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_path"    , a_path);
+   DEBUG_YJOBS   yLOG_point   ("r_list"    , r_list);
+   --rce;  if (r_list  == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("r_list"    , r_list);
+   /*---(prepare)------------------------*/
+   ystrlcpy (r_list, ","           , LEN_MASS);
+   /*---(open dir)-----------------------*/
+   x_dir = opendir (a_path);
+   DEBUG_YJOBS   yLOG_point   ("x_dir"     , x_dir);
+   --rce;  if (x_dir == NULL) {
+      yURG_err ('f', "could not open directory");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   yURG_msg ('-', "successfully openned directory");
+   /*---(walk files)---------------------*/
+   DEBUG_YJOBS   yLOG_note    ("walk through directory files");
+   x_file = readdir (x_dir);
+   DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
+   while (x_file != NULL) {
+      /*---(concatenate)-----------------*/
+      DEBUG_YJOBS   yLOG_info    ("d_name"    , x_file->d_name);
+      ystrlcat (r_list, x_file->d_name, LEN_MASS);
+      ystrlcat (r_list, ","           , LEN_MASS);
+      /*---(next)------------------------*/
+      x_file = readdir (x_dir);
+      DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
+      /*---(done)------------------------*/
+   }
+   /*---(close)--------------------------*/
+   rc = closedir (x_dir);
+   DEBUG_YJOBS   yLOG_point   ("close"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(sort)---------------------------*/
+   rc = ySORT_string (r_list);
+   DEBUG_YJOBS   yLOG_point   ("sort"      , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
 

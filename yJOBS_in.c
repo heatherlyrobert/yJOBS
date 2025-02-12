@@ -318,7 +318,7 @@ yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   if (rc_flag == 1)  rc_flag = 2;
+   DEBUG_YJOBS   yLOG_value   ("rc_flag"   , rc_flag);
    /*---(score)--------------------------*/
    rc = yjobs_ends_score (G_SCORE_LOCAL,  1, 'Ö');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
@@ -584,6 +584,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
+   char        rc_final    =    1;
    char        rc_warn     =    0;
    char        x_world     [LEN_LABEL] = "";
    char        x_db        [LEN_LABEL] = "";
@@ -593,12 +594,15 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_share_prepare ("yjobs__in_prepare", 'i', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, x_world, x_db, x_full);
+   rc = yjobs_share_prepare ("yjobs__in_prepare", 'i', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, x_world, x_db, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(read database)------------------*/
    rc = yjobs_share_readdb   ("yjobs__in_readdb", 'i', a_mode, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("readdb"    , rc);
@@ -606,6 +610,9 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(verify local)-------------------*/
    rc = yjobs__in_verify   (a_runas, a_mode, a_file, x_fuser, x_fdir, x_full);
    DEBUG_YJOBS   yLOG_value   ("verify"    , rc);
@@ -613,6 +620,9 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(pull local)---------------------*/
    rc = yjobs__in_pull     (a_mode, f_callback, x_full);
    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
@@ -620,7 +630,9 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   if (rc == 2)  rc_warn = 1;
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(write report)-------------------*/
    rc = yjobs__in_report   (a_mode, f_callback, x_full);
    DEBUG_YJOBS   yLOG_value   ("report"    , rc);
@@ -628,6 +640,9 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(local to central)---------------*/
    rc = yjobs__in_intake   (a_runas, a_mode, a_file, x_db, x_fuser);
    DEBUG_YJOBS   yLOG_value   ("intake"    , rc);
@@ -636,12 +651,18 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       return rce;
    }
    /*---(pull local)---------------------*/
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    rc = yjobs_share_writedb  ("yjobs__in_writedb", 'i', a_mode, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("writedb"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(register)-----------------------*/
    rc = yjobs__in_register (a_runas, a_mode, a_file, x_world, NULL);
    DEBUG_YJOBS   yLOG_value   ("register"  , rc);
@@ -649,18 +670,27 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   if      (rc > rc_final)  rc_final = rc;
+   else if (rc < 0)         rc_final = RC_FATAL;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(footer)-------------------------*/
-   if (rc_warn == 0)  rc = yjobs_ends_success (a_mode);
-   else               rc = yjobs_ends_warning (a_mode);
-   DEBUG_YJOBS   yLOG_value   ("footer"    , rc);
+   switch (rc_final) {
+   case RC_ACK      :
+   case RC_POSITIVE :  rc = yjobs_ends_success  (a_mode);                    rc = RC_POSITIVE;  break;
+   case RC_OVERRIDE :  rc = yjobs_ends_approved (a_mode);                    rc = RC_OVERRIDE;  break;
+   case RC_REPAIR   :  rc = yjobs_ends_repaired (a_mode);                    rc = RC_REPAIR;    break;
+   case RC_WARNING  :  rc = yjobs_ends_warning  (a_mode);                    rc = RC_WARNING;   break;
+   case RC_FATAL    :  rc = yjobs_ends_failure  (a_mode, "serious errors");  rc = RC_FATAL;     break;
+   default          :  rc = yjobs_ends_failure  (a_mode, "serious errors");  rc = rce;          break;
+   }
+   DEBUG_YJOBS   yLOG_value   ("rc"        , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YJOBS   yLOG_value   ("rc_warn"   , rc_warn);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return rc_warn;
+   return rc;
 }
 
 char yjobs_in                (void) { return yjobs_in_full   (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }

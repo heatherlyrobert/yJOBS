@@ -5,7 +5,7 @@
 
 
 char
-yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH])
+yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -14,6 +14,7 @@ yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    /*---(default)------------------------*/
    strcpy (g_acts_score, g_acts_empty);
    if (r_cdir  != NULL)  strcpy (r_cdir , "");
+   if (r_hdir  != NULL)  strcpy (r_hdir , "");
    if (r_world != NULL)  strcpy (r_world, "");
    if (r_db    != NULL)  strcpy (r_db   , "");
    if (r_full  != NULL)  strcpy (r_full , "");
@@ -79,7 +80,7 @@ yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, cha
       return rce;
    }
    /*---(show header)--------------------*/
-   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, r_cdir, NULL, r_world, r_db, NULL, r_full);
+   rc = yjobs_ends_header (a_runas, a_mode, a_oneline, a_file, r_cdir, r_hdir, r_world, r_db, NULL, r_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
@@ -266,7 +267,7 @@ yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    }
    DEBUG_YJOBS   yLOG_info    ("a_config"  , a_config);
    DEBUG_YJOBS   yLOG_point   ("a_cname"   , a_cname);
-   --rce;  if (a_cname  == NULL || a_config [0] == '\0') {
+   --rce;  if (a_cname  == NULL || a_cname [0] == '\0') {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -294,19 +295,36 @@ yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       if (!yJOBS_ifverbose ()) yURG_msg_live ();
       yURG_msg (':', "%s", x_full);
       if (!yJOBS_ifverbose ()) yURG_msg_mute ();
-      rc_final = 1;
+      rc_final = RC_POSITIVE;
       break;
    case CASE_FIX   :
       break;
    default         :
       rc = x_callback (YJOBS_PULL , x_full);
       DEBUG_YJOBS   yLOG_value   ("pull"      , rc);
-      if (rc == 0)  rc_final = 1;
-      rc = x_callback (YJOBS_PURGE, x_full);
-      DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
-      break;
+      switch (rc) {
+      case RC_ACK      :
+      case RC_POSITIVE :
+      case RC_OVERRIDE :
+      case RC_REPAIR   :
+      case RC_WARNING  :
+         rc_final = rc;
+         break;
+      default :
+         rc_final = RC_FATAL;
+      }
    }
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
+   /*---(clear data)---------------------*/
+   if        (strstr (a_config, "/etc/") != NULL) {
+      DEBUG_YJOBS   yLOG_note    ("retain data from /etc/ config file");
+   } else if (a_mode != 0 && strchr (g_act_kep, a_mode) != NULL) {
+      DEBUG_YJOBS   yLOG_note    ("retain data from all file pulls");
+   } else {
+      DEBUG_YJOBS   yLOG_note    ("purge each file pulled");
+      rc = x_callback (YJOBS_PURGE, x_full);
+      DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
+   }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc_final;
@@ -318,12 +336,143 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
-   DIR        *x_dir       = NULL;
-   tDIRENT    *x_file      = NULL;
+   char       *p           = NULL;
+   char       *q           = ",";  
+   char       *r           = NULL;
+   int         rc_final    =    0;
    char        x_prefix    [LEN_USER]  = "";
+   int         x_all       =    0;
    int         x_total     =    0;
    int         x_count     =    0;
    int         x_pass      =    0;
+   int         x_warns     =    0;
+   int         x_error     =    0;
+   char        x_list      [LEN_MASS]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_config"  , a_config);
+   --rce;  if (a_config == NULL || a_config [0] == '\0') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_config"  , a_config);
+   DEBUG_YJOBS   yLOG_point   ("a_cname"   , a_cname);
+   --rce;  if (a_cname  == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_cname"   , a_cname);
+   DEBUG_YJOBS   yLOG_point   ("a_user"    , a_user);
+   --rce;  if (a_user   == NULL || a_user [0] == '\0') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_user"    , a_user);
+   /*---(quick-out)----------------------*/
+   --rce;  if (a_cname [0] != '\0') {
+      DEBUG_YJOBS   yLOG_note    ("configuation file specified, use single");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(gather)-------------------------*/
+   rc = yjobs_dir_list (a_config, x_list);
+   DEBUG_YJOBS   yLOG_point   ("list"      , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(prepare)------------------------*/
+   sprintf (x_prefix, "%s.", a_user);
+   DEBUG_YJOBS   yLOG_info    ("x_prefix"  , x_prefix);
+   if (strcmp ("root", a_user) == 0) {
+      yURG_msg ('-', "file filtering will see everything (root)");
+   } else {
+      yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);
+   }
+   /*---(walk files)---------------------*/
+   DEBUG_YJOBS   yLOG_note    ("walk through directory files");
+   p = strtok_r (x_list, q, &r);
+   DEBUG_YJOBS   yLOG_point   ("p"         , p);
+   while (p != NULL) {
+      /*---(header)-----------------------------*/
+      DEBUG_YJOBS   yLOG_info    ("file"      , p);
+      /*---(ignore-standards)-------------------*/
+      if (p [0] == '.') {
+         switch (p [1]) {
+         case '.'  : case '\0' :
+            p = strtok_r (NULL, q, &r);
+            DEBUG_YJOBS   yLOG_point   ("p"         , p);
+            continue;
+            break;
+         }
+      }
+      ++x_all;
+      /*---(simple filtering)-------------------*/
+      rc = yjobs__share_filter (p, x_prefix, a_uid);
+      DEBUG_YJOBS   yLOG_value   ("filter"    , rc);
+      if (rc != 0)  ++x_total;
+      if (rc <= 0) {
+         DEBUG_YJOBS   yLOG_note    ("not a valid job/khronos file");
+         p = strtok_r (NULL, q, &r);
+         DEBUG_YJOBS   yLOG_point   ("p"         , p);
+         continue;
+      }
+      rc = yjobs__share_single   (a_runas, a_mode, a_config, p, a_user, a_uid, f_callback);
+      DEBUG_YJOBS   yLOG_value   ("single"    , rc);
+      if (rc < 0) rc = RC_FATAL;
+      switch (rc) {
+      case RC_ACK      :
+      case RC_POSITIVE :
+      case RC_OVERRIDE :
+      case RC_REPAIR   : ++x_pass;   break;
+      case RC_WARNING  : ++x_warns;  break;
+      case RC_FATAL    : ++x_error;  break;
+      }
+      ++x_count;
+      DEBUG_YJOBS   yLOG_complex ("counts"    , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
+      /*---(next)------------------------*/
+      p = strtok_r (NULL, q, &r);
+      DEBUG_YJOBS   yLOG_point   ("p"         , p);
+      /*---(done)------------------------*/
+   }
+   /*---(summary)------------------------*/
+   yURG_msg ('>', "summary of central file review...");
+   DEBUG_YJOBS   yLOG_complex ("FINAL"     , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
+   if      (x_all   == 0)  { yURG_msg ('-', "empty, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);           ; rc_final = RC_POSITIVE; }
+   else if (x_count == 0)  { yURG_msg ('-', "nothing to see, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);  ; rc_final = RC_POSITIVE; }
+   else if (x_error >  0)  { yURG_msg ('-', "ERRORS, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);          ; rc_final = RC_FATAL;    }
+   else if (x_warns >  0)  { yURG_msg ('-', "warning, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);         ; rc_final = RC_WARNING;  }
+   else                    { yURG_msg ('-', "success, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);         ; rc_final = RC_POSITIVE; }
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
+   /*---(return nunbers)-----------------*/
+   DEBUG_YJOBS   yLOG_value   ("x_count"   , x_count);
+   if (rc >= 0) {
+      if (x_count > 100) x_count = 100;
+      rc = x_count;
+   }
+   DEBUG_YJOBS   yLOG_value   ("rc"        , rc);
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return rc_final;
+}
+
+char
+yjobs__share_multi_OLD  (char a_runas, char a_mode, char a_config [LEN_DESC], char a_cname [LEN_LABEL], char a_user [LEN_USER], int a_uid, void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   int         rc_final    =    0;
+   DIR        *x_dir       = NULL;
+   tDIRENT    *x_file      = NULL;
+   char        x_prefix    [LEN_USER]  = "";
+   int         x_all       =    0;
+   int         x_total     =    0;
+   int         x_count     =    0;
+   int         x_pass      =    0;
+   int         x_warns     =    0;
+   int         x_error     =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
@@ -363,7 +512,11 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    /*---(prepare)------------------------*/
    sprintf (x_prefix, "%s.", a_user);
    DEBUG_YJOBS   yLOG_info    ("x_prefix"  , x_prefix);
-   yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);
+   if (strcmp ("root", a_user) == 0) {
+      yURG_msg ('-', "file filtering will see everything (root)");
+   } else {
+      yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);
+   }
    /*---(walk files)---------------------*/
    DEBUG_YJOBS   yLOG_note    ("walk through directory files");
    x_file = readdir (x_dir);
@@ -371,6 +524,17 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    while (x_file != NULL) {
       /*---(header)-----------------------------*/
       DEBUG_YJOBS   yLOG_info    ("d_name"    , x_file->d_name);
+      /*---(ignore-standards)-------------------*/
+      if (x_file->d_name [0] == '.') {
+         switch (x_file->d_name [1]) {
+         case '.'  : case '\0' :
+            x_file = readdir (x_dir);
+            DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
+            continue;
+            break;
+         }
+      }
+      ++x_all;
       /*---(simple filtering)-------------------*/
       rc = yjobs__share_filter (x_file->d_name, x_prefix, a_uid);
       DEBUG_YJOBS   yLOG_value   ("filter"    , rc);
@@ -383,55 +547,19 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       }
       rc = yjobs__share_single   (a_runas, a_mode, a_config, x_file->d_name, a_user, a_uid, f_callback);
       DEBUG_YJOBS   yLOG_value   ("single"    , rc);
-      /*> rc = yjobs_central_old  (a_runas, a_mode, x_file->d_name, NULL, NULL, NULL, NULL);   <* 
-       *> /+---(list)-------------------------------+/                                         <* 
-       *> rc_final = 0;                                                                        <* 
-       *> switch (a_mode) {                                                                    <* 
-       *> case ACT_LIST :                                                                      <* 
-       *>    if (!yJOBS_ifverbose ()) yURG_msg_live ();                                        <* 
-       *>    yURG_msg (':', "%s", x_file->d_name);                                             <* 
-       *>    if (!yJOBS_ifverbose ()) yURG_msg_mute ();                                        <* 
-       *>    rc_final = 1;                                                                     <* 
-       *> case CASE_FIX   :                                                                    <* 
-       *>    break;                                                                            <* 
-       *> default         :                                                                    <* 
-       *>    rc = x_callback (YJOBS_PULL , x_full);                                            <* 
-       *>    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);                                    <* 
-       *>    if (rc == 0)  rc_final = 1;                                                       <* 
-       *>    rc = x_callback (YJOBS_PURGE, x_full);                                            <* 
-       *>    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                    <* 
-       *>    break;                                                                            <* 
-       *> }                                                                                    <* 
-       *> /+---(list)-------------------------------+/                                         <* 
-       *> else {                                                                               <* 
-       *>    rc = x_callback (YJOBS_PULL , x_full);                                            <* 
-       *>    DEBUG_YJOBS   yLOG_value   ("pull"      , rc);                                    <* 
-       *>    if (rc == 0)  rc_final = 1;                                                       <* 
-       *>    rc = x_callback (YJOBS_PURGE, x_full);                                            <* 
-       *>    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                    <* 
-       *> }                                                                                    <*/
-      /*---(actions)----------------------------*/
-      /*> else switch (a_mode) {                                                                            <* 
-       *> case ACT_AUDIT     : case ACT_CAUDIT    : case ACT_VAUDIT    :                                    <* 
-       *> case ACT_NORMAL    : case ACT_CNORMAL   : case ACT_VNORMAL   :                                    <* 
-       *> case ACT_DAEMON    : case ACT_CDAEMON   : case ACT_VDAEMON   :                                    <* 
-       *> case ACT_PRICKLY   : case ACT_CPRICKLY  : case ACT_VPRICKLY  :                                    <* 
-       *>    yURG_msg (' ', "");                                                                            <* 
-       *>    /+> rc = yJOBS_act_check   (a_runas, a_mode, a_oneline, x_file->d_name, s_assimilate);   <+/   <* 
-       *>    break;                                                                                         <* 
-       *> }                                                                                                 <*/
+      if (rc < 0) rc = 3;
+      switch (rc) {
+      case 1   : ++x_pass;   break;
+      case 3   : ++x_warns;  break;
+      case 4   : ++x_error;  break;
+      }
       ++x_count;
-      if (rc >= 0)  ++x_pass;
-      DEBUG_YJOBS   yLOG_complex ("counts"    , "%d total, %d count, %d pass", x_total, x_count, x_pass);
+      DEBUG_YJOBS   yLOG_complex ("counts"    , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
       /*---(next)------------------------*/
       x_file = readdir (x_dir);
       DEBUG_YJOBS   yLOG_point   ("x_file"    , x_file);
       /*---(done)------------------------*/
    }
-   /*---(summary)------------------------*/
-   DEBUG_YJOBS   yLOG_value   ("found"     , x_total);
-   DEBUG_YJOBS   yLOG_value   ("processed" , x_count);
-   DEBUG_YJOBS   yLOG_value   ("passed"    , x_pass);
    /*---(close)--------------------------*/
    rc = closedir (x_dir);
    DEBUG_YJOBS   yLOG_point   ("close"     , rc);
@@ -440,6 +568,15 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       return rce;
    }
    /*---(summary)------------------------*/
+   yURG_msg ('>', "summary of central file review...");
+   DEBUG_YJOBS   yLOG_complex ("FINAL"     , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
+   if      (x_all   == 0)  { yURG_msg ('-', "empty, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);           ; rc_final = 0; }
+   else if (x_count == 0)  { yURG_msg ('-', "nothing to see, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);  ; rc_final = 0; }
+   else if (x_error >  0)  { yURG_msg ('-', "ERRORS, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);          ; rc_final = 4; }
+   else if (x_warns >  0)  { yURG_msg ('-', "warning, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);         ; rc_final = 3; }
+   else                    { yURG_msg ('-', "success, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);         ; rc_final = 1; }
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
+   /*---(return nunbers)-----------------*/
    DEBUG_YJOBS   yLOG_value   ("x_count"   , x_count);
    if (rc >= 0) {
       if (x_count > 100) x_count = 100;
@@ -448,15 +585,16 @@ yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    DEBUG_YJOBS   yLOG_value   ("rc"        , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return rc;
+   return rc_final;
 }
 
 char         /*--> review central files --------------------------------------*/
-yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, void *f_callback)
+yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, void *f_callback, char a_fail)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
+   int         rc_final    =    0;
    char        x_user      [LEN_USER]  = "";
    int         x_uid       =    0;
    char        x_config    [LEN_PATH]  = "";
@@ -470,7 +608,7 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (a_func);
    /*---(header)-------------------------*/
-   yURG_msg ('>', "configuration directory file review...");
+   yURG_msg ('>', "configuration central file review...");
    /*---(running as)---------------------*/
    rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
@@ -508,96 +646,38 @@ yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, cha
    }
    /*---(handle file)---------------------------*/
    --rce;  if (strcmp (x_cname, "") != 0) {
-      yURG_msg ('-', "single file configuration set-up");
+      yURG_msg ('-', "single-file configuration set-up");
       rc = yjobs__share_single   (a_runas, a_mode, x_config, x_cname, x_user, x_uid, f_callback);
       DEBUG_YJOBS   yLOG_value   ("single"    , rc);
       if (rc < 0)  {
-         DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
-         return rce;
+         if (a_fail == 'y') {
+            DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
+            return rce;
+         }
+      } else if (rc >= 3) {
+         yURG_msg ('-', "warning, trouble with audit, see details above");
       }
-      DEBUG_YJOBS   yLOG_exit    (a_func);
-      return 1;
    }
    /*---(multiple files)------------------------*/
-   yURG_msg ('-', "multiple file configuration set-up");
-   rc = yjobs__share_multiple (a_runas, a_mode, x_config, x_cname, x_user, x_uid, f_callback);
-   DEBUG_YJOBS   yLOG_value   ("multiple"  , rc);
-   if (rc < 0)  {
-      DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
-      return rce;
+   else {
+      yURG_msg ('-', "multiple-file configuration set-up");
+      rc = yjobs__share_multiple (a_runas, a_mode, x_config, x_cname, x_user, x_uid, f_callback);
+      DEBUG_YJOBS   yLOG_value   ("multiple"  , rc);
+      if (rc < 0)  {
+         if (a_fail == 'y') {
+            DEBUG_YJOBS   yLOG_exitr   (a_func, rce);
+            return rce;
+         }
+      } else if (rc >= 3) {
+         yURG_msg ('-', "warning, trouble with audit, see details above");
+      }
    }
-   /*---(open dir)-----------------------*/
-   /*> x_dir = opendir (x_config);                                                    <* 
-    *> DEBUG_YJOBS   yLOG_point   ("x_dir"     , x_dir);                              <* 
-    *> --rce;  if (x_dir == NULL) {                                                   <* 
-    *>    yURG_err ('f', "could not open configuration directory");                   <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (a_func, rce);                             <* 
-    *>    return rce;                                                                 <* 
-    *> }                                                                              <* 
-    *> yURG_msg ('-', "successfully openned configuration directory");                <*/
-   /*---(prepare)------------------------*/
-   /*> sprintf (x_prefix, "%s.", x_user);                                             <* 
-    *> DEBUG_YJOBS   yLOG_info    ("x_prefix"  , x_prefix);                           <* 
-    *> yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);                     <*/
-   /*---(walk files)---------------------*/
-   /*> DEBUG_YJOBS   yLOG_note    ("walk through directory files");                   <*/
-   /*> while ((x_file = readdir (x_dir)) != NULL) {                                                                   <* 
-    *>    /+---(header)-----------------------------+/                                                                <* 
-    *>    DEBUG_YJOBS   yLOG_info    ("d_name"    , x_file->d_name);                                                  <* 
-    *>    /+---(simple filtering)-------------------+/                                                                <* 
-    *>    rc = yjobs_act__filter (x_file->d_name, x_prefix, x_uid);                                                   <* 
-    *>    if (rc != 0)  ++x_total;                                                                                    <* 
-    *>    if (rc <= 0) {                                                                                              <* 
-    *>       DEBUG_YJOBS   yLOG_note    ("not a valid job/khronos file");                                             <* 
-    *>       continue;                                                                                                <* 
-    *>    }                                                                                                           <* 
-    *>    /+---(list)-------------------------------+/                                                                <* 
-    *>    if (a_mode == ACT_LIST) {                                                                                   <* 
-    *>       if (!yJOBS_ifverbose ()) yURG_msg_live ();                                                               <* 
-    *>       yURG_msg (':', "%s", x_file->d_name);                                                                    <* 
-    *>       if (!yJOBS_ifverbose ()) yURG_msg_mute ();                                                               <* 
-    *>       rc = 0;                                                                                                  <* 
-    *>    }                                                                                                           <* 
-    *>    /+---(list)-------------------------------+/                                                                <* 
-    *>    else {                                                                                                      <* 
-    *>       rc = yjobs_central_old  (a_runas, a_mode, x_file->d_name, NULL, NULL, NULL, NULL);                       <* 
-    *>    }                                                                                                           <* 
-    *>    /+---(actions)----------------------------+/                                                                <* 
-    *>    /+> else switch (a_mode) {                                                                            <*    <* 
-    *>     *> case ACT_AUDIT     : case ACT_CAUDIT    : case ACT_VAUDIT    :                                    <*    <* 
-    *>     *> case ACT_NORMAL    : case ACT_CNORMAL   : case ACT_VNORMAL   :                                    <*    <* 
-    *>     *> case ACT_DAEMON    : case ACT_CDAEMON   : case ACT_VDAEMON   :                                    <*    <* 
-    *>     *> case ACT_PRICKLY   : case ACT_CPRICKLY  : case ACT_VPRICKLY  :                                    <*    <* 
-    *>     *>    yURG_msg (' ', "");                                                                            <*    <* 
-    *>     *>    /+> rc = yJOBS_act_check   (a_runas, a_mode, a_oneline, x_file->d_name, s_assimilate);   <+/   <*    <* 
-    *>     *>    break;                                                                                         <*    <* 
-    *>     *> }                                                                                                 <+/   <* 
-    *>    ++x_count;                                                                                                  <* 
-    *>    if (rc >= 0)  ++x_pass;                                                                                     <* 
-    *>    DEBUG_YJOBS   yLOG_complex ("counts"    , "%d total, %d count, %d pass", x_total, x_count, x_pass);         <* 
-    *>    /+---(done)------------------------+/                                                                       <* 
-    *> }                                                                                                              <*/
-   /*---(summary)------------------------*/
-   /*> DEBUG_YJOBS   yLOG_value   ("found"     , x_total);                            <*/
-   /*> DEBUG_YJOBS   yLOG_value   ("processed" , x_count);                            <*/
-   /*> DEBUG_YJOBS   yLOG_value   ("passed"    , x_pass);                             <*/
-   /*---(close)--------------------------*/
-   /*> rc = closedir (x_dir);                                                         <* 
-    *> DEBUG_YJOBS   yLOG_point   ("close"     , rc);                                 <* 
-    *> --rce;  if (rc < 0) {                                                          <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (a_func, rce);                             <* 
-    *>    return rce;                                                                 <* 
-    *> }                                                                              <*/
-   /*---(summary)------------------------*/
-   /*> if (rc >= 0) {                                                                 <* 
-    *>    if (x_count > 100) x_count = 100;                                           <* 
-    *>    rc = x_count;                                                               <* 
-    *> }                                                                              <*/
-   /*> DEBUG_YJOBS   yLOG_value   ("rc"        , rc);                                 <*/
-   DEBUG_YJOBS   yLOG_value   ("x_count"   , x_count);
+   /*---(wrap up)------------------------*/
+   rc_final = rc;
+   DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (a_func);
-   return x_count;
+   return rc_final;
 }
 
 /*> char         /+--> review central files --------------------------------------+/                                                                        <* 

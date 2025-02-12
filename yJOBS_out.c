@@ -156,7 +156,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_share_prepare ("yjobs__out_prepare", 'o', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, x_world, x_db, x_full);
+   rc = yjobs_share_prepare ("yjobs__out_prepare", 'o', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, x_world, x_db, x_full);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;

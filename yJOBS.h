@@ -18,6 +18,15 @@ typedef const  char      cchar;
 
 
 
+/*---(standard recturn codes)-------------------*/
+#define     RC_ACK          0
+#define     RC_POSITIVE     1
+#define     RC_OVERRIDE     2
+#define     RC_REPAIR       3
+#define     RC_WARNING      4
+#define     RC_FATAL        5
+
+
 
 /*---(run-as)-----------------------------------*/
 #define     IAM_EOS          'e'

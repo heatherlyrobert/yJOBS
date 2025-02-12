@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2d"
-#define     P_VERTXT    "more tiny updates after EOS string-testing on yjobs incomming"
+#define     P_VERNUM    "1.2e"
+#define     P_VERTXT    "unit testing done with yJOBS__maint_config and updates to function"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -244,6 +244,7 @@ extern char   g_act_pul     [LEN_HUND];    /* read-in central files       */
 extern char   g_act_rpt     [LEN_HUND];    /* central reporting           */
 extern char   g_act_run     [LEN_HUND];    /* run mode                    */
 extern char   g_act_chk     [LEN_HUND];    /* check a single central file */
+extern char   g_act_kep     [LEN_HUND];    /* retain file pull data       */
 
 extern char   g_act_wit     [LEN_HUND];    /* withdraw from world file    */
 extern char   g_act_clr     [LEN_HUND];    /* clear out of database       */
@@ -401,8 +402,10 @@ char        yjobs__ends_locations   (char a_runas, char r_cdir [LEN_DESC], char 
 char        yjobs__ends_cwd         (char a_mode, char a_file [LEN_TERSE], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
 char        yjobs_ends_header       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_TERSE], char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH]);
 /*---(footer)---------------*/
-char        yjobs_ends_warning      (char a_mode);
 char        yjobs_ends_success      (char a_mode);
+char        yjobs_ends_approved     (char a_mode);
+char        yjobs_ends_repaired     (char a_mode);
+char        yjobs_ends_warning      (char a_mode);
 /*---(failure)--------------*/
 char        yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND]);
 /*---(end)------------------*/
@@ -473,13 +476,13 @@ char        yjobs_callback          (cchar a_req, cchar *a_data);
 
 /*===[[ yJOBS_share.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
+char        yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_full [LEN_PATH]);
 char        yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback);
 char        yjobs__share_filter     (char a_name [LEN_HUND], char a_prefix [LEN_TERSE], int a_muid);
 char        yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], char a_cname [LEN_LABEL], char a_user [LEN_USER], int a_uid, void *f_callback);
 char        yjobs__share_multiple   (char a_runas, char a_mode, char a_config [LEN_DESC], char a_cname [LEN_LABEL], char a_user [LEN_USER], int a_uid, void *f_callback);
-char        yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, void *f_callback);
+char        yjobs_share_review      (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, void *f_callback, char a_fail);
 
 
 /*===[[ yJOBS_in.c ]]=========================================================*/
@@ -503,7 +506,9 @@ char        yjobs_in                (void);
 /*---(partial)--------------*/
 char        yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND]);
 char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
+char        yjobs__maint_config     (char a_runas, char a_mode, char a_cdir [LEN_DESC], void *f_callback, char c_hardfail);
 char        yjobs__maint_stats      (char a_mode, void *f_callback);
+char        yjobs__maint_report     (char a_mode, char a_file [LEN_PATH], void *f_callback);
 /*---(main)-----------------*/
 char        yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback);
 char        yjobs_maint             (void);
@@ -517,6 +522,7 @@ char        yjobs__dir_fix          (char a_dir [LEN_PATH], char a_issue, int a_
 char        yjobs__dir_check        (char a_level, char a_dir [LEN_PATH], int a_perms, char a_fix);
 char        yjobs_dir_single        (char a_level, char a_dir [LEN_PATH], char a_fix);
 char        yjobs_dir_review        (char a_runas, char a_act, char a_oneline [LEN_HUND], char a_fix);
+char        yjobs_dir_list          (char a_path [LEN_PATH], char r_list [LEN_MASS]);
 
 
 /*---(done)-----------------*/

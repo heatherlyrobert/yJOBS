@@ -226,7 +226,7 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       yURG_msg ('>', "verify the contents of a source/configuration file (pull)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       g_fullacts  [ 9] = 'Ö';
-      return YJOBS_RC_PULL;
+      return RC_POSITIVE;
       break;
    case ACT_REGISTER    :
       return YJOBS_RC_REGISTER;

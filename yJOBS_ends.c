@@ -42,8 +42,8 @@ static struct {
    {  0, G_SCORE_PREPARE   , "°h-·"    , "printing of the title lines"      },
    {  1, G_SCORE_PREPARE   , "°l·"     , "default location lookup"          },
 
-   {  7, G_SCORE_SECURE    , "°a·"     , "general security audit"           },
-   {  8, G_SCORE_SECURE    , "°f·"     , "general security update/fix"      },
+   {  7, G_SCORE_SECURE    , "°a-·"    , "general security audit"           },
+   {  8, G_SCORE_SECURE    , "°fF-·"   , "general security update/fix"      },
 
    { 14, G_SCORE_DATABASE  , "°p·"     , "purge all data in memory"         },
    { 15, G_SCORE_DATABASE  , "°Ô-·"    , "read database"                    },
@@ -59,12 +59,12 @@ static struct {
    { 33, G_SCORE_WORLD     , "°Ô-·"    , "read world file"                  },
    { 34, G_SCORE_WORLD     , "°=·"     , "register a world entry"           },
    { 35, G_SCORE_WORLD     , "°r-·"    , "withdraw a world entry"           },
-   { 36, G_SCORE_WORLD     , "°Õ-·"    , "wrote world file"                 },
+   { 36, G_SCORE_WORLD     , "°Õ-·"    , "write world file"                 },
 
    { 43, G_SCORE_CENTRAL   , "°m-·"    , "move local to central"            },
    { 44, G_SCORE_CENTRAL   , "°ce-·"   , "audit security of central"        },
-   { 45, G_SCORE_CENTRAL   , "°Ö-·"    , "pull/load central file"           },
-   { 46, G_SCORE_CENTRAL   , "°r-·"    , ""                                 },
+   { 45, G_SCORE_CENTRAL   , "°Ö-·"    , "pull/load central config"         },
+   { 46, G_SCORE_CENTRAL   , "°rR-·"   , "read all central files"           },
    { 47, G_SCORE_CENTRAL   , "°×-·"    , "clear central file"               },
    { 48, G_SCORE_CENTRAL   , "°=·"     , "list central files"               },
    { 49, G_SCORE_CENTRAL   , "°x-·"    , "remove central file"              },
@@ -414,6 +414,7 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
+   char        x_suffix    [LEN_DESC]  = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (a_func);
    /*---(default)------------------------*/
@@ -442,29 +443,32 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
       return 0;
    }
    /*---(prepare)------------------------*/
+   if (strcmp (a_prefix, "APPROVED") == 0)  strcpy (x_suffix, "; USES over-rides");
+   if (strcmp (a_prefix, "REPAIRED") == 0)  strcpy (x_suffix, "; MUST investigate");
+   if (strcmp (a_prefix, "WARNING")  == 0)  strcpy (x_suffix, "; BUT, issues outstanding");
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_live ();
    if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (' ', "");
    /*---(write actual header)------------*/
    switch (a_mode) {    /*---(incomming 5)-----------------*/
-   case CASE_VERIFY   : yURG_msg (':', "%s%s, read and verified local, but no register, update, or install requested%s" , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_LOCALRPT : yURG_msg (':', "%s%s, verified and specific report completed on local data%s"                   , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_REGISTER : yURG_msg (':', "%s%s, verified and registered local, but no update or install requested%s"      , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_UPDATE   : yURG_msg (':', "%s%s, verified and updated, but registration not requested%s"                   , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_INSTALL  : yURG_msg (':', "%s%s, full install of verification, update, and registration%s"                 , a_color, a_prefix, BOLD_OFF);  break;
+   case CASE_VERIFY   : yURG_msg (':', "%s%s, read and verified local, but no register, update, or install requested%s%s" , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_LOCALRPT : yURG_msg (':', "%s%s, verified and specific report completed on local data%s%s"                   , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_REGISTER : yURG_msg (':', "%s%s, verified and registered local, but no update or install requested%s%s"      , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_UPDATE   : yURG_msg (':', "%s%s, verified and updated, but registration not requested%s%s"                   , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_INSTALL  : yURG_msg (':', "%s%s, full install of verification, update, and registration%s%s"                 , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
                         /*---(central 6)-------------------*/
-   case CASE_CHECK    : yURG_msg (':', "%s%s, centrally installed file is runable, all lines checked%s"                 , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_AUDIT    : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s"               , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_FIX      : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s"               , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_ONLY     : yURG_msg (':', "%s%s, central execution on single file confirmed%s"                             , a_color, a_prefix, BOLD_OFF);  break;
+   case CASE_CHECK    : yURG_msg (':', "%s%s, centrally installed file is runable, all lines checked%s%s"                 , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_AUDIT    : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s%s"               , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_FIX      : yURG_msg (':', "%s%s, environment and all central files passed relevent checks%s%s"               , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_ONLY     : yURG_msg (':', "%s%s, central execution on single file confirmed%s%s"                             , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
                         /*---(epic 3)----------------------*/
                         /*---(elsewhere 2)-----------------*/
                         /*---(outgoing 4)------------------*/
-   case CASE_WITHDRAW : yURG_msg (':', "%s%s, registered local withdrawn from world, but clear/remove not requested%s"  , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_CLEAR    : yURG_msg (':', "%s%s, installed file/dir cleared from database, but withdraw not requested%s"   , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_REMOVE   : yURG_msg (':', "%s%s, installed file/dir cleared from database and withdrawn from world%s"      , a_color, a_prefix, BOLD_OFF);  break;
-   case CASE_EXTRACT  : yURG_msg (':', "%s%s, installed file/dir contents extracted to local file%s"                    , a_color, a_prefix, BOLD_OFF);  break;
+   case CASE_WITHDRAW : yURG_msg (':', "%s%s, registered local withdrawn from world, but clear/remove not requested%s%s"  , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_CLEAR    : yURG_msg (':', "%s%s, installed file/dir cleared from database, but withdraw not requested%s%s"   , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_REMOVE   : yURG_msg (':', "%s%s, installed file/dir cleared from database and withdrawn from world%s%s"      , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
+   case CASE_EXTRACT  : yURG_msg (':', "%s%s, installed file/dir contents extracted to local file%s%s"                    , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
                         /*---(execution 6)-----------------*/
-   case CASE_GATHER   : yURG_msg (':', "%s%s, world registry entries have been gathered/updated in the database%s"      , a_color, a_prefix, BOLD_OFF);  break;
+   case CASE_GATHER   : yURG_msg (':', "%s%s, world registry entries have been gathered/updated in the database%s%s"      , a_color, a_prefix, x_suffix, BOLD_OFF);  break;
    }
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
@@ -477,8 +481,10 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    return rc;
 }
 
-char yjobs_ends_success      (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "SUCCESS", BOLD_GRN); }
-char yjobs_ends_warning      (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "WARNING", BOLD_YEL); }
+char yjobs_ends_success      (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "SUCCESS" , BOLD_GRN); }
+char yjobs_ends_approved     (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "APPROVED", BOLD_BLU); }
+char yjobs_ends_repaired     (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "REPAIRED", BOLD_CYN); }
+char yjobs_ends_warning      (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "WARNING" , BOLD_YEL); }
 
 char
 yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND])

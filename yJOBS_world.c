@@ -679,6 +679,8 @@ yjobs_world_audit       (cchar a_runas)
    char        rce         =  -10;
    char        rc          =    0;
    tWORLD     *x_world     = NULL;
+   int         c           =    0;
+   int         n           =    0;
    int         x_fail      =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
@@ -700,13 +702,18 @@ yjobs_world_audit       (cchar a_runas)
    } else {
       yURG_msg ('-', "success, world file imported with no troubles");
    }
+   /*---(get count)----------------------*/
+   c = yjobs_world__count ();
+   DEBUG_YJOBS   yLOG_value   ("count"     , c);
+   yURG_msg ('-', "world file has %d entries", c);
    /*---(import)-------------------------*/
    yjobs_world__by_cursor  (YDLST_HEAD, &x_world);
    while (x_world != NULL) {
+      ++n;
       rc = yjobs_world__exist (x_world->path);
       DEBUG_YJOBS   yLOG_value   ("exist"     , rc);
       if (rc < 0) {
-         yURG_err ('f', "failed to find å%sæ", x_world->path);
+         yURG_err ('f', "failed to find %2d/%2d å%sæ", n, c, x_world->path);
          ++x_fail;
       }
       yjobs_world__by_cursor  (YDLST_NEXT, &x_world);
@@ -716,8 +723,18 @@ yjobs_world_audit       (cchar a_runas)
       yURG_err ('f', "failed to find (%d) directories in world list", x_fail);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
+   } else if (c == 0) {
+      yURG_msg ('-', "warning, world is empty of entries");
    } else {
       yURG_msg ('-', "success, verified all world entries");
+   }
+   /*---(purge)--------------------------*/
+   yURG_msg ('-', "finally, cleaned up after world audit");
+   rc = yjobs_world__purge ();
+   DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return  rce;
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
