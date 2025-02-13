@@ -1116,6 +1116,179 @@ yjobs_local             (char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir
 static void      o___CENTRAL_________________o (void) {;};
 
 char
+yjobs__file_fix         (char a_full [LEN_PATH], char a_issue, int a_perms, tSTAT *r_stat)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        t           [LEN_LABEL] = "";
+   char        x_type      =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("r_stat"    , r_stat);
+   --rce;  if (r_stat == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_point   ("a_full"    , a_full);
+   --rce;  if (a_full == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_full"    , a_full);
+   x_type = yENV_exists (a_full);
+   --rce;  if (x_type != 'r') {
+      DEBUG_YJOBS   yLOG_note    ("filesystem entry is not a file");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(prepare)------------------------*/
+   DEBUG_YJOBS   yLOG_value   ("a_perms"   , a_perms);
+   rc = yENV_perms_data ('i', NULL, &a_perms, t);
+   DEBUG_YJOBS   yLOG_value   ("perms"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("t"         , t);
+   /*---(messages)-----------------------*/
+   DEBUG_YJOBS   yLOG_char    ("a_issue"   , a_issue);
+   --rce;  switch (a_issue) {
+   case 'e' :
+      DEBUG_YJOBS   yLOG_note    ("fixfile attempting create");
+      yURG_msg ('1', "file does not exist, attempting to create");
+      break;
+   case 'o' :
+      DEBUG_YJOBS   yLOG_note    ("fixfile attempting change owner");
+      yURG_msg ('1', "owner is not årootæ, attempting to change");
+      break;
+   case 'g' :
+      DEBUG_YJOBS   yLOG_note    ("fixfile attempting change group");
+      yURG_msg ('1', "group is not årootæ, attempting to change");
+      break;
+   case 'p' :
+      DEBUG_YJOBS   yLOG_note    ("fixfile attempting change permissions");
+      yURG_msg ('1', "permissions are not å%sæ, attempting to change", t);
+      break;
+   default  :
+      DEBUG_YJOBS   yLOG_note    ("no such a_issue option allowed");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+      break;
+   }
+   /*---(handle update)------------------*/
+   rc = yENV_touch (a_full, "root", "root", t);
+   DEBUG_YJOBS   yLOG_char    ("touch"     , rc);
+   --rce;  if (rc == '-') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(reset stat)---------------------*/
+   rc = lstat (a_full, r_stat);
+   DEBUG_YJOBS   yLOG_value   ("lstat"     , rc);
+   DEBUG_YJOBS   yLOG_point   ("r_stat"    , r_stat);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return RC_REPAIR;
+}
+
+char
+yjobs_central_data      (char a_dir [LEN_PATH], char a_name [LEN_LABEL], char c_fix)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        rc_final    = RC_POSITIVE;
+   tSTAT       s;
+   char        x_full      [LEN_PATH]  = "";
+   int         x_perms     =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS  yLOG_char    ("c_fix"     , c_fix);
+   /*---(prepare)------------------------*/
+   yURG_msg ('>', "central data file check...");
+   /*---(defense)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_dir"     , a_dir);
+   --rce;  if (a_dir == NULL || a_dir [0] == '\0') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_dir"     , a_dir);
+   yURG_msg ('-', "directory name å%sæ", a_dir);
+   DEBUG_YJOBS   yLOG_point   ("a_name"    , a_name);
+   --rce;  if (a_name == NULL || a_name [0] == '\0') {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_name"    , a_name);
+   yURG_msg ('-', "file name å%sæ", a_name);
+   sprintf (x_full, "%s%s", a_dir, a_name);
+   yURG_msg ('-', "fully qualified name å%sæ", x_full);
+   /*---(name quality)-------------------*/
+   rc = yjobs__name_quality (a_name);
+   DEBUG_YJOBS   yLOG_value   ("quality"   , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check existance)----------------*/
+   rc = yjobs__stat_exists (a_dir, a_name, &s);
+   DEBUG_YJOBS  yLOG_value   ("exists"    , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(ownership)----------------------*/
+   --rce;  if (s.st_uid != 0) {
+      if (c_fix == 'y') rc = yjobs__file_fix (x_full, 'o', 0600, &s);
+      if (s.st_uid != 0) {
+         yURG_err ('f', "å%sæ is not owned by root (security risk)", a_name);
+         DEBUG_YJOBS  yLOG_note    ("/var/spool/khronos not owned by root (security risk)");
+         DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      rc_final = RC_REPAIR;
+   }
+   DEBUG_YJOBS  yLOG_note    ("ownership is root (private)");
+   --rce;  if (s.st_gid != 0) {
+      if (c_fix == 'y') rc = yjobs__file_fix (x_full, 'g', 0600, &s);
+      if (s.st_gid != 0) {
+         yURG_err ('f', "å%sæ is not in root group (security risk)", a_name);
+         DEBUG_YJOBS  yLOG_note    ("/var/spool/khronos not group of root (security risk)");
+         DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      rc_final = RC_REPAIR;
+   }
+   yURG_msg ('-', "å%sæ directory owner and group are both root", a_name);
+   DEBUG_YJOBS  yLOG_note    ("owner and group are both root (private)");
+   /*---(permissions)--------------------*/
+   x_perms = s.st_mode & 07777;
+   DEBUG_YJOBS   yLOG_complex ("x_perms"   , "%04o", x_perms);
+   --rce;  if  (x_perms != 0600)  {
+      if (c_fix == 'y') rc = yjobs__file_fix (x_full, 'p', 0600, &s);
+      x_perms = s.st_mode & 07777;
+      if  (x_perms != 0600)  {
+         yURG_err ('f', "å%sæ perms are %04o, not the requested %04o (security risk)", a_name, s.st_mode & 07777, 0600);
+         DEBUG_YJOBS   yLOG_note    ("permissions not set correctly (private to user)");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      rc_final = RC_REPAIR;
+   }
+   yURG_msg ('-', "å%sæ directory permissions confirmed as %04o", a_name, 0600);
+   DEBUG_YJOBS  yLOG_note    ("permissions are appropiate (private)");
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return rc_final;
+}
+
+char
 yjobs_central_full       (cchar a_runas, cchar *a_central, cchar *a_file, cchar *a_muser, int a_muid, char *r_fuser, int *r_fuid, char *r_fdesc)
 {
    /*---(locals)-----------+-----+-----+-*/

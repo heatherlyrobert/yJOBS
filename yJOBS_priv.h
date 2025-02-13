@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2f"
-#define     P_VERTXT    "unit testing done with yJOBS__maint_check and updates to function"
+#define     P_VERNUM    "1.2g"
+#define     P_VERTXT    "built and unit testing done with yJOBS_central_data to check and fix central data files"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -357,6 +357,7 @@ char        yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home);
 char        yjobs_local_old         (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir);
 char        yjobs_local             (char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir);
 /*---(central)--------------*/
+char        yjobs_central_data      (char a_dir [LEN_PATH], char a_name [LEN_LABEL], char c_fix);
 char        yjobs_central_full      (cchar a_runas, cchar *a_central, cchar *a_file, cchar *a_muser, int a_muid, char *r_fuser, int *r_fuid, char *r_fdesc);
 char        yjobs_central_dirs      (cchar a_runas, cchar a_mode, cchar *a_file, cchar *a_user, char *r_dir, char *r_new);
 char        yjobs_central_old       (cchar a_runas, cchar a_mode, cchar *a_file, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir);
