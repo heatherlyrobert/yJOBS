@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2e"
-#define     P_VERTXT    "unit testing done with yJOBS__maint_config and updates to function"
+#define     P_VERNUM    "1.2f"
+#define     P_VERTXT    "unit testing done with yJOBS__maint_check and updates to function"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -507,6 +507,8 @@ char        yjobs_in                (void);
 char        yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND]);
 char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
 char        yjobs__maint_config     (char a_runas, char a_mode, char a_cdir [LEN_DESC], void *f_callback, char c_hardfail);
+char        yjobs__maint_check      (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_file [LEN_LABEL], void *f_callback, char c_hardfail);
+char        yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL], char a_database [LEN_LABEL], void *f_callback, char c_hardfail);
 char        yjobs__maint_stats      (char a_mode, void *f_callback);
 char        yjobs__maint_report     (char a_mode, char a_file [LEN_PATH], void *f_callback);
 /*---(main)-----------------*/
