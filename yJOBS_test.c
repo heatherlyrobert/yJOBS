@@ -210,15 +210,17 @@ yjobs_callback          (cchar a_req, cchar *a_data)
 {
    switch (a_req) {
    case YJOBS_READ      :
-      g_fullacts  [ 4] = 'Ô';
+      yURG_msg ('>', "verify the contents of the database (read)...");
+      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
+      /*> g_fullacts  [ 4] = 'Ô';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_STATS     :
-      g_fullacts  [15] = '#';
+      /*> g_fullacts  [15] = '#';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_WRITE     :
-      g_fullacts  [ 5] = 'Õ';
+      /*> g_fullacts  [ 5] = 'Õ';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_PULL      :
@@ -232,24 +234,24 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       return RC_POSITIVE;
       break;
    case YJOBS_CLEAR     :
-      g_fullacts  [30] = '×';
+      /*> g_fullacts  [30] = '×';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_LOCALRPT  :
       if (a_data == NULL)  return -1;
-      g_fullacts  [11] = 'ò';
+      /*> g_fullacts  [11] = 'ò';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_REPORT    :
-      g_fullacts  [17] = 'ó';
+      /*> g_fullacts  [17] = 'ó';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_EXTRACT   :
-      g_fullacts  [32] = 'e';
+      /*> g_fullacts  [32] = 'e';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_PURGE     :
-      g_fullacts  [25] = 'P';
+      /*> g_fullacts  [25] = 'P';                                                     <*/
       yURG_msg ('>', "verify purging all contents (purge)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       return RC_POSITIVE;

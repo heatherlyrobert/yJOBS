@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2g"
-#define     P_VERTXT    "built and unit testing done with yJOBS_central_data to check and fix central data files"
+#define     P_VERNUM    "1.2h"
+#define     P_VERTXT    "radically improved unit testing done with yJOBS_central_data"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

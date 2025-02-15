@@ -236,6 +236,7 @@ yjobs__maint_config     (char a_runas, char a_mode, char a_cdir [LEN_DESC], void
    /*---(defense)-------------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_cdir"    , a_cdir);
    --rce;  if (a_cdir       == NULL) {
+      yjobs_ends_failure (a_mode, "configuration directory is NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -445,6 +446,7 @@ yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    char        rc_final    =    1;
    char        x_fix       =  '-';
    char        x_hdir      [LEN_DESC]  = "";
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
    /*---(quick-out)----------------------*/
    if (a_mode == 0 || strchr (g_act_aud, a_mode) == NULL) {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
@@ -458,23 +460,53 @@ yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(title)---------------------------------*/
    yURG_msg ('>', "central data directory setup/security review...");
-   /*---(get location data)--------------*/
-   rc = yjobs_who_location (a_runas, NULL, x_hdir, NULL, NULL, NULL);
-   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
-   --rce;  if (rc < 0) {
+   DEBUG_YJOBS   yLOG_char    ("c_hardfail", c_hardfail);
+   /*---(set fix)-------------------------------*/
+   if (strchr (g_fix, a_mode) != NULL)       x_fix = 'y';
+   DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
+   rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_FAIL);
+   if (x_fix == 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, G_SCORE_FAIL);
+   /*---(defense)-------------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_hdir"    , a_hdir);
+   --rce;  if (a_hdir       == NULL) {
+      yURG_err ('f', "central data directory is NULL (illegal setup)");
+      yjobs_ends_failure (a_mode, "host program configuration is illegal");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   if (strcmp (x_hdir, "") == 0) {
+   /*---(check call-back)----------------*/
+   DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
+   --rce;  if (f_callback == NULL) {
+      yURG_err ('f', "host program callback function is NULL (illegal setup)");
+      yjobs_ends_failure (a_mode, "host program configuration is illegal");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   x_callback = f_callback;
+   /*---(quick-out)----------------------*/
+   DEBUG_YJOBS   yLOG_info    ("a_hdir"    , a_hdir);
+   --rce;  if (strcmp (a_hdir, "") == 0) {
+      DEBUG_YJOBS   yLOG_point   ("a_world"   , a_world);
+      if (a_world    != NULL && a_world [0]    != '\0') {
+         yURG_err ('f', "configured for world file, but no central data directory (illegal setup)");
+         yjobs_ends_failure (a_mode, "host program configuration is illegal");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      if (a_database != NULL && a_database [0] != '\0') {
+         yURG_err ('f', "configured for database, but no central data directory (illegal setup)");
+         yjobs_ends_failure (a_mode, "host program configuration is illegal");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
       yURG_msg ('-', "skipping, no central data directory specified for application");
+      rc = yjobs_ends_score (G_SCORE_SECURE  ,  0, G_SCORE_SKIP);
+      if (x_fix == 'y')  rc = yjobs_ends_score (G_SCORE_SECURE  ,  1, G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
-   /*---(set fix)-------------------------------*/
-   if (strchr (g_fix, a_mode) != NULL)  x_fix = 'y';
-   DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
    /*---(check directory)-----------------------*/
-   rc = yjobs_dir_single (0, x_hdir, x_fix);
+   rc = yjobs_dir_single (0, a_hdir, x_fix);
    DEBUG_YJOBS   yLOG_value   ("single"    , rc);
    --rce;  if (rc <  0) {
       if (c_hardfail == 'y') {
@@ -492,11 +524,27 @@ yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       rc_final = RC_POSITIVE;
    }
    /*---(audit world file)----------------------*/
-   if (strcmp (a_world, "") == 0) {
+   DEBUG_YJOBS   yLOG_point   ("a_world"   , a_world);
+   if (a_world == NULL || strcmp (a_world, "") == 0) {
       yURG_msg ('>', "audit the central world file...");
       yURG_msg ('-', "no world file specified for this host");
+      rc = yjobs_ends_score (G_SCORE_WORLD,  0, G_SCORE_SKIP);
+      rc = yjobs_ends_score (G_SCORE_WORLD,  1, G_SCORE_SKIP);
    } else {
+      DEBUG_YJOBS   yLOG_info    ("a_world"   , a_world);
       rc = yjobs_ends_score (G_SCORE_WORLD,  0, G_SCORE_FAIL);
+      rc = yjobs_ends_score (G_SCORE_WORLD,  1, G_SCORE_FAIL);
+      /*---(check file)-------------------------*/
+      rc = yjobs_central_data (a_hdir, a_world, x_fix);
+      DEBUG_YJOBS   yLOG_value   ("data"      , rc);
+      if (rc < 0) {
+         yjobs_ends_failure (a_mode, "world file does not exist or is not properly secured");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      if (rc > rc_final)  rc_final = rc;
+      rc = yjobs_ends_score (G_SCORE_WORLD,  0, 'w');
+      /*---(check contents)---------------------*/
       rc = yjobs_world_audit (a_runas);
       DEBUG_YJOBS   yLOG_value   ("world"     , rc);
       if (rc < 0) {
@@ -505,23 +553,43 @@ yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
          return rce;
       }
       if (rc > rc_final)  rc_final = rc;
-      rc = yjobs_ends_score (G_SCORE_WORLD,  0, 'w');
+      rc = yjobs_ends_score (G_SCORE_WORLD,  1, 'Ô');
    }
    /*---(audit database)------------------------*/
+   DEBUG_YJOBS   yLOG_point   ("a_database", a_database);
    if (strcmp (a_database, "") == 0) {
       yURG_msg ('>', "audit the central database...");
       yURG_msg ('-', "no database specified for this host");
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  0, G_SCORE_SKIP);
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_SKIP);
    } else {
-      rc = yjobs_ends_score (G_SCORE_WORLD,  0, G_SCORE_FAIL);
-      rc = yjobs_world_audit (a_runas);
+      DEBUG_YJOBS   yLOG_info    ("a_database", a_database);
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  0, G_SCORE_FAIL);
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_FAIL);
+      /*---(check file)-------------------------*/
+      rc = yjobs_central_data (a_hdir, a_database, x_fix);
       DEBUG_YJOBS   yLOG_value   ("database"  , rc);
       if (rc < 0) {
-         yjobs_ends_failure (a_mode, "database content audit failed");
+         yjobs_ends_failure (a_mode, "database does not exist or is not properly secured");
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
       if (rc > rc_final)  rc_final = rc;
-      rc = yjobs_ends_score (G_SCORE_WORLD,  0, 'w');
+      /*---(check contents)---------------------*/
+      rc = x_callback (YJOBS_READ, "");
+      DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
+      --rce;  if (rc < 0) {
+         yjobs_ends_failure (a_mode, "central database could not be read");
+         DEBUG_YJOBS   yLOG_note    ("FATAL, central database could not be read");
+         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      if (rc > rc_final)  rc_final = rc;
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  1, 'Ô');
+      /*---(wrap)-------------------------------*/
+      rc = x_callback (YJOBS_PURGE, "");
+      DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
+      rc = yjobs_ends_score (G_SCORE_DATABASE,  0, 'p');
    }
    /*---(score end)----------------------*/
    if (a_mode != '=')  {

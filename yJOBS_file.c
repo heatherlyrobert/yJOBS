@@ -1122,6 +1122,8 @@ yjobs__file_fix         (char a_full [LEN_PATH], char a_issue, int a_perms, tSTA
    char        rce         =  -10;
    char        rc          =    0;
    char        t           [LEN_LABEL] = "";
+   char        x_name      [LEN_USER]  = "";
+   int         x_perms     =    0;
    char        x_type      =  '-';
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
@@ -1155,21 +1157,26 @@ yjobs__file_fix         (char a_full [LEN_PATH], char a_issue, int a_perms, tSTA
    /*---(messages)-----------------------*/
    DEBUG_YJOBS   yLOG_char    ("a_issue"   , a_issue);
    --rce;  switch (a_issue) {
-   case 'e' :
-      DEBUG_YJOBS   yLOG_note    ("fixfile attempting create");
-      yURG_msg ('1', "file does not exist, attempting to create");
-      break;
+   /*> case 'e' :                                                                     <* 
+    *>    DEBUG_YJOBS   yLOG_note    ("fixfile attempting create");                   <* 
+    *>    yURG_msg ('1', "file does not exist, attempting to create");                <* 
+    *>    break;                                                                      <*/
    case 'o' :
       DEBUG_YJOBS   yLOG_note    ("fixfile attempting change owner");
-      yURG_msg ('1', "owner is not årootæ, attempting to change");
+      rc = yENV_user_data  ('i', x_name, &(r_stat->st_uid), NULL, NULL, NULL);
+      if (strcmp (x_name, "") == 0)  strcpy (x_name, "((unknown))");
+      yURG_msg ('1', "owner is å%sæ not årootæ, attempting to change", x_name);
       break;
    case 'g' :
       DEBUG_YJOBS   yLOG_note    ("fixfile attempting change group");
-      yURG_msg ('1', "group is not årootæ, attempting to change");
+      rc = yENV_group_data ('i', x_name, &(r_stat->st_gid));
+      yURG_msg ('1', "group is å%sæ not årootæ, attempting to change", x_name);
       break;
    case 'p' :
       DEBUG_YJOBS   yLOG_note    ("fixfile attempting change permissions");
-      yURG_msg ('1', "permissions are not å%sæ, attempting to change", t);
+      x_perms = (r_stat->st_mode) & 07777;
+      rc = yENV_perms_data ('i', NULL, &x_perms, x_name);
+      yURG_msg ('1', "permissions are å%sæ not å%sæ, attempting to change", x_name, t);
       break;
    default  :
       DEBUG_YJOBS   yLOG_note    ("no such a_issue option allowed");
@@ -1265,7 +1272,7 @@ yjobs_central_data      (char a_dir [LEN_PATH], char a_name [LEN_LABEL], char c_
       }
       rc_final = RC_REPAIR;
    }
-   yURG_msg ('-', "å%sæ directory owner and group are both root", a_name);
+   yURG_msg ('-', "å%sæ file owner and group are both root", a_name);
    DEBUG_YJOBS  yLOG_note    ("owner and group are both root (private)");
    /*---(permissions)--------------------*/
    x_perms = s.st_mode & 07777;
@@ -1281,7 +1288,7 @@ yjobs_central_data      (char a_dir [LEN_PATH], char a_name [LEN_LABEL], char c_
       }
       rc_final = RC_REPAIR;
    }
-   yURG_msg ('-', "å%sæ directory permissions confirmed as %04o", a_name, 0600);
+   yURG_msg ('-', "å%sæ file permissions confirmed as %04o", a_name, 0600);
    DEBUG_YJOBS  yLOG_note    ("permissions are appropiate (private)");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
