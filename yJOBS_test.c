@@ -10,6 +10,55 @@
 static void      o___UNITTEST________________o (void) {;};
 
 char
+yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_out       [LEN_HUND]  = "";
+   char        n           =    0;
+   char        f           =  '?';
+   /*---(clear all)----------------------*/
+   yJOBS_reset (NULL, NULL, NULL);
+   yjobs_ends_clear ();
+   /*---(defense)------------------------*/
+   --rce;  if (a_runas == 0)  return rce;
+   ystrlcpy (x_out, yjobs_iam  (a_runas), LEN_HUND);
+   --rce;  if (strcmp (x_out, "unknown") == 0)  return rce;
+   --rce;  if (a_mode  == 0)  return rce;
+   ystrlcpy (x_out, yjobs_mode (a_mode ), LEN_HUND);
+   --rce;  if (strcmp (x_out, "unknown (unknown)") == 0)  return rce;
+   n = yjobs_args_offset (a_mode);
+   --rce;  if (n < 0)  return rce;
+   f = yjobs_who_action (a_runas, n);
+   --rce;  if (f == '¢')  return rce;
+   --rce;  if (f == '·')  return rce;
+   --rce;  if (f == 'F' && a_file == NULL)  return rce;
+   --rce;  if (f == 'F' && strcmp (a_file, "") == 0)  return rce;
+   /*---(set majors)---------------------*/
+   myJOBS.m_runas = a_runas;
+   myJOBS.m_mode  = a_mode;
+   myJOBS.m_flag  = f;
+   /*---(set verbosity)------------------*/
+   yURG_msg_tmp  (); 
+   yURG_msg_mute (); 
+   yURG_err_tmp  (); 
+   yURG_err_mute (); 
+   if (yJOBS_ifverbose ()) {
+      yURG_msg_live ();
+      yURG_err_live ();
+   }
+   /*---(set file)-----------------------*/
+   yjobs_who_location      (a_runas, myJOBS.m_dir, NULL, NULL, NULL, NULL);
+   if (f == 'F' && a_file != NULL) {
+      ystrlcpy (myJOBS.m_file, a_file, LEN_DESC);
+   }
+   sprintf (myJOBS.m_full, "%s%s", myJOBS.m_dir, myJOBS.m_file);
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
 yjobs__unit_rmdir_one   (char *a_dir)
 {
    /*---(locals)-----------+-----+-----+-*/

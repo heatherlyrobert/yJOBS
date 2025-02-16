@@ -291,13 +291,16 @@ yjobs__share_single     (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    /*---(handle)-------------------------*/
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    switch (a_mode) {
+   case CASE_STATS :
+   case CASE_FIX   :
+   case CASE_ONLY  :
+      rc_final = RC_POSITIVE;
+      break;
    case ACT_LIST :
       if (!yJOBS_ifverbose ()) yURG_msg_live ();
       yURG_msg (':', "%s", x_full);
       if (!yJOBS_ifverbose ()) yURG_msg_mute ();
       rc_final = RC_POSITIVE;
-      break;
-   case CASE_FIX   :
       break;
    default         :
       rc = x_callback (YJOBS_PULL , x_full);

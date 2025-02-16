@@ -494,10 +494,11 @@ yjobs_args__clearmode   (char *r_runas, char *r_mode, char *r_file)
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    /*---(defaults)-----------------------*/
+   myJOBS.m_runas = YJOBS_NEITHER;
    if (r_runas != NULL)  *r_runas   = myJOBS.m_runas;
-   myJOBS.m_mode = YJOBS_NEITHER;
+   myJOBS.m_mode  = YJOBS_NEITHER;
    if (r_mode  != NULL)  *r_mode = YJOBS_NEITHER;
-   myJOBS.m_flag = '·';
+   myJOBS.m_flag  = '·';
    ystrlcpy (myJOBS.m_file, "", LEN_PATH);
    ystrlcpy (myJOBS.m_dir , "", LEN_PATH);
    ystrlcpy (myJOBS.m_full, "", LEN_PATH);

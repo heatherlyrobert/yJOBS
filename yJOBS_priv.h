@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.2-, improve unit-testing and eos string-testing"
-#define     P_VERNUM    "1.2h"
-#define     P_VERTXT    "radically improved unit testing done with yJOBS_central_data"
+#define     P_VERNUM    "1.2i"
+#define     P_VERTXT    "completed unit testing on yJOBS_maint and sub-functions"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -116,8 +116,8 @@ struct cLOCAL {
    char      m_root        [LEN_DESC];      /* root directory start             */
    char      m_home        [LEN_DESC];      /* home directory start             */
    /*---(overall)-----------*/
-   char      m_runas;
-   char      m_mode;
+   char      m_runas;                       /* host program identify            */
+   char      m_mode;                        /* run mode selected                */
    char      m_flag;
    char      m_file        [LEN_PATH];      /* source file name                 */
    char      m_dir         [LEN_PATH];      /* source file dir                  */
@@ -326,6 +326,7 @@ char*       yjobs_base__unit        (char *a_question);
 
 /*===[[ yJOBS_test ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC]);
 char        yjobs__unit_rmdir_one   (char *a_dir);
 char        yjobs__unit_mkdir_one   (char *a_dir);
 char        yjobs__unit_quiet       (void);
@@ -505,8 +506,6 @@ char        yjobs_in                (void);
 /*===[[ yJOBS_maint.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(partial)--------------*/
-char        yjobs__maint_secure     (char a_runas, char a_mode, char a_oneline [LEN_HUND]);
-char        yjobs_maint_security    (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_fix);
 char        yjobs__maint_config     (char a_runas, char a_mode, char a_cdir [LEN_DESC], void *f_callback, char c_hardfail);
 char        yjobs__maint_check      (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_file [LEN_LABEL], void *f_callback, char c_hardfail);
 char        yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL], char a_database [LEN_LABEL], void *f_callback, char c_hardfail);
