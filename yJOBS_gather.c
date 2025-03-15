@@ -150,7 +150,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(import)-------------------------*/
    yURG_msg ('>', "import world file...");
-   rc = yjobs_world__import (a_runas);
+   /*> rc = yjobs_world__import (a_runas, a_mode);                                    <*/
    DEBUG_YJOBS   yLOG_value   ("import"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_note    ("no existing file");
@@ -218,7 +218,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
 char yjobs_world             (void) { return yjobs_world_full  (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_oneline, myJOBS.m_file, myJOBS.e_callback); }
 
 char
-yJOBS_world_system       (cchar a_runas, void *a_callback)
+yJOBS_world_system       (char a_runas, char a_mode, void *a_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -251,7 +251,7 @@ yJOBS_world_system       (cchar a_runas, void *a_callback)
       return  rce;
    }
    /*---(import)-------------------------*/
-   rc = yjobs_world__import (a_runas);
+   /*> rc = yjobs_world__import (a_runas, a_mode);                                    <*/
    DEBUG_YJOBS   yLOG_value   ("import"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_note    ("no existing file");

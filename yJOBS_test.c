@@ -259,7 +259,7 @@ yjobs_callback          (cchar a_req, cchar *a_data)
 {
    switch (a_req) {
    case YJOBS_READ      :
-      yURG_msg ('>', "verify the contents of the database (read)...");
+      yURG_msg ('>', "host-based reading of the database (read)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       /*> g_fullacts  [ 4] = 'Ô';                                                     <*/
       return RC_POSITIVE;
@@ -269,26 +269,44 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       return RC_POSITIVE;
       break;
    case YJOBS_WRITE     :
+      yURG_msg ('>', "host-based writing of the database (write)...");
+      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       /*> g_fullacts  [ 5] = 'Õ';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_PULL      :
       if (a_data == NULL)  return -1;
-      yURG_msg ('>', "verify the contents of a source/configuration file (pull)...");
+      yURG_msg ('>', "host-based verification of a source/configuration file (pull)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       g_fullacts  [ 9] = 'Ö';
       return RC_POSITIVE;
       break;
    case ACT_REGISTER    :
+      yURG_msg ('>', "testing-stub to register project in world file...");
+      yURG_msg ('-', "skipping, over-riding detail for testing purposes");
+      return RC_POSITIVE;
+      break;
+   case ACT_WITHDRAW    :
+      yURG_msg ('>', "testing-stub to withdraw project from world file...");
+      yURG_msg ('-', "skipping, over-riding detail for testing purposes");
       return RC_POSITIVE;
       break;
    case YJOBS_CLEAR     :
       /*> g_fullacts  [30] = '×';                                                     <*/
+      yURG_msg ('>', "host-based clearing of select database contents (clear)...");
+      if (strcmp (a_data, "(fail)") != 0) {
+         yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
+         return RC_POSITIVE;
+      } else {
+         yURG_err ('w', "skipping, host-based action (but, simulating non-existant data)");
+         return RC_WARNING;
+      }
       return RC_POSITIVE;
       break;
    case YJOBS_LOCALRPT  :
       if (a_data == NULL)  return -1;
-      /*> g_fullacts  [11] = 'ò';                                                     <*/
+      yURG_msg ('>', "host-based report of locally collected data (localrpt)...");
+      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       return RC_POSITIVE;
       break;
    case YJOBS_REPORT    :
@@ -301,7 +319,7 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       break;
    case YJOBS_PURGE     :
       /*> g_fullacts  [25] = 'P';                                                     <*/
-      yURG_msg ('>', "verify purging all contents (purge)...");
+      yURG_msg ('>', "host-based purging all contents (purge)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       return RC_POSITIVE;
       break;

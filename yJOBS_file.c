@@ -30,7 +30,7 @@ yjobs__name_quality     (cchar *a_name)
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("a_name"    , a_name);
-   yURG_msg ('-', "name å%sæ is not empty/null", a_name);
+   yURG_msg ('-', "requested name å%sæ is not empty/null", a_name);
    /*---(path)---------------------------*/
    l = strlen (a_name);
    DEBUG_YJOBS   yLOG_value   ("l"         , l);
@@ -49,7 +49,7 @@ yjobs__name_quality     (cchar *a_name)
       }
    }
    DEBUG_YJOBS   yLOG_note    ("file name is pathless/local");
-   yURG_msg ('-', "file name is pathless/local");
+   /*> yURG_msg ('-', "file name is pathless/local (security restriction)");          <*/
    /*---(name length)--------------------*/
    --rce;  if (l <  7) {
       yURG_err ('f', "file name can not be shorter than 7 chars (lazy)");
@@ -64,7 +64,7 @@ yjobs__name_quality     (cchar *a_name)
       return rce;
    }
    DEBUG_YJOBS   yLOG_note    ("file name is of acceptable length (7-50 chars)");
-   yURG_msg ('-', "file name is of acceptable length (7-50 chars)");
+   /*> yURG_msg ('-', "file name is of acceptable length (7-50 chars)");              <*/
    /*---(name quality)-------------------*/
    --rce;  for (i = 0; i < l; ++i) {
       if (strchr (YSTR_FILES, a_name [i]) == NULL) {
@@ -75,7 +75,7 @@ yjobs__name_quality     (cchar *a_name)
       }
    }
    DEBUG_YJOBS   yLOG_note    ("all name characters are acceptable");
-   yURG_msg ('-', "all the file name characters are legal [A-Za-z0-9_.]");
+   /*> yURG_msg ('-', "all the file name characters are legal [A-Za-z0-9_.]");        <*/
    /*---(hidden file)--------------------*/
    DEBUG_YJOBS   yLOG_char    ("first char", a_name [0]);
    --rce;  if (a_name [0] == '.') {
@@ -91,7 +91,7 @@ yjobs__name_quality     (cchar *a_name)
       DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
       return 1;
    }
-   yURG_msg ('-', "good, file is not hidden, no lead period, without extension");
+   yURG_msg ('-', "name is pathless, of acceptable length, and uses only legal characters");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -161,7 +161,7 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      yURG_msg ('-', "name prefix å%sæ matches local standard å%sæ", t, x_pre);
+      /*> yURG_msg ('-', "name prefix å%sæ matches local standard å%sæ", t, x_pre);   <*/
       DEBUG_YJOBS   yLOG_note    ("file prefix matches standard");
       x_rem -= strlen (x_pre);
       x_beg  = p + 1;
@@ -186,7 +186,7 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      yURG_msg ('-', "name suffix å%sæ matches local standard å%sæ", t, x_suf);
+      /*> yURG_msg ('-', "name suffix å%sæ matches local standard å%sæ", t, x_suf);   <*/
       DEBUG_YJOBS   yLOG_note    ("file suffix matches stanard");
       x_rem -= strlen (x_suf);
       DEBUG_YJOBS   yLOG_value   ("x_rem"     , x_rem);
@@ -198,7 +198,8 @@ yjobs__name_local       (cchar a_runas, cchar *a_name, uchar *r_desc)
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   yURG_msg ('-', "name description is adequate length (>= 3 characters)");
+   /*> yURG_msg ('-', "name description is adequate length (>= 3 characters)");       <*/
+   yURG_msg ('-', "prefix å%sæ and suffix å%sæ match local standard", x_pre, x_suf);
    /*---(save-back)----------------------*/
    DEBUG_YJOBS   yLOG_value   ("x_rem"     , x_rem);
    DEBUG_YJOBS   yLOG_info    ("x_beg"     , x_beg);
@@ -534,7 +535,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
       if (strncmp (r_dir, t, l) == 0) {
          DEBUG_YJOBS   yLOG_note    ("root in root user home directory tree");
          ystrlcpy (r_fuser, "root", LEN_USER);
-         yURG_msg ('-', "root user file in or below årootæ home directory");
+         yURG_msg ('-', "root user looking in or below årootæ home directory");
       } else {
          sprintf (t, "%s", a_home);
          l = strlen (t);
@@ -545,7 +546,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
             ystrlcpy (r_fuser, s, LEN_USER);
             DEBUG_YJOBS   yLOG_info    ("r_fuser"   , r_fuser);
             if (strcmp (r_fuser, "") == 0) {
-               DEBUG_YJOBS   yLOG_note    ("not within a user directory");
+               DEBUG_YJOBS   yLOG_note    ("file is not within a user directory");
                DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
                return rce;
             } else if (strcmp (r_fuser, "machine") == 0) {
@@ -553,7 +554,7 @@ yjobs__loc_local        (cchar *a_home, cchar *a_root, cchar *a_muser, int a_mui
                ystrlcpy (r_fuser, "root", LEN_USER);
                yURG_msg ('-', "root user file in or below å%sæ home directory, so use årootæ as user", s);
             } else {
-               yURG_msg ('-', "root user file in or below å%sæ home directory", s);
+               yURG_msg ('-', "run-time user årootæ can look in or below å%sæ home directory", s);
             }
          } else {
             yURG_err ('f', "root, but not in or below any valid user home directory (security risk)");
@@ -659,7 +660,7 @@ yjobs__location         (cchar a_runas, cchar a_loc, cchar *a_home, cchar *a_roo
       return rce;
    }
    DEBUG_YJOBS   yLOG_value   ("*r_fuid"   , *r_fuid);
-   yURG_msg ('-', "file user is registered with system, %s, uid %d", r_fuser, *r_fuid);
+   yURG_msg ('-', "directory ownership å%sæ is registered with system (%d)", r_fuser, *r_fuid);
    /*---(name prefix)--------------------*/
    --rce;  if (a_loc == YJOBS_CENTRAL) {
       if (a_muid != 0) {
@@ -949,7 +950,8 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    }
    DEBUG_YJOBS   yLOG_value   ("x_fuid"    , x_fuid);
    /*---(stats)--------------------------*/
-   rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_file, a_muser, a_muid, x_fuser, x_fuid);
+   /*> rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_file, a_muser, a_muid, x_fuser, x_fuid);   <*/
+   rc = yENV_audit_reg   ('-', YENV_LOCAL, x_cwd, a_file, x_fuser, "users", "f_tight");
    DEBUG_YJOBS  yLOG_value   ("stats"     , rc);
    --rce;  if (rc < 0) {
       /*> yURG_msg (' ', "");                                                         <*/
@@ -973,35 +975,35 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
    return 0;
 }
 
-char
-yJOBS_file_audit  (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND])
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_user      [LEN_LABEL] = "";
-   int         x_uid       =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(get security data)--------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
-   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
-   --rce;  if (rc < 0) {
-      yURG_err ('f', "could not identify current user (yEXEC_whoami)");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(call verification)--------------*/
-   rc = yjobs_local_full (myJOBS.m_runas, a_path, a_path, a_file, x_user, x_uid, NULL, NULL, NULL, NULL);
-   DEBUG_YJOBS  yLOG_value   ("local"     , rc);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                        <* 
+ *> yJOBS_file_audit  (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND])                                        <* 
+ *> {                                                                                                           <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                 <* 
+ *>    char        rce         =  -10;                                                                          <* 
+ *>    char        rc          =    0;                                                                          <* 
+ *>    char        x_user      [LEN_LABEL] = "";                                                                <* 
+ *>    int         x_uid       =    0;                                                                          <* 
+ *>    /+---(header)-------------------------+/                                                                 <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                                <* 
+ *>    /+---(get security data)--------------+/                                                                 <* 
+ *>    rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);              <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);                                                            <* 
+ *>    --rce;  if (rc < 0) {                                                                                    <* 
+ *>       yURG_err ('f', "could not identify current user (yEXEC_whoami)");                                     <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                       <* 
+ *>       return rce;                                                                                           <* 
+ *>    }                                                                                                        <* 
+ *>    /+---(call verification)--------------+/                                                                 <* 
+ *>    rc = yjobs_local_full (myJOBS.m_runas, a_path, a_path, a_file, x_user, x_uid, NULL, NULL, NULL, NULL);   <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("local"     , rc);                                                            <* 
+ *>    --rce;  if (rc < 0) {                                                                                    <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                       <* 
+ *>       return rce;                                                                                           <* 
+ *>    }                                                                                                        <* 
+ *>    /+---(complete)-----------------------+/                                                                 <* 
+ *>    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);                                                                <* 
+ *>    return 0;                                                                                                <* 
+ *> }                                                                                                           <*/
 
 char
 yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)
@@ -1101,12 +1103,12 @@ yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fu
    return 0;
 }
 
-char
-yjobs_local             (char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir)
-{
-   myJOBS.f_loc = YJOBS_LOCAL;
-   return yjobs_local_old (myJOBS.m_runas, myJOBS.m_file, myJOBS.f_user, myJOBS.f_uid, myJOBS.f_desc, myJOBS.f_dir);
-}
+/*> char                                                                                                                   <* 
+ *> yjobs_local             (char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir)                                      <* 
+ *> {                                                                                                                      <* 
+ *>    myJOBS.f_loc = YJOBS_LOCAL;                                                                                         <* 
+ *>    return yjobs_local_old (myJOBS.m_runas, myJOBS.m_file, myJOBS.f_user, myJOBS.f_uid, myJOBS.f_desc, myJOBS.f_dir);   <* 
+ *> }                                                                                                                      <*/
 
 
 

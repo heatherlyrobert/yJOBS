@@ -92,7 +92,7 @@ typedef const  char      cchar;
 /*---(local report)---------*/
 #define     ACT_LOCALRPT    'l'
 #define     ACT_CLOCALRPT   'ò'
-#define     ACT_VLOCALRPT   '_'
+#define     ACT_VLOCALRPT   'L'
 #define     IF_LOCALRPT     if (yJOBS_iflocalrpt () == 1)
 #define     CASE_LOCALRPT   'l' : case 'L' : case 'ò'
 #define     INDEX_LOCAL      5
@@ -335,7 +335,7 @@ char        yJOBS_configured        (cchar a_runas, char *r_unit, char r_name [L
 
 
 char        yJOBS_filedata          (char *r_runas, char *r_mode, char *r_floc, char *r_fname, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir, char *r_full);
-char        yJOBS_file_audit        (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND]);
+/*> char        yJOBS_file_audit        (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND]);   <*/
 
 
 /*===[[ DEBUGGING ]]==========================================================*/
@@ -352,7 +352,7 @@ char        yJOBS_rmdirs            (void);
 /*---(local)----------------*/
 /*---(central)--------------*/
 char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name, void *a_assimilate);
-char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
+/*> char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);   <*/
 char        yJOBS_act_extract       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
 /*---(security)-------------*/
 char        yJOBS_security          (void);

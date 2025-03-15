@@ -146,7 +146,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (strchr ("=", a_mode) != NULL)  {
       if (strcmp  (x_world, "") != 0) {
          g_acts_score  [G_SCORE_WORLD   + 2] = G_SCORE_FAIL;
-         rc = yjobs_world_list (a_runas);
+         /*> rc = yjobs_world_list (a_runas, a_mode);                                 <*/
          if (rc < 0) {
             yjobs_ends_failure (a_mode, "world list did not run");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -239,7 +239,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (strchr ("aèA", a_mode) != NULL) {
       if (strcmp (x_world, "") != 0) {
          g_acts_score  [G_SCORE_WORLD + 0] = G_SCORE_FAIL;
-         rc = yjobs_world_audit (a_runas);
+         rc = yjobs_world_audit (a_runas, a_mode);
          DEBUG_YJOBS   yLOG_value   ("world"     , rc);
          if (rc < 0) {
             yjobs_ends_failure (a_mode, "world file content audit failed");

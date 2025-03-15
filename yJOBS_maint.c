@@ -340,7 +340,7 @@ yjobs__maint_central    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       if (rc > rc_final)  rc_final = rc;
       rc = yjobs_ends_score (G_SCORE_WORLD,  0, 'w');
       /*---(check contents)---------------------*/
-      rc = yjobs_world_audit (a_runas);
+      rc = yjobs_world_audit (a_runas, a_mode);
       DEBUG_YJOBS   yLOG_value   ("world"     , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "world file content audit failed");
@@ -520,7 +520,7 @@ yjobs_maint_full        (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_share_prepare ("yjobs__maint_prepare", 'm', a_runas, a_mode, a_oneline, a_file, f_callback, x_cdir, x_hdir, x_world, x_db, x_full);
+   rc = yjobs_share_prepare ("yjobs__maint_prepare", 'm', a_runas, a_mode, a_oneline, a_file, f_callback, x_cdir, x_hdir, x_world, x_db, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

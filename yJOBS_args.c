@@ -74,7 +74,6 @@ char          g_act_kep     [LEN_HUND]  = "";
 
 char          g_act_wit     [LEN_HUND]  = "";
 char          g_act_clr     [LEN_HUND]  = "";
-char          g_act_rem     [LEN_HUND]  = "";
 char          g_act_wdb     [LEN_HUND]  = "";
 /*---(done)-----------------*/
 
@@ -306,7 +305,6 @@ yjobs_args__empty       (void)
 
    ystrlcpy (g_act_wit , "", LEN_HUND);
    ystrlcpy (g_act_clr , "", LEN_HUND);
-   ystrlcpy (g_act_rem , "", LEN_HUND);
    ystrlcpy (g_act_wdb , "", LEN_HUND);
    /*---(complete)-----------------------*/
    return 0;
@@ -466,7 +464,6 @@ yjobs_args_init         (char *r_runas, char *r_mode, char *r_file)
 
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_withdraw , s_opts [i].o_levels, g_act_wit);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_clear    , s_opts [i].o_levels, g_act_clr);
-      yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_remove   , s_opts [i].o_levels, g_act_rem);
       yjobs__args_actions (s_opts [i].o_cat, s_opts [i].o_writedb  , s_opts [i].o_levels, g_act_wdb);
       /*---(done)------------------------*/
    }
