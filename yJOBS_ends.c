@@ -11,20 +11,20 @@
 /*
  *  0         1         2         3         4         5         6         7         8
  *  -123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
- *  hl········································································· prepare    : header and location lookup
- *      SEáaf·································································· security   : audit overall security, fixed security
- *             DBásÔ#óÕ························································ database   : purge all data, read db, statistics, db reporting, write db
- *                       LOálÖò················································ local file : audit file secure local, pull file, move to central, read all files, remove central file
- *                               WOáseÔ=rÕ····································· world file : audit world security, check entry, load world, report, register/withdrawl, save world
- *                                          CEásmÖr×=x························· central    : move local to central, audit security of central file, pull one central file, pull all central files, clear one central file, list central files, remove central file
- *                                                      ACágnd················· actions    : gather, normal/strict, daemon/prickly
- *                                                              BEáEUBDR······· backend    : extract file, upload, backup, download, restore
- *                                                                        fy··· wrapup     : footer and yes=pass/°=fail
+ *  hl············································································· ··prepare    : header and location lookup
+ *      SEáafcd······································································ security   : audit overall security, fixed security
+ *               DBásaÔ#óÕ··························································· database   : purge all data, read db, statistics, db reporting, write db
+ *                          LOálÖò··················································· local file : audit file secure local, pull file, move to central, read all files, remove central file
+ *                                  WOásaeÔ=rÕ······································· world file : audit world security, check entry, load world, report, register/withdrawl, save world
+ *                                              CEáamÖr×=x··························· central    : move local to central, audit security of central file, pull one central file, pull all central files, clear one central file, list central files, remove central file
+ *                                                          ACágnd··················· actions    : gather, normal/strict, daemon/prickly
+ *                                                                  BEásaEUBDR······· backend    : extract file, upload, backup, download, restore
+ *                                                                              fy··· wrapup     : footer and yes=pass/°=fail
  */
 
 
-char    g_acts_empty    [LEN_HUND]  = "··  SEá··  DBá·····  LOá···  WOá······  CEá·······  ACá···  BEá·····  ··";
-char    g_acts_full     [LEN_HUND]  = "hl  SEáaf  DBásÔ#óÕ  LOálÖò  WOáseÔ=rÕ  CEámcÖr×=x  ACágnd  BEáEUBDR  fy";
+char    g_acts_empty    [LEN_HUND]  = "··  SEá····  DBá······  LOá···  WOá·······  CEá·······  ACá···  BEá·······  ··";
+char    g_acts_full     [LEN_HUND]  = "hl  SEáafcd  DBásaÔ#óÕ  LOálÖò  WOásaeÔ=rÕ  CEáamÖr×=x  ACágnd  BEásaEUBDR  fy";
 
 char    g_acts_score    [LEN_HUND]  = "                                                                        ";
 
@@ -43,45 +43,51 @@ static struct {
    {  1, G_SCORE_PREPARE   , "°l·"     , "default location lookup"          },
 
    {  7, G_SCORE_SECURE    , "°a-·"    , "general security audit"           },
-   {  8, G_SCORE_SECURE    , "°fF-·"   , "general security update/fix"      },
+   {  8, G_SCORE_SECURE    , "°fF-·"   , "adding fix to the audit"          },
+   {  9, G_SCORE_SECURE    , "°cF-·"   , "configuration dir security"       },
+   { 10, G_SCORE_SECURE    , "°dF-·"   , "central data dir security"        },
 
-   { 14, G_SCORE_DATABASE  , "°sa-·"   , "purge all data in memory"         }, /* s) secure, a) audited content, -) skipped */
-   { 15, G_SCORE_DATABASE  , "°Ô-·"    , "read database"                    },
-   { 16, G_SCORE_DATABASE  , "°#·"     , "database statistics"              },
-   { 17, G_SCORE_DATABASE  , "°ó·"     , "database reporting"               },
-   { 18, G_SCORE_DATABASE  , "°Õ-·"    , "write database"                   },
+   { 16, G_SCORE_DATABASE  , "°s--·"   , "database security"                }, /* s) secure, a) audited content, -) skipped */
+   { 17, G_SCORE_DATABASE  , "°a--·"   , "database contents audit"          },
+   { 18, G_SCORE_DATABASE  , "°Ô-·"    , "read database"                    },
+   { 19, G_SCORE_DATABASE  , "°#·"     , "database statistics"              },
+   { 20, G_SCORE_DATABASE  , "°ó·"     , "database reporting"               },
+   { 21, G_SCORE_DATABASE  , "°Õ-·"    , "write database"                   },
 
-   { 24, G_SCORE_LOCAL     , "°dl·"    , "audit local file/directory"       },
-   { 25, G_SCORE_LOCAL     , "°Ö·"     , "pull/read local file"             },
-   { 26, G_SCORE_LOCAL     , "°ò·"     , "move local file to central"       },
+   { 27, G_SCORE_LOCAL     , "°dl·"    , "audit local file/directory"       },
+   { 28, G_SCORE_LOCAL     , "°Ö·"     , "pull/read local file"             },
+   { 29, G_SCORE_LOCAL     , "°ò·"     , "local report"                     },
 
-   { 32, G_SCORE_WORLD     , "°sa-·"   , "audit world file"                 }, /* s) secure, a) audited content, -) skipped    */
-   { 33, G_SCORE_WORLD     , "°fd-·"   , "audit requested entry"            }, /* f) file, d) directory, -) skipped */
-   { 34, G_SCORE_WORLD     , "°Ô-·"    , "read/import world file"           },
-   { 35, G_SCORE_WORLD     , "°=-·"    , "reporting"                        },
-   { 36, G_SCORE_WORLD     , "°ruD-·"  , "register or withdraw"             }, /* r) register, u) withdraw, D) duplicate, -) skipped */
-   { 37, G_SCORE_WORLD     , "°Õ-·"    , "write/export world file"          },
+   { 35, G_SCORE_WORLD     , "°s-·"    , "world file security"              }, /* s) secure, a) audited content, -) skipped    */
+   { 36, G_SCORE_WORLD     , "°a-·"    , "world contents audit"             },
+   { 37, G_SCORE_WORLD     , "°fd-·"   , "requested entry check"            }, /* f) file, d) directory, -) skipped */
+   { 38, G_SCORE_WORLD     , "°Ô-·"    , "read/import world file"           },
+   { 39, G_SCORE_WORLD     , "°=-·"    , "reporting"                        },
+   { 40, G_SCORE_WORLD     , "°ruD-·"  , "register or withdraw"             }, /* r) register, u) withdraw, D) duplicate, -) skipped */
+   { 41, G_SCORE_WORLD     , "°Õ-·"    , "write/export world file"          },
 
-   { 43, G_SCORE_CENTRAL   , "°ce-·"   , "audit security of central"        },
-   { 44, G_SCORE_CENTRAL   , "°m-·"    , "move local to central"            },
-   { 45, G_SCORE_CENTRAL   , "°Ö-·"    , "pull/load central config"         },
-   { 46, G_SCORE_CENTRAL   , "°rR-·"   , "read all central files"           },
-   { 47, G_SCORE_CENTRAL   , "°x-·"    , "clear specific data from db"      },
-   { 48, G_SCORE_CENTRAL   , "°=·"     , "list central files"               },
-   { 49, G_SCORE_CENTRAL   , "°X-·"    , "remove central file"              },
+   { 47, G_SCORE_CENTRAL   , "°a-·"    , "file contents audit"              },
+   { 48, G_SCORE_CENTRAL   , "°m-·"    , "move local to central"            },
+   { 49, G_SCORE_CENTRAL   , "°Ö-·"    , "pull/load central config"         },
+   { 50, G_SCORE_CENTRAL   , "°rR-·"   , "read all central files"           },
+   { 51, G_SCORE_CENTRAL   , "°x-·"    , "clear specific data from db"      },
+   { 52, G_SCORE_CENTRAL   , "°=·"     , "list central files"               },
+   { 53, G_SCORE_CENTRAL   , "°X-·"    , "remove central file"              },
 
-   { 55, G_SCORE_ACTION    , "°g·"     , "gather local files"               },
-   { 56, G_SCORE_ACTION    , "°n·"     , "normal/strict mode"               },
-   { 57, G_SCORE_ACTION    , "°d·"     , "daemon/prickly mode"              },
+   { 59, G_SCORE_ACTION    , "°g·"     , "gather local files"               },
+   { 60, G_SCORE_ACTION    , "°n·"     , "normal/strict mode"               },
+   { 61, G_SCORE_ACTION    , "°d·"     , "daemon/prickly mode"              },
 
-   { 63, G_SCORE_BACKEND   , "°E-·"    , "extract a central file"           },
-   { 64, G_SCORE_BACKEND   , "°U-·"    , "upload a central file"            },
-   { 65, G_SCORE_BACKEND   , "°B-·"    , "backup a central file"            },
-   { 66, G_SCORE_BACKEND   , "°D-·"    , "download a central file"          },
-   { 67, G_SCORE_BACKEND   , "°R-·"    , "restore a central file"           },
+   { 67, G_SCORE_BSECURE   , "°s-·"    , "backend security"                 },
+   { 68, G_SCORE_BAUDIT    , "°a-·"    , "audit of backend"                 },
+   { 69, G_SCORE_BACKEND   , "°E-·"    , "extract a central file"           },
+   { 70, G_SCORE_BACKEND   , "°U-·"    , "upload a central file"            },
+   { 71, G_SCORE_BACKEND   , "°B-·"    , "backup a central file"            },
+   { 72, G_SCORE_BACKEND   , "°D-·"    , "download a central file"          },
+   { 73, G_SCORE_BACKEND   , "°R-·"    , "restore a central file"           },
 
-   { 70, G_SCORE_JUDGE     , "°f-·"    , "print footer on output"           },
-   { 71, G_SCORE_JUDGE     , "°y!·"    , "final judgement"                  },
+   { 76, G_SCORE_JUDGE     , "°f-·"    , "print footer on output"           },
+   { 77, G_SCORE_JUDGE     , "°y!·"    , "final judgement"                  },
 
    { -1, -1                , ""        , "end-of-entries"                   },
 };
@@ -232,10 +238,10 @@ yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
    case CASE_EXTRACT  :  yURG_msg (':', "  option --vextract  : make a local copy of a central file/entry");              break;
                          /*---(execution 6)-----------------*/
    case CASE_GATHER   :  yURG_msg (':', "  option --vgather   : verify and update all entries from world file");          break;
-   case CASE_DAEMON   :  yURG_msg (':', "  option --vdaemon   : verbosely launch in daemon mode");                        break;
+   case CASE_DAEMON   :  yURG_msg (':', "  option --vdaemon   : verbosely launch in background daemon mode");             break;
    case CASE_PRICKLY  :  yURG_msg (':', "  option --vprickly  : verbosely launch in prickly daemon mode");                break;
-   case CASE_NORMAL   :  yURG_msg (':', "  option --vnormal   : verbosely launch in normal mode");                        break;
-   case CASE_STRICT   :  yURG_msg (':', "  option --vstrict   : verbosely launch in strict normal mode");                 break;
+   case CASE_NORMAL   :  yURG_msg (':', "  option --vnormal   : verbosely launch in normal/non-daemon mode");             break;
+   case CASE_STRICT   :  yURG_msg (':', "  option --vstrict   : verbosely launch in strict normal/non-daemon mode");      break;
 
    default            :
       DEBUG_YJOBS   yLOG_note    ("mode is illegal or not-recognized");

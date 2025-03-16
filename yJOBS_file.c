@@ -905,75 +905,75 @@ yjobs_saveback           (cchar a_loc, cchar *a_fuser, int a_fuid, char *a_fdesc
    return 0;
 }
 
-char
-yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_file, cchar *a_muser, int a_muid, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_cwd       [LEN_PATH]  = "";
-   char        x_fuser     [LEN_LABEL] = "";
-   char        x_fdesc     [LEN_DESC]  = "";
-   char        x_full      [LEN_PATH]  = "";
-   int         x_fuid      =   -1;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   yURG_msg ('>', "local file verification...");
-   /*---(defaults)-----------------------*/
-   yjobs_prepare (r_fuser, r_fuid, r_fdesc, r_dir);
-   /*> DEBUG_YJOBS   yLOG_point   ("r_fuid"    , r_fuid);                             <*/
-   /*> if (r_fuser != NULL)  strcpy (r_fuser, "");                                    <* 
-    *> if (r_fuid  != NULL)  *r_fuid = -1;                                            <* 
-    *> if (r_fdesc != NULL)  strcpy (r_fdesc, "");                                    <* 
-    *> if (r_dir   != NULL)  strcpy (r_dir  , "");                                    <*/
-   /*---(naming)-------------------------*/
-   rc = yjobs__naming (a_runas, YJOBS_LOCAL, a_file, &x_fdesc);
-   DEBUG_YJOBS  yLOG_value   ("naming"    , rc);
-   --rce;  if (rc < 0) {
-      /*> yURG_msg (' ', "");                                                         <*/
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   if (rc == 1) {
-      DEBUG_YJOBS   yLOG_note    ("short-cut for directory");
-      DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return 1;
-   }
-   /*---(verify user)--------------------*/
-   rc = yjobs__location (a_runas, YJOBS_LOCAL, a_home, a_root, a_file, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);
-   DEBUG_YJOBS  yLOG_value   ("location"  , rc);
-   --rce;  if (rc < 0) {
-      /*> yURG_msg (' ', "");                                                         <*/
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_value   ("x_fuid"    , x_fuid);
-   /*---(stats)--------------------------*/
-   /*> rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_file, a_muser, a_muid, x_fuser, x_fuid);   <*/
-   rc = yENV_audit_reg   ('-', YENV_LOCAL, x_cwd, a_file, x_fuser, "users", "f_tight");
-   DEBUG_YJOBS  yLOG_value   ("stats"     , rc);
-   --rce;  if (rc < 0) {
-      /*> yURG_msg (' ', "");                                                         <*/
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(update globals)-----------------*/
-   if (r_fuser != NULL)  ystrlcpy (r_fuser, x_fuser, LEN_USER);
-   if (r_fuid  != NULL) {
-      *r_fuid = x_fuid;
-      DEBUG_YJOBS   yLOG_value   ("*r_fuid"   , *r_fuid);
-   }
-   if (r_fdesc != NULL)  ystrlcpy (r_fdesc, x_fdesc, LEN_DESC);
-   if (r_dir   != NULL)  ystrlcpy (r_dir  , x_cwd, LEN_PATH);
-   sprintf (x_full, "%s%s", x_cwd, a_file);
-   yjobs_saveback  (YJOBS_LOCAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);
-   /*---(finish)-------------------------*/
-   yURG_msg ('-', "success, local file acceptable");
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                                                                                        <* 
+ *> yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_file, cchar *a_muser, int a_muid, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir)   <* 
+ *> {                                                                                                                                                                           <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                                                                                 <* 
+ *>    char        rce         =  -10;                                                                                                                                          <* 
+ *>    char        rc          =    0;                                                                                                                                          <* 
+ *>    char        x_cwd       [LEN_PATH]  = "";                                                                                                                                <* 
+ *>    char        x_fuser     [LEN_LABEL] = "";                                                                                                                                <* 
+ *>    char        x_fdesc     [LEN_DESC]  = "";                                                                                                                                <* 
+ *>    char        x_full      [LEN_PATH]  = "";                                                                                                                                <* 
+ *>    int         x_fuid      =   -1;                                                                                                                                          <* 
+ *>    /+---(header)-------------------------+/                                                                                                                                 <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                                                                                                <* 
+ *>    yURG_msg ('>', "local file verification...");                                                                                                                            <* 
+ *>    /+---(defaults)-----------------------+/                                                                                                                                 <* 
+ *>    yjobs_prepare (r_fuser, r_fuid, r_fdesc, r_dir);                                                                                                                         <* 
+ *>    /+> DEBUG_YJOBS   yLOG_point   ("r_fuid"    , r_fuid);                             <+/                                                                                   <* 
+ *>    /+> if (r_fuser != NULL)  strcpy (r_fuser, "");                                    <*                                                                                    <* 
+ *>     *> if (r_fuid  != NULL)  *r_fuid = -1;                                            <*                                                                                    <* 
+ *>     *> if (r_fdesc != NULL)  strcpy (r_fdesc, "");                                    <*                                                                                    <* 
+ *>     *> if (r_dir   != NULL)  strcpy (r_dir  , "");                                    <+/                                                                                   <* 
+ *>    /+---(naming)-------------------------+/                                                                                                                                 <* 
+ *>    rc = yjobs__naming (a_runas, YJOBS_LOCAL, a_file, &x_fdesc);                                                                                                             <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("naming"    , rc);                                                                                                                            <* 
+ *>    --rce;  if (rc < 0) {                                                                                                                                                    <* 
+ *>       /+> yURG_msg (' ', "");                                                         <+/                                                                                   <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                       <* 
+ *>       return rce;                                                                                                                                                           <* 
+ *>    }                                                                                                                                                                        <* 
+ *>    if (rc == 1) {                                                                                                                                                           <* 
+ *>       DEBUG_YJOBS   yLOG_note    ("short-cut for directory");                                                                                                               <* 
+ *>       DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);                                                                                                                    <* 
+ *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                                                            <* 
+ *>       return 1;                                                                                                                                                             <* 
+ *>    }                                                                                                                                                                        <* 
+ *>    /+---(verify user)--------------------+/                                                                                                                                 <* 
+ *>    rc = yjobs__location (a_runas, YJOBS_LOCAL, a_home, a_root, a_file, a_muser, a_muid, x_fuser, &x_fuid, x_cwd);                                                           <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("location"  , rc);                                                                                                                            <* 
+ *>    --rce;  if (rc < 0) {                                                                                                                                                    <* 
+ *>       /+> yURG_msg (' ', "");                                                         <+/                                                                                   <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                       <* 
+ *>       return rce;                                                                                                                                                           <* 
+ *>    }                                                                                                                                                                        <* 
+ *>    DEBUG_YJOBS   yLOG_value   ("x_fuid"    , x_fuid);                                                                                                                       <* 
+ *>    /+---(stats)--------------------------+/                                                                                                                                 <* 
+ *>    /+> rc = yjobs__stats (YJOBS_LOCAL, x_cwd, a_file, a_muser, a_muid, x_fuser, x_fuid);   <+/                                                                              <* 
+ *>    rc = yENV_audit_reg   ('-', YENV_LOCAL, x_cwd, a_file, x_fuser, "users", "f_tight");                                                                                     <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("stats"     , rc);                                                                                                                            <* 
+ *>    --rce;  if (rc < 0) {                                                                                                                                                    <* 
+ *>       /+> yURG_msg (' ', "");                                                         <+/                                                                                   <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                       <* 
+ *>       return rce;                                                                                                                                                           <* 
+ *>    }                                                                                                                                                                        <* 
+ *>    /+---(update globals)-----------------+/                                                                                                                                 <* 
+ *>    if (r_fuser != NULL)  ystrlcpy (r_fuser, x_fuser, LEN_USER);                                                                                                             <* 
+ *>    if (r_fuid  != NULL) {                                                                                                                                                   <* 
+ *>       *r_fuid = x_fuid;                                                                                                                                                     <* 
+ *>       DEBUG_YJOBS   yLOG_value   ("*r_fuid"   , *r_fuid);                                                                                                                   <* 
+ *>    }                                                                                                                                                                        <* 
+ *>    if (r_fdesc != NULL)  ystrlcpy (r_fdesc, x_fdesc, LEN_DESC);                                                                                                             <* 
+ *>    if (r_dir   != NULL)  ystrlcpy (r_dir  , x_cwd, LEN_PATH);                                                                                                               <* 
+ *>    sprintf (x_full, "%s%s", x_cwd, a_file);                                                                                                                                 <* 
+ *>    yjobs_saveback  (YJOBS_LOCAL, x_fuser, x_fuid, x_fdesc, a_file, x_cwd, x_full);                                                                                          <* 
+ *>    /+---(finish)-------------------------+/                                                                                                                                 <* 
+ *>    yURG_msg ('-', "success, local file acceptable");                                                                                                                        <* 
+ *>    /+---(complete)-----------------------+/                                                                                                                                 <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                                                               <* 
+ *>    return 0;                                                                                                                                                                <* 
+ *> }                                                                                                                                                                           <*/
 
 /*> char                                                                                                        <* 
  *> yJOBS_file_audit  (cchar a_path [LEN_HUND], cchar a_file [LEN_HUND])                                        <* 
@@ -1005,103 +1005,103 @@ yjobs_local_full         (cchar a_runas, cchar *a_home, cchar *a_root, cchar *a_
  *>    return 0;                                                                                                <* 
  *> }                                                                                                           <*/
 
-char
-yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_senter  (__FUNCTION__);
-   /*---(default)------------------------*/
-   ystrlcpy (myJOBS.m_root, "", LEN_DESC);
-   ystrlcpy (myJOBS.m_home, "", LEN_DESC);
-   if (r_root != NULL) ystrlcpy (r_root, "", LEN_DESC);
-   if (r_home != NULL) ystrlcpy (r_home, "", LEN_DESC);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS  yLOG_spoint  (r_root);
-   --rce;  if (r_root == NULL) {
-      DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_spoint  (r_home);
-   --rce;  if (r_home == NULL) {
-      DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_schar   (a_runas);
-   --rce;  if (strchr (g_valid, a_runas) == NULL) {
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(directories)--------------------*/
-   if (strchr (g_unit, a_runas) == NULL)  {
-      DEBUG_YJOBS  yLOG_snote   ("normal");
-      strcpy (myJOBS.m_root, "/root");
-      strcpy (myJOBS.m_home, "/home/");
-   } else {
-      DEBUG_YJOBS  yLOG_snote   ("unittest");
-      strcpy (myJOBS.m_root, "/tmp/root");
-      strcpy (myJOBS.m_home, "/tmp/home/");
-   }
-   /*---(save globally)------------------*/
-   DEBUG_YJOBS  yLOG_snote   ("globals");
-   ystrlcpy (r_root, myJOBS.m_root, LEN_DESC);
-   ystrlcpy (r_home, myJOBS.m_home, LEN_DESC);
-   /*---(report-out)---------------------*/
-   DEBUG_YJOBS  yLOG_snote   (r_root);
-   DEBUG_YJOBS  yLOG_snote   (r_home);
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                              <* 
+ *> yjobs__local_dirs       (cchar a_runas, char *r_root, char *r_home)               <* 
+ *> {                                                                                 <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                       <* 
+ *>    char        rce         =  -10;                                                <* 
+ *>    /+---(header)-------------------------+/                                       <* 
+ *>    DEBUG_YJOBS  yLOG_senter  (__FUNCTION__);                                      <* 
+ *>    /+---(default)------------------------+/                                       <* 
+ *>    ystrlcpy (myJOBS.m_root, "", LEN_DESC);                                        <* 
+ *>    ystrlcpy (myJOBS.m_home, "", LEN_DESC);                                        <* 
+ *>    if (r_root != NULL) ystrlcpy (r_root, "", LEN_DESC);                           <* 
+ *>    if (r_home != NULL) ystrlcpy (r_home, "", LEN_DESC);                           <* 
+ *>    /+---(defense)------------------------+/                                       <* 
+ *>    DEBUG_YJOBS  yLOG_spoint  (r_root);                                            <* 
+ *>    --rce;  if (r_root == NULL) {                                                  <* 
+ *>       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);                             <* 
+ *>       return rce;                                                                 <* 
+ *>    }                                                                              <* 
+ *>    DEBUG_YJOBS  yLOG_spoint  (r_home);                                            <* 
+ *>    --rce;  if (r_home == NULL) {                                                  <* 
+ *>       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);                             <* 
+ *>       return rce;                                                                 <* 
+ *>    }                                                                              <* 
+ *>    DEBUG_YJOBS   yLOG_schar   (a_runas);                                          <* 
+ *>    --rce;  if (strchr (g_valid, a_runas) == NULL) {                               <* 
+ *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                  <* 
+ *>       return rce;                                                                 <* 
+ *>    }                                                                              <* 
+ *>    /+---(directories)--------------------+/                                       <* 
+ *>    if (strchr (g_unit, a_runas) == NULL)  {                                       <* 
+ *>       DEBUG_YJOBS  yLOG_snote   ("normal");                                       <* 
+ *>       strcpy (myJOBS.m_root, "/root");                                            <* 
+ *>       strcpy (myJOBS.m_home, "/home/");                                           <* 
+ *>    } else {                                                                       <* 
+ *>       DEBUG_YJOBS  yLOG_snote   ("unittest");                                     <* 
+ *>       strcpy (myJOBS.m_root, "/tmp/root");                                        <* 
+ *>       strcpy (myJOBS.m_home, "/tmp/home/");                                       <* 
+ *>    }                                                                              <* 
+ *>    /+---(save globally)------------------+/                                       <* 
+ *>    DEBUG_YJOBS  yLOG_snote   ("globals");                                         <* 
+ *>    ystrlcpy (r_root, myJOBS.m_root, LEN_DESC);                                    <* 
+ *>    ystrlcpy (r_home, myJOBS.m_home, LEN_DESC);                                    <* 
+ *>    /+---(report-out)---------------------+/                                       <* 
+ *>    DEBUG_YJOBS  yLOG_snote   (r_root);                                            <* 
+ *>    DEBUG_YJOBS  yLOG_snote   (r_home);                                            <* 
+ *>    /+---(complete)-----------------------+/                                       <* 
+ *>    DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);                                     <* 
+ *>    return 0;                                                                      <* 
+ *> }                                                                                 <*/
 
-char
-yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_user      [LEN_LABEL] = "";
-   char        x_root      [LEN_PATH]  = "";
-   char        x_home      [LEN_PATH]  = "";
-   int         x_uid       =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(get the directories)------------*/
-   rc = yjobs__local_dirs (a_runas, x_root, x_home);
-   DEBUG_YJOBS  yLOG_value   ("dir"       , rc);
-   --rce;  if (rc < 0) {
-      yURG_err ('f', "could not identify local directories");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(get security data)--------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
-   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
-   --rce;  if (rc < 0) {
-      yURG_err ('f', "could not identify current user (yEXEC_whoami)");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   ystrlcpy (myJOBS.m_user, x_user, LEN_USER);
-   myJOBS.m_uid = x_uid;
-   /*---(check local file)---------------*/
-   rc = yjobs_local_full (a_runas, x_home, x_root, a_file, x_user, x_uid, r_fuser, r_fuid, r_fdesc, r_dir);
-   DEBUG_YJOBS  yLOG_value   ("local"     , rc);
-   --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   if (rc == 1) {
-      DEBUG_YJOBS   yLOG_note    ("short-cut for directory");
-      DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return 1;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
+/*> char                                                                                                              <* 
+ *> yjobs_local_old          (cchar a_runas, cchar *a_file, char *r_fuser, int *r_fuid, char *r_fdesc, char *r_dir)   <* 
+ *> {                                                                                                                 <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                       <* 
+ *>    char        rce         =  -10;                                                                                <* 
+ *>    char        rc          =    0;                                                                                <* 
+ *>    char        x_user      [LEN_LABEL] = "";                                                                      <* 
+ *>    char        x_root      [LEN_PATH]  = "";                                                                      <* 
+ *>    char        x_home      [LEN_PATH]  = "";                                                                      <* 
+ *>    int         x_uid       =    0;                                                                                <* 
+ *>    /+---(header)-------------------------+/                                                                       <* 
+ *>    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);                                                                      <* 
+ *>    /+---(get the directories)------------+/                                                                       <* 
+ *>    rc = yjobs__local_dirs (a_runas, x_root, x_home);                                                              <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("dir"       , rc);                                                                  <* 
+ *>    --rce;  if (rc < 0) {                                                                                          <* 
+ *>       yURG_err ('f', "could not identify local directories");                                                     <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                             <* 
+ *>       return rce;                                                                                                 <* 
+ *>    }                                                                                                              <* 
+ *>    /+---(get security data)--------------+/                                                                       <* 
+ *>    rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);                    <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);                                                                  <* 
+ *>    --rce;  if (rc < 0) {                                                                                          <* 
+ *>       yURG_err ('f', "could not identify current user (yEXEC_whoami)");                                           <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                             <* 
+ *>       return rce;                                                                                                 <* 
+ *>    }                                                                                                              <* 
+ *>    ystrlcpy (myJOBS.m_user, x_user, LEN_USER);                                                                    <* 
+ *>    myJOBS.m_uid = x_uid;                                                                                          <* 
+ *>    /+---(check local file)---------------+/                                                                       <* 
+ *>    rc = yjobs_local_full (a_runas, x_home, x_root, a_file, x_user, x_uid, r_fuser, r_fuid, r_fdesc, r_dir);       <* 
+ *>    DEBUG_YJOBS  yLOG_value   ("local"     , rc);                                                                  <* 
+ *>    --rce;  if (rc < 0) {                                                                                          <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                             <* 
+ *>       return rce;                                                                                                 <* 
+ *>    }                                                                                                              <* 
+ *>    if (rc == 1) {                                                                                                 <* 
+ *>       DEBUG_YJOBS   yLOG_note    ("short-cut for directory");                                                     <* 
+ *>       DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);                                                          <* 
+ *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                  <* 
+ *>       return 1;                                                                                                   <* 
+ *>    }                                                                                                              <* 
+ *>    /+---(complete)-----------------------+/                                                                       <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                     <* 
+ *>    return 0;                                                                                                      <* 
+ *> }                                                                                                                 <*/
 
 /*> char                                                                                                                   <* 
  *> yjobs_local             (char *r_fuser, int *r_fuid, char *r_fdesc, char *r_fdir)                                      <* 
@@ -1487,12 +1487,12 @@ yjobs_central_old       (cchar a_runas, cchar a_mode, cchar *a_file, char *r_fus
    return 0;
 }
 
-char
-yjobs_central           (void)
-{
-   myJOBS.f_loc = YJOBS_CENTRAL;
-   return yjobs_central_old       (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_file, myJOBS.f_user, &(myJOBS.f_uid), myJOBS.f_desc, myJOBS.f_dir);
-}
+/*> char                                                                                                                                             <* 
+ *> yjobs_central           (void)                                                                                                                   <* 
+ *> {                                                                                                                                                <* 
+ *>    myJOBS.f_loc = YJOBS_CENTRAL;                                                                                                                 <* 
+ *>    return yjobs_central_old       (myJOBS.m_runas, myJOBS.m_mode, myJOBS.m_file, myJOBS.f_user, &(myJOBS.f_uid), myJOBS.f_desc, myJOBS.f_dir);   <* 
+ *> }                                                                                                                                                <*/
 
 
 

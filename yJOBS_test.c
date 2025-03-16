@@ -68,6 +68,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
    char        r_dir       [LEN_DESC]  = "";
    char       *p           = NULL;
    int         l           =    0;
+   char        x_cmd       [LEN_FULL]  = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
@@ -89,8 +90,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
       return 0;
    }
    /*---(head execute)-------------------*/
-   DEBUG_YJOBS   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
-   yENV_rmdir (x_dir);
+   yENV_rmdir_and_files (x_dir);
    /*---(peal next layer)----------------*/
    ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
@@ -181,17 +181,18 @@ yJOBS_rmdirs            (void)
       rc = yjobs_who_by_index (i, x_cdir, x_hdir, NULL, NULL);
       DEBUG_YJOBS   yLOG_complex ("index"     , "%2d å%sæ å%sæ", i, x_cdir, x_hdir);
       if (rc < 0)  break;
-      yjobs__unit_rmdir_one (x_cdir);
-      yjobs__unit_rmdir_one (x_hdir);
+      if (strcmp (x_cdir , "") != 0)  yjobs__unit_rmdir_one (x_cdir);
+      if (strcmp (x_hdir , "") != 0)  yjobs__unit_rmdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yENV_rmdir ("/tmp/root"                 );
-   yENV_rmdir ("/tmp/home/member/c_quani"  );
-   yENV_rmdir ("/tmp/home/member"          );
-   yENV_rmdir ("/tmp/home/machine"         );
-   yENV_rmdir ("/tmp/home/monkey"          );
-   yENV_rmdir ("/tmp/home"                 );
-   yENV_rmdir ("/tmp/spool"                );
+   yENV_rmdir_and_files ("/tmp/root"                 );
+   yENV_rmdir_and_files ("/tmp/home/member/c_quani"  );
+   yENV_rmdir_and_files ("/tmp/home/member"          );
+   yENV_rmdir_and_files ("/tmp/home/machine"         );
+   yENV_rmdir_and_files ("/tmp/home/monkey"          );
+   yENV_rmdir_and_files ("/tmp/home"                 );
+   yENV_rmdir_and_files ("/tmp/spool"                );
+   yENV_rmdir_and_files ("/tmp/lib"                  );
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -222,37 +223,38 @@ yJOBS_mkdirs            (void)
    yENV_mkdir ("/tmp/home/monkey"          , "member" , "users" , "0700");
    yENV_mkdir ("/tmp/home/member/c_quani"  , "member" , "users" , "0700");
    yENV_mkdir ("/tmp/spool"                , "root"   , "root"  , "0755");
+   yENV_mkdir ("/tmp/lib"                  , "root"   , "root"  , "0755");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
-char
-yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_user      [LEN_USER]  = "";
-   int         x_uid       =    0;
-   char        x_desc      [LEN_DESC]  = "";
-   char        x_dir       [LEN_PATH]  = "";
-   /*---(default)------------------------*/
-   if (r_user != NULL)  ystrlcpy (r_user, ""       , LEN_USER);
-   if (r_desc != NULL)  ystrlcpy (r_desc, ""       , LEN_DESC);
-   /*---(parse file)---------------------*/
-   --rce;  if (a_loc == YJOBS_CENTRAL)   rc = yjobs_central_old (a_runas, '-', a_name, &x_user, &x_uid, &x_desc, x_dir);
-   else if    (a_loc == YJOBS_LOCAL  )   rc = yjobs_local_old   (a_runas, a_name, &x_user, &x_uid, &x_desc, x_dir);
-   else                                  return rce;
-   --rce;  if (rc < 0)                   return rce;
-   /*---(save back)----------------------*/
-   if (r_user != NULL)  ystrlcpy (r_user, x_user, LEN_USER);
-   if (r_desc != NULL)  ystrlcpy (r_desc, x_desc, LEN_DESC);
-   /*---(trouble)------------------------*/
-   if (strstr (a_name, "bad") != NULL)  return -10;
-   /*---(complete)-----------------------*/
-   return 0;
-}
+/*> char                                                                                                                       <* 
+ *> yjobs_act__assim        (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc)                            <* 
+ *> {                                                                                                                          <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                                <* 
+ *>    char        rce         =  -10;                                                                                         <* 
+ *>    char        rc          =    0;                                                                                         <* 
+ *>    char        x_user      [LEN_USER]  = "";                                                                               <* 
+ *>    int         x_uid       =    0;                                                                                         <* 
+ *>    char        x_desc      [LEN_DESC]  = "";                                                                               <* 
+ *>    char        x_dir       [LEN_PATH]  = "";                                                                               <* 
+ *>    /+---(default)------------------------+/                                                                                <* 
+ *>    if (r_user != NULL)  ystrlcpy (r_user, ""       , LEN_USER);                                                            <* 
+ *>    if (r_desc != NULL)  ystrlcpy (r_desc, ""       , LEN_DESC);                                                            <* 
+ *>    /+---(parse file)---------------------+/                                                                                <* 
+ *>    --rce;  if (a_loc == YJOBS_CENTRAL)   rc = yjobs_central_old (a_runas, '-', a_name, &x_user, &x_uid, &x_desc, x_dir);   <* 
+ *>    else if    (a_loc == YJOBS_LOCAL  )   rc = yjobs_local_old   (a_runas, a_name, &x_user, &x_uid, &x_desc, x_dir);        <* 
+ *>    else                                  return rce;                                                                       <* 
+ *>    --rce;  if (rc < 0)                   return rce;                                                                       <* 
+ *>    /+---(save back)----------------------+/                                                                                <* 
+ *>    if (r_user != NULL)  ystrlcpy (r_user, x_user, LEN_USER);                                                               <* 
+ *>    if (r_desc != NULL)  ystrlcpy (r_desc, x_desc, LEN_DESC);                                                               <* 
+ *>    /+---(trouble)------------------------+/                                                                                <* 
+ *>    if (strstr (a_name, "bad") != NULL)  return -10;                                                                        <* 
+ *>    /+---(complete)-----------------------+/                                                                                <* 
+ *>    return 0;                                                                                                               <* 
+ *> }                                                                                                                          <*/
 
 char
 yjobs_callback          (cchar a_req, cchar *a_data)

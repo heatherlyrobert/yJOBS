@@ -284,7 +284,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(read database)------------------*/
-   rc = yjobs_share_readdb   ("yjobs__out_readdb", 'o', a_mode, x_db, f_callback);
+   rc = yjobs_share_readdb   ("yjobs__out_readdb", 'o', a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("readdb"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -304,7 +304,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(write database)-----------------*/
-   rc = yjobs_share_writedb  ("yjobs__out_writedb", 'o', a_mode, x_db, f_callback);
+   rc = yjobs_share_writedb  ("yjobs__out_writedb", 'o', a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("writedb"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

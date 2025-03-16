@@ -214,8 +214,9 @@ yjobs__in_verify        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    DEBUG_YJOBS   yLOG_complex ("a_args"    , "%c %c", a_runas, a_mode);
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_LAUDIT ] = G_SCORE_FAIL;
    /*---(default)------------------------*/
-   rc = yjobs_ends_score (G_SCORE_LOCAL,  0, G_SCORE_FAIL);
    if (r_full   != NULL)  strcpy (r_full  , "");
    if (r_fuser  != NULL)  strcpy (r_fuser , "");
    /*---(defense)------------------------*/
@@ -254,8 +255,8 @@ yjobs__in_verify        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      /*---(score)-----------------------*/
-      rc = yjobs_ends_score (G_SCORE_LOCAL,  0, 'd');
+      /*---(score)--------------------------*/
+      g_acts_score  [G_SCORE_LAUDIT ] = 'd';
       DEBUG_YJOBS   yLOG_value   ("score"     , rc);
       /*---(finish)----------------------*/
       yURG_msg ('-', "success, local directory acceptable");
@@ -290,8 +291,8 @@ yjobs__in_verify        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      /*---(score)-----------------------*/
-      rc = yjobs_ends_score (G_SCORE_LOCAL,  0, 'l');
+      /*---(score)--------------------------*/
+      g_acts_score  [G_SCORE_LAUDIT ] = 'l';
       DEBUG_YJOBS   yLOG_value   ("score"     , rc);
       /*---(finish)----------------------*/
       yURG_msg ('-', "success, local file acceptable");
@@ -315,8 +316,8 @@ yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
    char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(default)------------------------*/
-   rc = yjobs_ends_score (G_SCORE_LOCAL,  1, G_SCORE_FAIL);
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_LPULL  ] = G_SCORE_FAIL;
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(check call-back)----------------*/
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
@@ -336,7 +337,7 @@ yjobs__in_pull          (char a_mode, void *f_callback, char a_full [LEN_PATH])
    }
    DEBUG_YJOBS   yLOG_value   ("rc_flag"   , rc_flag);
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_LOCAL,  1, 'Ö');
+   g_acts_score  [G_SCORE_LPULL  ] = 'Ö';
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -361,6 +362,8 @@ yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH])
    }
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_LRPT   ] = G_SCORE_FAIL;
    /*---(default)------------------------*/
    rc = yjobs_ends_score (G_SCORE_LOCAL,  2, G_SCORE_FAIL);
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
@@ -381,7 +384,7 @@ yjobs__in_report        (char a_mode, void *f_callback, char a_full [LEN_PATH])
       return rce;
    }
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_LOCAL,  2, 'ò');
+   g_acts_score  [G_SCORE_LRPT   ] = 'ò';
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -421,7 +424,7 @@ yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    yURG_msg ('>', "install file in central directory...");
-   g_acts_score  [G_SCORE_CENTRAL + 0] = G_SCORE_FAIL;
+   g_acts_score  [G_SCORE_CMOVE  ] = G_SCORE_FAIL;
    /*---(get central info)-------------------*/
    rc = yjobs_central_dirs (a_runas, a_mode, a_file, a_fuser, x_fdir, x_fnew);
    DEBUG_YJOBS   yLOG_value   ("central"   , rc);
@@ -472,14 +475,14 @@ yjobs__in_intake        (char a_runas, char a_mode, char a_file [LEN_PATH], char
    yURG_msg ('-', "changed permissions to root-only write/read (0600)");
    /*---(summary)----------------------------*/
    yURG_msg ('-', "success, configuration file moved to central");
-   g_acts_score  [G_SCORE_CENTRAL + 0] = 'm';
+   g_acts_score  [G_SCORE_CMOVE  ] = 'm';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
-yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_world [LEN_LABEL], void *f_testcall)
+yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char a_hdir [LEN_DESC], char a_world [LEN_LABEL], void *f_testcall)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -519,7 +522,7 @@ yjobs__in_register      (char a_runas, char a_mode, char a_file [LEN_PATH], char
       rc = x_testcall (ACT_REGISTER, "");
    }
    else {
-      /*> rc = yjobs_world_register (a_runas, a_mode, a_file);                        <*/
+      rc = yjobs_world_register (a_runas, a_mode, a_file, a_hdir, a_world);
    }
    /*---(handle trouble)-----------------*/
    DEBUG_YJOBS   yLOG_value   ("register"  , rc);
@@ -548,6 +551,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    char        rc          =    0;
    char        rc_final    =    1;
    char        rc_warn     =    0;
+   char        x_hdir      [LEN_PATH]  = "";
    char        x_world     [LEN_LABEL] = "";
    char        x_db        [LEN_LABEL] = "";
    char        x_cwd       [LEN_PATH]  = "";
@@ -556,7 +560,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_share_prepare ("yjobs__in_prepare", 'i', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, x_world, x_db, x_cwd, x_full);
+   rc = yjobs_share_prepare ("yjobs__in_prepare", 'i', a_runas, a_mode, a_oneline, a_file, f_callback, NULL, x_hdir, x_world, x_db, x_cwd, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -566,7 +570,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(read database)------------------*/
-   rc = yjobs_share_readdb   ("yjobs__in_readdb", 'i', a_mode, x_db, f_callback);
+   rc = yjobs_share_readdb   ("yjobs__in_readdb", 'i', a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("readdb"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -612,11 +616,11 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(pull local)---------------------*/
    if      (rc > rc_final)  rc_final = rc;
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
-   rc = yjobs_share_writedb  ("yjobs__in_writedb", 'i', a_mode, x_db, f_callback);
+   /*---(pull local)---------------------*/
+   rc = yjobs_share_writedb  ("yjobs__in_writedb", 'i', a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("writedb"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -626,7 +630,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(register)-----------------------*/
-   rc = yjobs__in_register (a_runas, a_mode, a_file, x_world, NULL);
+   rc = yjobs__in_register (a_runas, a_mode, x_full, x_hdir, x_world, NULL);
    DEBUG_YJOBS   yLOG_value   ("register"  , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

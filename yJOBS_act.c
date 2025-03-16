@@ -176,7 +176,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
       DEBUG_YJOBS   yLOG_info    ("a_file"    , a_file);
       if (strcmp (a_file, "") != 0) {
          g_acts_score  [G_SCORE_CENTRAL + 1] = G_SCORE_FAIL;
-         rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
+         /*> rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);   <*/
          DEBUG_YJOBS   yLOG_value   ("central"   , rc);
          if (rc < 0) {
             yjobs_ends_failure (a_mode, "central file not proper and/or secure");
@@ -239,7 +239,7 @@ yjobs_maintain_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (strchr ("aèA", a_mode) != NULL) {
       if (strcmp (x_world, "") != 0) {
          g_acts_score  [G_SCORE_WORLD + 0] = G_SCORE_FAIL;
-         rc = yjobs_world_audit (a_runas, a_mode);
+         /*> rc = yjobs_world_audit (a_runas, a_mode);                                <*/
          DEBUG_YJOBS   yLOG_value   ("world"     , rc);
          if (rc < 0) {
             yjobs_ends_failure (a_mode, "world file content audit failed");
@@ -964,7 +964,7 @@ yjobs_running__pull     (cchar a_runas, cchar a_mode, cchar *a_cdir, void *f_cal
       ystrlcpy (x_name, x_file->d_name, LEN_DESC);
       sprintf (x_full, "%s%s", a_cdir, x_file->d_name);
       /*---(verify file)------------------------*/
-      rc = yjobs_central_old  (a_runas, a_mode, x_name, NULL, NULL, NULL, NULL);
+      /*> rc = yjobs_central_old  (a_runas, a_mode, x_name, NULL, NULL, NULL, NULL);   <*/
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "local file not proper and/or secure");
@@ -1126,7 +1126,7 @@ yjobs_running_full      (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    /*---(verify file)------------------------*/
    --rce;  if (strchr ("eEhH", a_runas) != NULL) {
-      rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);
+      /*> rc = yjobs_central_old  (a_runas, a_mode, a_file, x_fuser, &x_fuid, x_fdesc, x_fdir);   <*/
       DEBUG_YJOBS   yLOG_value   ("central"   , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "central file not proper and/or secure");

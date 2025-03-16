@@ -5,76 +5,6 @@
 
 
 char
-SHARED_open             (char a_name [LEN_PATH], char a_mode, FILE **r_file)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        x_mode      [LEN_TERSE] = "";
-   FILE       *f           = NULL;
-   /*---(header)-------------------------*/
-   DEBUG_FILE   yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_FILE   yLOG_point   ("a_name"    , a_name);
-   --rce;  if (a_name      == NULL) {
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_FILE   yLOG_info    ("a_name"    , a_name);
-   DEBUG_FILE   yLOG_char    ("a_mode"    , a_mode);
-   --rce;  if (a_mode == 0 || strchr ("rRwW", a_mode) == NULL) {
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_FILE   yLOG_point   ("r_file"    , r_file);
-   --rce;  if (r_file      == NULL) {
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_INPT   yLOG_point   ("*r_file"   , *r_file);
-   --rce;  if (*r_file != NULL) {
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(set mode)-----------------------*/
-   DEBUG_FILE   yLOG_char    ("a_mode"    , a_mode);
-   --rce;  switch (a_mode) {
-   case 'r' :
-      strlcpy (x_mode, "rt", LEN_TERSE);
-      yURG_msg ('-', "reading text file å%sæ", a_name);
-      break;
-   case 'R' :
-      strlcpy (x_mode, "rb", LEN_TERSE);
-      yURG_msg ('-', "reading database å%sæ", a_name);
-      break;
-   case 'w' :
-      strlcpy (x_mode, "wt", LEN_TERSE);
-      yURG_msg ('-', "writing text file å%sæ", a_name);
-      break;
-   case 'W' :
-      strlcpy (x_mode, "wb", LEN_TERSE);
-      yURG_msg ('-', "writing database å%sæ", a_name);
-      break;
-   default  :
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_FILE   yLOG_info    ("x_mode"    , x_mode);
-   /*---(open)---------------------------*/
-   DEBUG_FILE   yLOG_info    ("a_name"    , a_name);
-   f = fopen (a_name, x_mode);
-   DEBUG_FILE   yLOG_point   ("f"         , f);
-   --rce;  if (f == NULL) {
-      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(save-back)----------------------*/
-   if (r_file != NULL)  *r_file = f;
-   /*---(complete)-----------------------*/
-   DEBUG_FILE   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
 yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH])
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -162,7 +92,7 @@ yjobs_share_prepare     (char a_func [LEN_TITLE], char a_area, char a_runas, cha
 }
 
 char
-yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback)
+yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char a_hdir [LEN_DESC], char a_db [LEN_LABEL], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -180,21 +110,35 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    }
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (a_func);
-   /*---(header)-------------------------*/
-   yURG_msg ('>', "verify reading the contents of the database (read)...");
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_DAUDIT ] = G_SCORE_FAIL;
+   g_acts_score  [G_SCORE_DREAD  ] = G_SCORE_FAIL;
    /*---(no-database)--------------------*/
    if (a_db == NULL || strcmp (a_db, "") == 0) {
       DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
-      yURG_msg ('-', "skipping, host program does not use central database");
-      yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_SKIP);
+      yURG_msg ('>', "verify audit and reading of the database...");
+      yURG_msg ('-', "skipping, host program does not use a central database");
+      g_acts_score  [G_SCORE_DAUDIT ] = G_SCORE_SKIP;
+      g_acts_score  [G_SCORE_DREAD  ] = G_SCORE_SKIP;
       DEBUG_YJOBS   yLOG_exit    (a_func);
       return RC_ACK;
    }
+   /*---(audit database)-----------------*/
+   yURG_msg ('>', "audit existance and security of database...");
+   /*---(audit databasee)----------------*/
+   rc = yENV_audit_reg ('-', 'n', a_hdir, a_db, "root", "root", "f_tight");
+   DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "database is not secure/appropriate");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return  rce;
+   }
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_DAUDIT ] = 's';
+   yURG_msg ('-', "success, database exists and security is appropriate");
    /*---(prepare)------------------------*/
-   yURG_msg ('-', "host database å%sæ", a_db);
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_note    ("mode requires database loaded before");
-   rc = yjobs_ends_score (G_SCORE_DATABASE,  1, G_SCORE_FAIL);
    /*---(check call-back)----------------*/
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
@@ -206,7 +150,6 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    /*---(call)---------------------------*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    x_callback = f_callback;
-   yURG_msg ('-', "call host to read database");
    rc = x_callback (YJOBS_READ, "");
    DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
    --rce;  if (rc < 0) {
@@ -216,7 +159,7 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
    }
    rc_final = rc;
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_DATABASE,  1, 'Ô');
+   g_acts_score  [G_SCORE_DREAD  ] = 'Ô';
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (a_func);
@@ -224,7 +167,7 @@ yjobs_share_readdb      (char a_func [LEN_TITLE], char a_area, char a_mode, char
 }
 
 char
-yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char a_db [LEN_LABEL], void *f_callback)
+yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char a_hdir [LEN_DESC], char a_db [LEN_LABEL], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -242,22 +185,35 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    }
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (a_func);
-   /*---(header)-------------------------*/
-   yURG_msg ('>', "verify writing the contents of the database (write)...");
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_DAUDIT ] = G_SCORE_FAIL;
+   g_acts_score  [G_SCORE_DWRITE ] = G_SCORE_FAIL;
    /*---(no-database)--------------------*/
    if (a_db == NULL || strcmp (a_db, "") == 0) {
-      DEBUG_YJOBS   yLOG_snote   ("host program does not use central database");
-      yURG_msg ('-', "skipping, host program does not use central database");
-      yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_SKIP);
+      DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
+      yURG_msg ('>', "verify audit and writing of the database...");
+      yURG_msg ('-', "skipping, host program does not use a central database");
+      g_acts_score  [G_SCORE_DAUDIT ] = G_SCORE_SKIP;
+      g_acts_score  [G_SCORE_DWRITE ] = G_SCORE_SKIP;
       DEBUG_YJOBS   yLOG_exit    (a_func);
       return RC_ACK;
    }
-   /*---(prepare)------------------------*/
-   yURG_msg ('-', "host database å%sæ", a_db);
+   /*---(audit database)-----------------*/
+   yURG_msg ('>', "audit existance and security of database...");
+   /*---(audit database)-----------------*/
+   rc = yENV_audit_reg ('-', 'n', a_hdir, a_db, "root", "root", "f_tight");
+   DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "database is not secure/appropriate");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return  rce;
+   }
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_DAUDIT ] = 's';
+   yURG_msg ('-', "success, database exists and security is appropriate");
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_note    ("mode requires database written after");
-   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, G_SCORE_FAIL);
    /*---(check call-back)----------------*/
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
@@ -269,7 +225,6 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    /*---(call)---------------------------*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    x_callback = f_callback;
-   yURG_msg ('-', "call host to write database");
    rc = x_callback (YJOBS_WRITE, "");
    DEBUG_YJOBS   yLOG_value   ("write db"  , rc);
    --rce;  if (rc < 0) {
@@ -279,7 +234,7 @@ yjobs_share_writedb     (char a_func [LEN_TITLE], char a_area, char a_mode, char
    }
    rc_final = rc;
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_DATABASE,  4, 'Õ');
+   g_acts_score  [G_SCORE_DWRITE ] = 'Õ';
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (a_func);

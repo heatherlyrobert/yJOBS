@@ -140,8 +140,6 @@ yjobs_world__add        (char *a_path)
    tWORLD     *x_new       = NULL;
    /*---(begin)--------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  4, G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_path"    , a_path);
    --rce;  if (a_path == NULL) {
@@ -186,8 +184,6 @@ yjobs_world__add        (char *a_path)
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  4, 'r');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -202,8 +198,6 @@ yjobs_world__remove     (char *a_path)
    tWORLD     *x_old       = NULL;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  4, G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_path"    , a_path);
    --rce;  if (a_path == NULL) {
@@ -240,8 +234,6 @@ yjobs_world__remove     (char *a_path)
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  4, 'u');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -300,128 +292,9 @@ char yjobs_world__by_cursor    (char a_dir, tWORLD **r_world)    { return ySORT_
 
 
 /*====================------------------------------------====================*/
-/*===----                        export and import                     ----===*/
+/*===----                       export/import                          ----===*/
 /*====================------------------------------------====================*/
 static void  o___EXIM____________o () { return; }
-
-/*> char                                                                                                     <* 
- *> yjobs_world__open       (char a_runas, char a_mode, char a_opt [LEN_TERSE])                              <* 
- *> {                                                                                                        <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                                              <* 
- *>    char        rce         =  -10;                                                                       <* 
- *>    char        rc          =    0;                                                                       <* 
- *>    char        x_hdir      [LEN_DESC]  = "";                                                             <* 
- *>    char        x_world     [LEN_LABEL] = "";                                                             <* 
- *>    /+---(header)-------------------------+/                                                              <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                                            <* 
- *>    /+---(defense)------------------------+/                                                              <* 
- *>    DEBUG_YJOBS   yLOG_point   ("w_file"    , myJOBS.w_file);                                             <* 
- *>    if (myJOBS.w_file != NULL) {                                                                          <* 
- *>       yURG_msg ('-', "world file already open, continuing");                                             <* 
- *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                         <* 
- *>       return RC_POSITIVE;                                                                                <* 
- *>    }                                                                                                     <* 
- *>    /+---(get localtion)------------------+/                                                              <* 
- *>    rc = yjobs_who_location (a_runas, NULL, x_hdir, x_world, NULL, NULL);                                 <* 
- *>    DEBUG_YJOBS   yLOG_value   ("location"  , rc);                                                        <* 
- *>    --rce;  if (rc < 0) {                                                                                 <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
- *>       return rce;                                                                                        <* 
- *>    }                                                                                                     <* 
- *>    /+---(check world)--------------------+/                                                              <* 
- *>    DEBUG_YJOBS   yLOG_info    ("x_world"   , x_world);                                                   <* 
- *>    --rce;  if (strcmp (x_world, "") == 0) {                                                              <* 
- *>       yURG_msg ('-', "skipping, no world file configuration specified for this host program");           <* 
- *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                         <* 
- *>       return RC_ACK;                                                                                     <* 
- *>    }                                                                                                     <* 
- *>    /+---(prepare full name)--------------+/                                                              <* 
- *>    sprintf (myJOBS.w_name, "%s"  , x_world);                                                             <* 
- *>    sprintf (myJOBS.w_full, "%s%s", x_hdir, x_world);                                                     <* 
- *>    yURG_msg ('-', "world file identified as å%sæ", myJOBS.w_full);                                       <* 
- *>    DEBUG_YJOBS   yLOG_info    ("w_full"    , myJOBS.w_full);                                             <* 
- *>    /+---(verify exists)------------------+/                                                              <* 
- *>    rc = yENV_exists (myJOBS.w_full);                                                                     <* 
- *>    --rce;  if (rc == '-') {                                                                              <* 
- *>       yURG_err ('f', "world file does not exist, but specified");                                        <* 
- *>       yjobs_ends_failure (a_mode, "world file not proper");                                              <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
- *>       return rce;                                                                                        <* 
- *>    }                                                                                                     <* 
- *>    --rce;  if (rc != 'r') {                                                                              <* 
- *>       yURG_err ('f', "a world file entry exists, but not a regular file");                               <* 
- *>       yjobs_ends_failure (a_mode, "world file not proper");                                              <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
- *>       return rce;                                                                                        <* 
- *>    }                                                                                                     <* 
- *>    /+---(check options)------------------+/                                                              <* 
- *>    --rce;  if (a_opt == NULL) {                                                                          <* 
- *>       yURG_err ('f', "world file read/write option is NULL");                                            <* 
- *>       yjobs_ends_failure (a_mode, "world file option not proper");                                       <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
- *>       return rce;                                                                                        <* 
- *>    }                                                                                                     <* 
- *>    --rce;  if (strcmp (a_opt, "rt") == 0)  ;                                                             <* 
- *>    else if    (strcmp (a_opt, "wt") == 0)  ;                                                             <* 
- *>    else {                                                                                                <* 
- *>       yURG_err ('f', "world file can not be openned as å%sæ", a_opt);                                    <* 
- *>       yjobs_ends_failure (a_mode, "world file option not proper");                                       <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
- *>       return rce;                                                                                        <* 
- *>    }                                                                                                     <* 
- *>    /+---(open file)----------------------+/                                                              <* 
- *>    myJOBS.w_file = fopen (myJOBS.w_full, a_opt);                                                         <* 
- *>    DEBUG_YJOBS   yLOG_point   ("w_file"    , myJOBS.w_file);                                             <* 
- *>    --rce;  if (myJOBS.w_file == NULL) {                                                                  <* 
- *>       yURG_err ('f', "world file can not be openned");                                                   <* 
- *>       yjobs_ends_failure (a_mode, "world file not proper");                                              <* 
-*>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                    <* 
-*>       return rce;                                                                                        <* 
-*>    }                                                                                                     <* 
-*>    /+---(note)---------------------------+/                                                              <* 
-*>    if      (strcmp (a_opt, "rt") == 0)  yURG_msg ('-', "world file successfully openned for reading");   <* 
-*>    else                                 yURG_msg ('-', "world file successfully openned for writing");   <* 
-*>    DEBUG_YJOBS   yLOG_note    ("openned successfully");                                                  <* 
-*>    /+---(complete)-----------------------+/                                                              <* 
-*>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                            <* 
-*>    return RC_POSITIVE;                                                                                   <* 
-*> }                                                                                                        <*/
-
-/*> char                                                                              <* 
- *> yjobs_world__close      (char a_runas, char a_mode)                               <* 
- *> {                                                                                 <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                       <* 
- *>    char        rce         =  -10;                                                <* 
- *>    char        rc          =    0;                                                <* 
- *>    /+---(header)-------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                     <* 
- *>    /+---(defense)------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_point   ("w_file"    , myJOBS.w_file);                      <* 
- *>    if (myJOBS.w_file == NULL) {                                                   <* 
- *>       yURG_msg ('-', "world file already closed, continuing");                    <* 
- *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                  <* 
- *>       return RC_POSITIVE;                                                         <* 
- *>    }                                                                              <* 
- *>    /+---(close file)---------------------+/                                       <* 
- *>    rc = fclose (myJOBS.w_file);                                                   <* 
- *>    DEBUG_YJOBS   yLOG_value   ("fclose"    , rc);                                 <* 
- *>    --rce;  if (rc < 0) {                                                          <* 
- *>       yURG_err ('f', "world file can not be closed");                             <* 
- *>       yjobs_ends_failure (a_mode, "world file not proper");                       <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    /+---(ground)-------------------------+/                                       <* 
- *>    ystrlcpy (myJOBS.w_name, "", LEN_LABEL);                                       <* 
- *>    ystrlcpy (myJOBS.w_full, "", LEN_PATH);                                        <* 
- *>    myJOBS.w_file = NULL;                                                          <* 
- *>    /+---(note)---------------------------+/                                       <* 
- *>    yURG_msg ('-', "world file successfully closed");                              <* 
- *>    DEBUG_YJOBS   yLOG_note    ("closed successfully");                            <* 
- *>    /+---(complete)-----------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                     <* 
- *>    return RC_POSITIVE;                                                            <* 
- *> }                                                                                 <*/
 
 char
 yjobs_world__read       (FILE *f, int *b_line, char r_recd [LEN_RECD])
@@ -476,48 +349,6 @@ yjobs_world__read       (FILE *f, int *b_line, char r_recd [LEN_RECD])
    return RC_POSITIVE;
 }
 
-/*> char                                                                              <* 
- *> yjobs_world__read       (char *a_recd)                                            <* 
- *> {                                                                                 <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                       <* 
- *>    char        rce         =  -10;                                                <* 
- *>    char        rc          =    0;                                                <* 
- *>    int         x_len       =    0;                                                <* 
- *>    /+---(begin)----------------------------+/                                     <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                     <* 
- *>    /+---(defense)------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_point   ("w_file"    , myJOBS.w_file);                      <* 
- *>    --rce;  if (myJOBS.w_file == NULL) {                                           <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    /+---(find a record)------------------+/                                       <* 
- *>    --rce;  while (1) {                                                            <* 
- *>       /+---(read)------------------------+/                                       <* 
- *>       fgets (a_recd, LEN_RECD, myJOBS.w_file);                                    <* 
- *>       DEBUG_YJOBS   yLOG_value   ("length"    , strlen (a_recd));                 <* 
- *>       if (feof (myJOBS.w_file)) {                                                 <* 
- *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
- *>          return rce;                                                              <* 
- *>       }                                                                           <* 
- *>       ++myJOBS.w_line;                                                            <* 
- *>       /+---(filter)----------------------+/                                       <* 
- *>       if (a_recd [0] == '\0')  continue;                                          <* 
- *>       if (a_recd [0] == '#')   continue;                                          <* 
- *>       if (a_recd [0] == ' ')   continue;                                          <* 
- *>       /+---(clean-up)--------------------+/                                       <* 
- *>       ystrltrim (a_recd, ySTR_BOTH, LEN_RECD);                                    <* 
- *>       x_len = strlen (a_recd);                                                    <* 
- *>       if (x_len <  5)          continue;                                          <* 
- *>       if (a_recd [x_len - 1] == '\n')  a_recd [--x_len] = '\0';                   <* 
- *>       DEBUG_YJOBS   yLOG_info    ("a_recd"    , a_recd);                          <* 
- *>       break;                                                                      <* 
- *>    }                                                                              <* 
- *>    /+---(complete)-----------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                     <* 
- *>    return 0;                                                                      <* 
- *> }                                                                                 <*/
-
 char
 yjobs_world__import     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL])
 {
@@ -530,7 +361,7 @@ yjobs_world__import     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  2, G_SCORE_FAIL);
+   g_acts_score  [G_SCORE_WREAD  ] = G_SCORE_FAIL;
    /*---(purge)--------------------------*/
    rc = yjobs_world__purge ();
    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
@@ -578,68 +409,11 @@ yjobs_world__import     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return  rce;
    }
    /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  2, 'Ô');
+   g_acts_score  [G_SCORE_WREAD  ] = 'Ô';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
 }
-
-/*> char                                                                                        <* 
- *> yjobs_world__import     (char a_runas, char a_mode)                                         <* 
- *> {                                                                                           <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                                 <* 
- *>    char        rce         =  -10;                                                          <* 
- *>    char        rc          =    0;                                                          <* 
- *>    char        x_curr      [LEN_PATH]  = "";                                                <* 
- *>    char        x_path      [LEN_PATH]  = "";                                                <* 
- *>    char       *p           = NULL;                                                          <* 
- *>    /+---(header)-------------------------+/                                                 <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                               <* 
- *>    /+---(open)---------------------------+/                                                 <* 
- *>    rc = yjobs_world__open (a_runas, a_mode, "rt");                                          <* 
- *>    DEBUG_YJOBS   yLOG_value   ("open"      , rc);                                           <* 
- *>    --rce;  if (rc < 0) {                                                                    <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
- *>       return  rce;                                                                          <* 
- *>    }                                                                                        <* 
- *>    if (rc == RC_ACK) {                                                                      <* 
- *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                            <* 
- *>       return RC_ACK;                                                                        <* 
- *>    }                                                                                        <* 
- *>    /+---(walk)---------------------------+/                                                 <* 
- *>    --rce;  while (1) {                                                                      <* 
- *>       /+---(read)------------------------+/                                                 <* 
- *>       /+> rc = yjobs_world__read (x_curr);                                            <+/   <* 
- *>       DEBUG_YJOBS   yLOG_value   ("read"      , rc);                                        <* 
- *>       if (rc < 0) {                                                                         <* 
- *>          DEBUG_YJOBS   yLOG_note    ("end of file");                                        <* 
- *>          break;                                                                             <* 
- *>       }                                                                                     <* 
- *>       ystrlcpy (x_path, x_curr, LEN_PATH);                                                  <* 
- *>       /+---(save)------------------------+/                                                 <* 
- *>       rc = yjobs_world__add (x_path);                                                       <* 
- *>       DEBUG_YJOBS   yLOG_value   ("add"       , rc);                                        <* 
- *>       if (rc < 0) {                                                                         <* 
- *>          yURG_msg ('F', "import failed on %d entry", myJOBS.w_line);                        <* 
- *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                    <* 
- *>          return  rce;                                                                       <* 
- *>       }                                                                                     <* 
- *>       /+---(done)------------------------+/                                                 <* 
- *>    }                                                                                        <* 
- *>    /+---(close)--------------------------+/                                                 <* 
- *>    rc = yENV_close_full ("world.ctrl", &(myJOBS.w_file), '-');                              <* 
- *>    /+> rc = yjobs_world__close (a_runas, a_m);                                     <+/      <* 
- *>    DEBUG_YJOBS   yLOG_value   ("close"     , rc);                                           <* 
- *>    --rce;  if (rc < 0) {                                                                    <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
- *>       return  rce;                                                                          <* 
- *>    }                                                                                        <* 
- *>    /+---(note)---------------------------+/                                                 <* 
- *>    yURG_msg ('-', "imported %d entries from world registry", yjobs_world__count ());        <* 
- *>    /+---(complete)-----------------------+/                                                 <* 
- *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                               <* 
- *>    return 0;                                                                                <* 
- *> }                                                                                           <*/
 
 char
 yjobs_world__export     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL])
@@ -652,7 +426,7 @@ yjobs_world__export     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  5, G_SCORE_FAIL);
+   g_acts_score  [G_SCORE_WWRITE ] = G_SCORE_FAIL;
    /*---(open)---------------------------*/
    rc = yENV_open_full ("world file", a_hdir, a_world, 'w', NULL, NULL, NULL, &f);
    DEBUG_YJOBS   yLOG_value   ("open"      , rc);
@@ -689,251 +463,21 @@ yjobs_world__export     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return  rce;
    }
    /*---(mark)---------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD,  5, 'Õ');
+   g_acts_score  [G_SCORE_WWRITE ] = 'Õ';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
 }
 
-/*> char                                                                                 <* 
- *> yjobs_world__export     (char a_runas, char a_mode)                                  <* 
- *> {                                                                                    <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                          <* 
- *>    char        rce         =  -10;                                                   <* 
- *>    char        rc          =    0;                                                   <* 
- *>    tWORLD     *x_world     = NULL;                                                   <* 
- *>    /+---(header)-------------------------+/                                          <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                        <* 
- *>    /+---(open)---------------------------+/                                          <* 
- *>    rc = yjobs_world__open (a_runas, a_mode, "wt");                                   <* 
- *>    DEBUG_YJOBS   yLOG_value   ("open"      , rc);                                    <* 
- *>    --rce;  if (rc < 0) {                                                             <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                <* 
- *>       return  rce;                                                                   <* 
- *>    }                                                                                 <* 
- *>    if (rc == RC_ACK) {                                                               <* 
- *>       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                     <* 
- *>       return RC_ACK;                                                                 <* 
- *>    }                                                                                 <* 
- *>    /+---(walk-through)-------------------+/                                          <* 
- *>    DEBUG_YJOBS   yLOG_value   ("count"     , yjobs_world__count ());                 <* 
- *>    rc = yjobs_world__by_cursor (YDLST_HEAD, &x_world);                               <* 
- *>    while (rc >= 0 && x_world != NULL) {                                              <* 
- *>       DEBUG_YJOBS   yLOG_info  ("->path"    , x_world->path);                        <* 
- *>       fprintf (myJOBS.w_file, "%s\n", x_world->path);                                <* 
- *>       rc = yjobs_world__by_cursor (YDLST_NEXT, &x_world);                            <* 
- *>    }                                                                                 <* 
- *>    /+---(close)--------------------------+/                                          <* 
- *>    rc = yjobs_world__close (a_runas, a_mode);                                        <* 
- *>    DEBUG_YJOBS   yLOG_value   ("close"     , rc);                                    <* 
- *>    --rce;  if (rc < 0) {                                                             <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                <* 
- *>       return  rce;                                                                   <* 
- *>    }                                                                                 <* 
- *>    yURG_msg ('-', "exported %d entries to world registry", yjobs_world__count ());   <* 
- *>    /+---(complete)-----------------------+/                                          <* 
- *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                        <* 
- *>    return 0;                                                                         <* 
- *> }                                                                                    <*/
-
 
 
 /*====================------------------------------------====================*/
-/*===----                      major actions                           ----===*/
+/*===----                    foreach actions                           ----===*/
 /*====================------------------------------------====================*/
-static void  o___ACTIONS_________o () { return; }
-
-/*> char                                                                              <* 
- *> yjobs_world__justhome   (char *r_file, char *r_path)                              <* 
- *> {                                                                                 <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                       <* 
- *>    char        rce         =  -10;                                                <* 
- *>    char        rc          =    0;                                                <* 
- *>    char        x_path      [LEN_PATH]  = "";                                      <* 
- *>    char       *p           = NULL;                                                <* 
- *>    int         l           =    0;                                                <* 
- *>    /+---(header)-------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                     <* 
- *>    /+---(get the home)-------------------+/                                       <* 
- *>    p = getcwd (x_path, LEN_PATH);                                                 <* 
- *>    DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);                                  <* 
- *>    --rce;  if (p == NULL) {                                                       <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    ystrlcat (x_path, "/", LEN_PATH);                                               <* 
- *>    /+---(handle a file)------------------+/                                       <* 
- *>    if (strcmp (myJOBS.m_file, "") != 0)  {                                        <* 
- *>       ystrlcat (x_path, myJOBS.m_file, LEN_PATH);                                  <* 
- *>       if (r_file != NULL)  *r_file = 'y';                                         <* 
- *>    }                                                                              <* 
- *>    l = strlen (x_path);                                                           <* 
- *>    DEBUG_YJOBS   yLOG_complex ("x_path"    , "%2då%sæ", l, x_path);               <* 
- *>    /+---(save-back)----------------------+/                                       <* 
- *>    if (r_path != NULL)  ystrlcpy (r_path, x_path, LEN_PATH);                       <* 
- *>    /+---(complete)-----------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                     <* 
- *>    return 0;                                                                      <* 
- *> }                                                                                 <*/
-
-/*> char                                                                              <* 
- *> yjobs_world__exist      (char a_path [LEN_PATH])                                  <* 
- *> {                                                                                 <* 
- *>    /+---(locals)-----------+-----+-----+-+/                                       <* 
- *>    char        rce         =  -10;                                                <* 
- *>    char        rc          =    0;                                                <* 
- *>    int         l           =    0;                                                <* 
- *>    char        x_file      =  '-';                                                <* 
- *>    char        x_path      [LEN_PATH]  = "";                                      <* 
- *>    tSTAT       s;                                                                 <* 
- *>    /+---(header)-------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                     <* 
- *>    /+---(defense)------------------------+/                                       <* 
- *>    DEBUG_YJOBS   yLOG_point   ("a_path"    , a_path);                             <* 
- *>    --rce;  if (a_path == NULL) {                                                  <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    DEBUG_YJOBS   yLOG_info    ("a_path"    , a_path);                             <* 
- *>    l = strlen (a_path);                                                           <* 
- *>    DEBUG_YJOBS   yLOG_value   ("l"         , l);                                  <* 
- *>    --rce;  if (l <= 0) {                                                          <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    /+---(prepare)------------------------+/                                       <* 
- *>    ystrlcpy (x_path, a_path, LEN_PATH);                                           <* 
- *>    if (x_path [l - 1] != '/') {                                                   <* 
- *>       x_file = 'y';                                                               <* 
- *>       yURG_msg ('-', "verifying file at %2då%sæ", l, x_path);                     <* 
- *>    } else {                                                                       <* 
- *>       x_path [l - 1] = '\0';                                                      <* 
- *>       yURG_msg ('-', "verifying dir at  %2då%sæ", l, x_path);                     <* 
- *>    }                                                                              <* 
- *>    DEBUG_YJOBS   yLOG_char    ("x_file"    , x_file);                             <* 
- *>    /+---(check existance)----------------+/                                       <* 
- *>    rc = lstat (x_path, &s);                                                       <* 
- *>    DEBUG_YJOBS   yLOG_value   ("stat"      , rc);                                 <* 
- *>    --rce;  if (rc < 0) {                                                          <* 
- *>       yURG_err ('f', "actual entry does not exist at this location");             <* 
- *>       DEBUG_YJOBS   yLOG_note    ("entry does not exist at this location");       <* 
- *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    --rce;  if (S_ISLNK (s.st_mode))  {                                            <* 
- *>       yURG_err ('f', "entry is a symlink (illegal)");                             <* 
- *>       DEBUG_YJOBS  yLOG_note    ("can not use a symlink");                        <* 
- *>       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);                              <* 
- *>       return rce;                                                                 <* 
- *>    }                                                                              <* 
- *>    /+---(file specific)------------------+/                                       <* 
- *>    --rce;  if (x_file == 'y') {                                                   <* 
- *>       --rce;  if (S_ISDIR (s.st_mode))  {                                         <* 
- *>          yURG_err ('f', "entry is a directory (illegal)");                        <* 
- *>          DEBUG_YJOBS   yLOG_note    ("can not use a directory");                  <* 
- *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
- *>          return rce;                                                              <* 
- *>       }                                                                           <* 
- *>       --rce;  if (!S_ISREG (s.st_mode))  {                                        <* 
- *>          yURG_err ('f', "entry is not a regular file (illegal)");                 <* 
- *>          DEBUG_YJOBS   yLOG_note    ("can not use a specialty file");             <* 
- *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
- *>          return rce;                                                              <* 
- *>       }                                                                           <* 
- *>    }                                                                              <* 
- *>    /+---(directory specific)-------------+/                                       <* 
- *>    --rce;  if (x_file != 'y') {                                                   <* 
- *>       --rce;  if (S_ISREG (s.st_mode))  {                                         <* 
- *>          yURG_err ('f', "entry is a regular file (illegal)");                     <* 
- *>          DEBUG_YJOBS   yLOG_note    ("can not use a normal file file");           <* 
- *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
-*>          return rce;                                                              <* 
-*>       }                                                                           <* 
-*>       --rce;  if (!S_ISDIR (s.st_mode))  {                                        <* 
-   *>          yURG_err ('f', "entry is not a directory (illegal)");                    <* 
-      *>          DEBUG_YJOBS   yLOG_note    ("can not use a specialty file");             <* 
-      *>          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                          <* 
-      *>          return rce;                                                              <* 
-      *>       }                                                                           <* 
-      *>    }                                                                              <* 
-      *>    /+---(positive outcome)---------------+/                                       <* 
-      *>    yURG_msg ('-', "entry is confirmed as existing");                              <* 
-      *>    /+---(complete)-----------------------+/                                       <* 
-      *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                     <* 
-      *>    return 0;                                                                      <* 
-      *> }                                                                                 <*/
+static void  o___FOREACH_________o () { return; }
 
 char
-yjobs_world_audit       (char a_runas, char a_mode)
-{
-   /*> /+---(locals)-----------+-----+-----+-+/                                                 <* 
-    *> char        rce         =  -10;                                                          <* 
-    *> char        rc          =    0;                                                          <* 
-    *> tWORLD     *x_world     = NULL;                                                          <* 
-    *> int         c           =    0;                                                          <* 
-    *> int         n           =    0;                                                          <* 
-    *> int         x_fail      =    0;                                                          <* 
-    *> /+---(header)-------------------------+/                                                 <* 
-    *> DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                               <* 
-    *> /+---(verify header)------------------+/                                                 <* 
-    *> yURG_msg ('>', "audit the world file...");                                               <* 
-    *> /+---(purge)--------------------------+/                                                 <* 
-    *> rc = yjobs_world__purge ();                                                              <* 
-    *> DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                           <* 
-    *> --rce;  if (rc < 0) {                                                                    <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
-    *>    return  rce;                                                                          <* 
-    *> }                                                                                        <* 
-    *> /+---(import)-------------------------+/                                                 <* 
-    *> rc = yjobs_world__import (a_runas, a_mode);                                              <* 
-    *> DEBUG_YJOBS   yLOG_value   ("import"    , rc);                                           <* 
-    *> --rce;  if (rc < 0) {                                                                    <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
-    *>    return  rce;                                                                          <* 
-    *> } else {                                                                                 <* 
-    *>    yURG_msg ('-', "success, world file imported with no troubles");                      <* 
-    *> }                                                                                        <* 
-    *> /+---(get count)----------------------+/                                                 <* 
-    *> c = yjobs_world__count ();                                                               <* 
-    *> DEBUG_YJOBS   yLOG_value   ("count"     , c);                                            <* 
-    *> yURG_msg ('-', "world file has %d entries", c);                                          <* 
-    *> /+---(import)-------------------------+/                                                 <* 
-    *> yjobs_world__by_cursor  (YDLST_HEAD, &x_world);                                          <* 
-    *> while (x_world != NULL) {                                                                <* 
-    *>    ++n;                                                                                  <* 
-    *>    /+> rc = yjobs_world__exist (x_world->path);                                    <+/   <* 
-    *>    DEBUG_YJOBS   yLOG_value   ("exist"     , rc);                                        <* 
-    *>    if (rc < 0) {                                                                         <* 
-    *>       yURG_err ('f', "failed to find %2d/%2d å%sæ", n, c, x_world->path);                <* 
-    *>       ++x_fail;                                                                          <* 
-    *>    }                                                                                     <* 
-    *>    yjobs_world__by_cursor  (YDLST_NEXT, &x_world);                                       <* 
-    *> }                                                                                        <* 
-    *> /+---(troubles)-----------------------+/                                                 <* 
-    *> --rce;  if (x_fail > 0) {                                                                <* 
-    *>    yURG_err ('f', "failed to find (%d) directories in world list", x_fail);              <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
-    *>    return  rce;                                                                          <* 
-    *> } else if (c == 0) {                                                                     <* 
-    *>    yURG_msg ('-', "warning, world is empty of entries");                                 <* 
-    *> } else {                                                                                 <* 
-    *>    yURG_msg ('-', "success, verified all world entries");                                <* 
-    *> }                                                                                        <* 
-    *> /+---(purge)--------------------------+/                                                 <* 
-    *> yURG_msg ('-', "finally, cleaned up after world audit");                                 <* 
-    *> rc = yjobs_world__purge ();                                                              <* 
-    *> DEBUG_YJOBS   yLOG_value   ("purge"     , rc);                                           <* 
-    *> --rce;  if (rc < 0) {                                                                    <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                       <* 
-    *>    return  rce;                                                                          <* 
-    *> }                                                                                        <* 
-    *> /+---(complete)-----------------------+/                                                 <* 
-    *> DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                               <* 
-    *> return 0;                                                                                <*/
-}
-
-char
-yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL])
+yjobs_world__foreach    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -950,6 +494,8 @@ yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    int         l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(score)--------------------------*/
+   g_acts_score  [G_SCORE_WAUDIT ] = G_SCORE_FAIL;
    /*---(mute)---------------------------*/
    switch (a_mode) {
    case CASE_LIST :   yURG_all_mute ();   break;
@@ -990,9 +536,6 @@ yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
          l = strlen (x_entry);
          yURG_msg ('>', "%d) verify world entry...", n);
          x_type = yENV_exists (x_entry);
-         /*> if      (rc < 0)           yURG_msg (' ', BOLD_ERR "%c   %s" BOLD_OFF, ' ', x_entry);   <* 
-          *> else if (rc != YENV_NONE)  yURG_msg (' ', "%c   %s"                  , rc , x_entry);   <* 
-          *> else                       yURG_msg (' ', BOLD_YEL "%c   %s" BOLD_OFF, '-', x_entry);   <*/
          DEBUG_YJOBS   yLOG_complex ("exists"    , "%d/%c", x_type, x_type);
          if (x_type == YENV_DIR) {
             if (x_entry [l - 1] != '/') {
@@ -1011,9 +554,6 @@ yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
             rc_final = RC_FAILED;
             ++x_fails;
             break;
-            /*> yURG_err ('f', "entry name could not be split");                      <* 
-             *> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                       <* 
-             *> return  rce;                                                          <*/
          }
          /*---(audit entry)--------------------*/
          rc = yENV_audit (x_type, '-', 'n', x_dir, x_file, "-", "-", "-", -1, -1, '-', "");
@@ -1023,9 +563,6 @@ yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
             rc_final = RC_FAILED;
             ++x_fails;
             break;
-            /*> yjobs_ends_failure (a_mode, "entry is not secure/appropriate");       <* 
-             *> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                       <* 
-             *> return  rce;                                                          <*/
          }
          yURG_msg ('-', "success, entry exists and is appropriate");
          break;
@@ -1036,10 +573,22 @@ yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    switch (a_mode) {
    case CASE_LIST :   yURG_all_mute ();   break;
    }
+   /*---(score)--------------------------*/
+   if (rc_final == RC_POSITIVE)   g_acts_score  [G_SCORE_WAUDIT ] = 'a';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc_final;
 }
+
+char yjobs_world_list        (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL]) { return yjobs_world__foreach (a_runas, a_mode, a_hdir, a_world); }
+char yjobs_world_audit       (char a_runas, char a_mode, char a_hdir [LEN_DESC], char a_world [LEN_LABEL]) { return yjobs_world__foreach (a_runas, a_mode, a_hdir, a_world); }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                    main drivers                              ----===*/
+/*====================------------------------------------====================*/
+static void  o___DRIVERS_________o () { return; }
 
 char
 yjobs_world__prepare    (char a_runas, char a_mode, char a_entry [LEN_PATH], char a_hdir [LEN_DESC], char a_world [LEN_LABEL])
@@ -1156,10 +705,12 @@ yjobs_world_register    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    rc = yjobs_world__by_path (a_entry, &x_world);
    if (x_world != NULL) {
       yURG_err ('w', "entry already exists in registry, nothing to do");
-      rc = yjobs_ends_score (G_SCORE_WORLD,  4, 'D');
+      g_acts_score  [G_SCORE_WUPDATE] = 'D';
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
+   /*---(mark)---------------------------*/
+   g_acts_score  [G_SCORE_WUPDATE] = G_SCORE_FAIL;
    /*---(add new one)--------------------*/
    rc = yjobs_world__add    (a_entry);
    --rce;  if (rc < 0) {
@@ -1167,6 +718,8 @@ yjobs_world_register    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   /*---(mark)---------------------------*/
+   g_acts_score  [G_SCORE_WUPDATE] = 'r';
    yURG_msg ('-', "entry is NEW to registry, and added successfully");
    /*---(export)-------------------------*/
    rc = yjobs_world__export     (a_runas, a_mode, a_hdir, a_world);
@@ -1214,10 +767,12 @@ yjobs_world_withdraw    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    rc = yjobs_world__by_path (a_entry, &x_world);
    if (x_world == NULL) {
       yURG_err ('w', "entry does not exist in registry, nothing to do");
-      rc = yjobs_ends_score (G_SCORE_WORLD,  4, 'D');
+      g_acts_score  [G_SCORE_WUPDATE] = 'D';
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
+   /*---(mark)---------------------------*/
+   g_acts_score  [G_SCORE_WUPDATE] = G_SCORE_FAIL;
    /*---(remove)-------------------------*/
    rc = yjobs_world__remove (a_entry);
    --rce;  if (rc < 0) {
@@ -1225,6 +780,8 @@ yjobs_world_withdraw    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   /*---(mark)---------------------------*/
+   g_acts_score  [G_SCORE_WUPDATE] = 'u';
    yURG_msg ('-', "entry EXISTED in registry, and removed successfully");
    /*---(export)-------------------------*/
    rc = yjobs_world__export (a_runas, a_mode, a_hdir, a_world);
