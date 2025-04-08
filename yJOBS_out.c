@@ -34,19 +34,19 @@ yjobs__out_clear        (char a_mode, char a_db [LEN_LABEL], char a_file [LEN_LA
    if (a_db == NULL || strcmp (a_db, "") == 0) {
       DEBUG_YJOBS   yLOG_note    ("host program does not use central database");
       yURG_msg ('-', "skipping, host program does not use central database");
-      rc = yjobs_ends_score (G_SCORE_CENTRAL ,  4, G_SCORE_SKIP);
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  4, G_SCORE_SKIP);             <*/
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
    yURG_msg ('-', "host database å%sæ", a_db);
    /*---(default)------------------------*/
-   rc = yjobs_ends_score (G_SCORE_CENTRAL ,  4, G_SCORE_FAIL);
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  4, G_SCORE_FAIL);                <*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(check call-back)----------------*/
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
    --rce;  if (f_callback == NULL) {
       yURG_err ('f', "host program callback function is NULL (illegal setup)");
-      yjobs_ends_failure (a_mode, "host program configuration is illegal");
+      yjobs_ends_failure (a_mode, "", "host program configuration is illegal");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -54,7 +54,7 @@ yjobs__out_clear        (char a_mode, char a_db [LEN_LABEL], char a_file [LEN_LA
    /*---(file name)----------------------*/
    --rce;  if (a_file == NULL || strcmp (a_file, "") == 0) {
       yURG_err ('f', "host program callback function is NULL (illegal setup)");
-      yjobs_ends_failure (a_mode, "host program configuration is illegal");
+      yjobs_ends_failure (a_mode, "", "host program configuration is illegal");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -63,14 +63,14 @@ yjobs__out_clear        (char a_mode, char a_db [LEN_LABEL], char a_file [LEN_LA
    rc = x_callback (YJOBS_CLEAR, a_file);
    DEBUG_YJOBS   yLOG_value   ("clear"     , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "contents could not be cleared");
+      yjobs_ends_failure (a_mode, "", "contents could not be cleared");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    rc_final = rc;
    /*---(score)--------------------------*/
    if (rc_final == RC_POSITIVE) {
-      rc = yjobs_ends_score (G_SCORE_CENTRAL ,  4, 'x');
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  4, 'x');                      <*/
       DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    }
    /*---(complete)-----------------------*/
@@ -102,7 +102,7 @@ yjobs__out_delete       (char a_runas, char a_mode, char a_cdir [LEN_DESC], char
    /*---(header)-------------------------*/
    yURG_msg ('>', "central data file deletion...");
    /*---(default)------------------------*/
-   rc = yjobs_ends_score (G_SCORE_CENTRAL ,  6, G_SCORE_FAIL);
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  6, G_SCORE_FAIL);                <*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(set etc)-------------------------------*/
    if (a_cdir != NULL && strstr  (a_cdir, "/etc/") != NULL)    x_etc = 'y';
@@ -111,7 +111,7 @@ yjobs__out_delete       (char a_runas, char a_mode, char a_cdir [LEN_DESC], char
    DEBUG_YJOBS   yLOG_point   ("a_cdir"    , a_cdir);
    --rce;  if (a_cdir       == NULL) {
       yURG_err ('f', "configuration directory is NULL (illegal setup)");
-      yjobs_ends_failure (a_mode, "host program configuration is illegal");
+      yjobs_ends_failure (a_mode, "", "host program configuration is illegal");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -119,7 +119,7 @@ yjobs__out_delete       (char a_runas, char a_mode, char a_cdir [LEN_DESC], char
    /*---(quick-out)----------------------*/
    --rce;  if (strcmp (a_cdir, "") == 0) {
       yURG_msg ('-', "skipping, no configuration directory specified for application");
-      rc = yjobs_ends_score (G_SCORE_CENTRAL ,  6, G_SCORE_SKIP);
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  6, G_SCORE_SKIP);             <*/
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
@@ -127,23 +127,23 @@ yjobs__out_delete       (char a_runas, char a_mode, char a_cdir [LEN_DESC], char
    /*---(quick-out)----------------------*/
    --rce;  if (x_etc == 'y') {
       yURG_err ('f', "skipping, single-file configuration can not be deleted, only replaced");
-      yjobs_ends_failure (a_mode, "/etc program can not deleted conf file");
+      yjobs_ends_failure (a_mode, "", "/etc program can not deleted conf file");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(check file)---------------------*/
    --rce;  if (a_file == NULL || strcmp (a_file, "") == 0) {
       yURG_err ('f', "configuration file to be deleted is NULL");
-      yjobs_ends_failure (a_mode, "requested null/empty file");
+      yjobs_ends_failure (a_mode, "", "requested null/empty file");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "configuration file å%sæ", a_file);
    /*---(validate file)----------------------*/
-   rc = yjobs_central_old  (a_runas, a_mode, a_file, NULL, NULL, NULL, NULL);
+   /*> rc = yjobs_central_old  (a_runas, a_mode, a_file, NULL, NULL, NULL, NULL);     <*/
    DEBUG_YJOBS   yLOG_value   ("central"   , rc);
    if (rc < 0) {
-      yjobs_ends_failure (a_mode, "central file not proper and/or existant");
+      yjobs_ends_failure (a_mode, "", "central file not proper and/or existant");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -159,20 +159,20 @@ yjobs__out_delete       (char a_runas, char a_mode, char a_cdir [LEN_DESC], char
    DEBUG_YJOBS   yLOG_value   ("wifexited" , WIFEXITED(rc));
    --rce;  if (rc < 0 || WIFEXITED (rc) < 0) {
       yURG_err ('f', "central file could not be deleted");
-      yjobs_ends_failure (a_mode, "central file could not be deleted");
+      yjobs_ends_failure (a_mode, "", "central file could not be deleted");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(verify)-----------------------------*/
    --rce;  if (yENV_exists (x_old) != '-') {
       yURG_err ('f', "central file still exists");
-      yjobs_ends_failure (a_mode, "central file still exists");
+      yjobs_ends_failure (a_mode, "", "central file still exists");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    yURG_msg ('-', "success, file deleted", x_old);
    /*---(score)--------------------------*/
-   rc = yjobs_ends_score (G_SCORE_CENTRAL ,  6, 'X');
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_CENTRAL ,  6, 'X');                         <*/
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -201,15 +201,15 @@ yjobs__out_withdraw     (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(header)-------------------------*/
    yURG_msg ('>', "withdraw from world file...");
    /*---(default)------------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  1, G_SCORE_FAIL);
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  3, G_SCORE_FAIL);
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  4, G_SCORE_FAIL);
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  1, G_SCORE_FAIL);                <*/
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  3, G_SCORE_FAIL);                <*/
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  4, G_SCORE_FAIL);                <*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(defense)-------------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_world"   , a_world);
    --rce;  if (a_world      == NULL) {
       yURG_err ('f', "world file configuration is NULL (illegal setup)");
-      yjobs_ends_failure (a_mode, "host program configuration is illegal");
+      yjobs_ends_failure (a_mode, "", "host program configuration is illegal");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -217,9 +217,9 @@ yjobs__out_withdraw     (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(quick-out)----------------------*/
    --rce;  if (strcmp (a_world, "") == 0) {
       yURG_msg ('-', "skipping, no world file configuration specified for application");
-      rc = yjobs_ends_score (G_SCORE_WORLD   ,  1, G_SCORE_SKIP);
-      rc = yjobs_ends_score (G_SCORE_WORLD   ,  3, G_SCORE_SKIP);
-      rc = yjobs_ends_score (G_SCORE_WORLD   ,  4, G_SCORE_SKIP);
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  1, G_SCORE_SKIP);             <*/
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  3, G_SCORE_SKIP);             <*/
+      /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  4, G_SCORE_SKIP);             <*/
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
@@ -237,14 +237,14 @@ yjobs__out_withdraw     (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(handle trouble)-----------------*/
    DEBUG_YJOBS   yLOG_value   ("withdraw"  , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "can not withdraw from world file");
+      yjobs_ends_failure (a_mode, "", "can not withdraw from world file");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(update score)-------------------*/
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  1, 'Ô');
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  3, 'u');
-   rc = yjobs_ends_score (G_SCORE_WORLD   ,  4, 'Õ');
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  1, 'Ô');                         <*/
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  3, 'u');                         <*/
+   /*> rc = yjobs_ends_score_OLD (G_SCORE_WORLD   ,  4, 'Õ');                         <*/
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -264,6 +264,8 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    char        rce         =  -10;
    char        rc          =    0;
    char        rc_final    =    1;
+   int         x_ruid      =   -1;
+   char        x_ruser     [LEN_USER]  = "";
    char        x_cdir      [LEN_DESC]  = "";
    char        x_hdir      [LEN_DESC]  = "";
    char        x_world     [LEN_LABEL] = "";
@@ -274,7 +276,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_share_prepare ("yjobs__out_prepare", 'o', a_runas, a_mode, a_oneline, a_file, f_callback, x_cdir, x_hdir, x_world, x_db, NULL, x_full);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, &x_ruid, x_ruser, x_cdir, NULL, x_hdir, x_world, x_db, NULL, NULL, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -284,7 +286,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(read database)------------------*/
-   rc = yjobs_share_readdb   ("yjobs__out_readdb", 'o', a_mode, x_hdir, x_db, f_callback);
+   rc = yjobs_db_read        (a_runas, a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("readdb"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -304,7 +306,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(write database)-----------------*/
-   rc = yjobs_share_writedb  ("yjobs__out_writedb", 'o', a_mode, x_hdir, x_db, f_callback);
+   rc = yjobs_db_write       (a_runas, a_mode, x_hdir, x_db, f_callback);
    DEBUG_YJOBS   yLOG_value   ("writedb"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -340,8 +342,8 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    case RC_OVERRIDE :  rc = yjobs_ends_approved (a_mode);                    rc = RC_OVERRIDE;   break;
    case RC_REPAIR   :  rc = yjobs_ends_repaired (a_mode);                    rc = RC_REPAIR;     break;
    case RC_WARNING  :  rc = yjobs_ends_warning  (a_mode);                    rc = RC_WARNING;    break;
-   case RC_FATAL    :  rc = yjobs_ends_failure  (a_mode, "serious errors");  rc = RC_FATAL;      break;
-   default          :  rc = yjobs_ends_failure  (a_mode, "serious errors");  rc = rce;           break;
+   case RC_FATAL    :  rc = yjobs_ends_failure  (a_mode, "", "serious errors");  rc = RC_FATAL;      break;
+   default          :  rc = yjobs_ends_failure  (a_mode, "", "serious errors");  rc = rce;           break;
    }
    DEBUG_YJOBS   yLOG_value   ("rc"        , rc);
    --rce;  if (rc < 0) {
@@ -431,10 +433,10 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    --rce;  if (strchr ("xõXrøReìE", a_mode) != NULL) {
       if (strcmp (a_file, "") != 0) {
          g_acts_score  [G_SCORE_CENTRAL  + 1] = G_SCORE_FAIL;
-         rc = yjobs_central_old  (a_runas, a_mode, a_file, NULL, NULL, NULL, NULL);
+         /*> rc = yjobs_central_old  (a_runas, a_mode, a_file, NULL, NULL, NULL, NULL);   <*/
          DEBUG_YJOBS   yLOG_value   ("central"   , rc);
          if (rc < 0) {
-            yjobs_ends_failure (a_mode, "central file not proper and/or secure");
+            yjobs_ends_failure (a_mode, "", "central file not proper and/or secure");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -473,7 +475,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          rc = x_callback (YJOBS_EXTRACT, x_full);
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_ends_failure (a_mode, "could not extract from database");
+            yjobs_ends_failure (a_mode, "", "could not extract from database");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
@@ -487,7 +489,7 @@ yjobs_outgoing_full     (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
          /* copy file down */
          DEBUG_YJOBS   yLOG_value   ("read db"   , rc);
          if (rc < 0) {
-            yjobs_ends_failure (a_mode, "could not copy from central");
+            yjobs_ends_failure (a_mode, "", "could not copy from central");
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }

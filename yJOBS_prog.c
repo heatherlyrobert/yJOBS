@@ -32,47 +32,73 @@
 
 
 char
-yjobs_prog__prepare     (cchar *a_oneline, void *f_callback)
+yjobs_prog__prepare     (char a_runas, char a_mode, char a_oneline [LEN_HUND], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    int         rce         =  -10;
    int         rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", myJOBS.m_runas, g_valid);
+   /*---(re-check runas)-----------------*/
+   DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", a_runas, g_valid);
    --rce;  if (yJOBS_ifvalid () == 0) {
-      DEBUG_YJOBS   yLOG_note    ("runas not recognized");
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_note    ("runas is not recognized");
+      yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
+      yENV_score_mark ("ENV"      , '·');
+      yjobs_ends_failure (a_mode, "", "runas is not recognized");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YJOBS   yLOG_complex ("mode"      , "%c  å%sæ", myJOBS.m_mode, g_allmode);
+   yENV_score_mark ("RUNAS"    , a_runas);
+   /*---(re-check mode)------------------*/
+   DEBUG_YJOBS   yLOG_complex ("mode"      , "%c  å%sæ", a_mode, g_allmode);
    --rce;  if (yJOBS_ifallmode () == 0) {
-      DEBUG_YJOBS   yLOG_note    ("mode not recognized");
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_note    ("mode is not recognized");
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+      yjobs_ends_failure (a_mode, "", "mode is not recognized");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(save args)----------------------*/
+   yENV_score_mark ("MODE"     , a_mode);
+   /*---(check oneline)------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_oneline" , a_oneline);
-   if (a_oneline  == NULL)    ystrlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
-   else                       ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
+   if (a_oneline == NULL || a_oneline [0] == '\0') {
+      DEBUG_YJOBS   yLOG_note    ("oneline can not be NULL/empty");
+      yENV_score_mark ("ONE"      , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "oneline can not be NULL/empty");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_oneline" , a_oneline);
+   yENV_score_mark ("ONE"      , 'o');
+   ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
+   /*---(check callback)-----------------*/
    DEBUG_YJOBS   yLOG_point   ("f_callback", f_callback);
-   if (f_callback != NULL)    myJOBS.e_callback   = f_callback;
-   else                       myJOBS.e_callback   = NULL;
+   if (f_callback == NULL) {
+      DEBUG_YJOBS   yLOG_note    ("callback can not be NULL");
+      yENV_score_mark ("CALL"     , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "callback can not be NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("a_oneline" , a_oneline);
+   yENV_score_mark ("CALL"     , '&');
+   myJOBS.e_callback   = f_callback;
    /*---(finalize verbosity)-------------*/
    rc = yjobs_final ();
    DEBUG_YJOBS   yLOG_value   ("final"     , rc);
    --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 char
-yJOBS_driver            (cchar *a_oneline, void *f_callback)
+yJOBS_driver            (char a_oneline [LEN_HUND], void *f_callback)
 {
    /*---(locals)-----------+-----+-----+-*/
    int         rce         =  -10;
@@ -80,33 +106,21 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
    char        x_done      =  '-';
    char       *p           = NULL;
    char        x_world     [LEN_LABEL] = "";
+   char        x_cat       =  '-';
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", myJOBS.m_runas, g_valid);
-   --rce;  if (yJOBS_ifvalid () == 0) {
-      DEBUG_YJOBS   yLOG_note    ("runas not recognized");
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_complex ("mode"      , "%c  å%sæ", myJOBS.m_mode, g_allmode);
-   --rce;  if (yJOBS_ifallmode () == 0) {
-      DEBUG_YJOBS   yLOG_note    ("mode not recognized");
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(save args)----------------------*/
-   DEBUG_YJOBS   yLOG_point   ("a_oneline" , a_oneline);
-   if (a_oneline  == NULL)    ystrlcpy (myJOBS.m_oneline , "oneline program description not provided", LEN_HUND);
-   else                       ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
-   DEBUG_YJOBS   yLOG_point   ("f_callback", f_callback);
-   if (f_callback != NULL)    myJOBS.e_callback   = f_callback;
-   else                       myJOBS.e_callback   = NULL;
-   /*---(finalize verbosity)-------------*/
-   rc = yjobs_final ();
-   DEBUG_YJOBS   yLOG_value   ("final"     , rc);
+   /*---(check inputs)-------------------*/
+   rc = yjobs_prog__prepare (myJOBS.m_runas, myJOBS.m_mode, a_oneline, f_callback);
+   DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
-      DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(gather category)----------------*/
+   x_cat = yjobs_args_cat (myJOBS.m_mode);
+   DEBUG_YJOBS   yLOG_value   ("x_cat"     , x_cat);
+   --rce;  if (x_cat < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(overall 3)----------------------*/
@@ -187,7 +201,7 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       switch (myJOBS.m_mode) {
       case CASE_GATHER     :
          /*---(get central files)--------------*/
-         rc = yjobs_who_location (myJOBS.m_runas, NULL, NULL, x_world, NULL, NULL);
+         rc = yjobs_who_location (myJOBS.m_runas, NULL, NULL, NULL, NULL, x_world);
          DEBUG_YJOBS   yLOG_value   ("location"  , rc);
          if (rc < 0) {
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -200,7 +214,8 @@ yJOBS_driver            (cchar *a_oneline, void *f_callback)
       case CASE_PRICKLY    :
       case CASE_NORMAL     :
       case CASE_STRICT     :
-         rc = yjobs_running   ();
+         /*> rc = yjobs_running   ();                                                 <*/
+         rc = yjobs_run       ();
          x_done = 'y';
          break;
       default              :

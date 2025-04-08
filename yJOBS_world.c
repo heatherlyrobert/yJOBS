@@ -361,7 +361,7 @@ yjobs_world__import     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WREAD  ] = G_SCORE_FAIL;
+   yENV_score_mark ("WREAD"    , G_SCORE_FAIL);
    /*---(purge)--------------------------*/
    rc = yjobs_world__purge ();
    DEBUG_YJOBS   yLOG_value   ("purge"     , rc);
@@ -409,7 +409,7 @@ yjobs_world__import     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return  rce;
    }
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WREAD  ] = 'Ô';
+   yENV_score_mark ("WREAD"    , 'Ô');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -426,7 +426,7 @@ yjobs_world__export     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WWRITE ] = G_SCORE_FAIL;
+   yENV_score_mark ("WWRITE"   , G_SCORE_FAIL);
    /*---(open)---------------------------*/
    rc = yENV_open_full ("world file", a_hdir, a_world, 'w', NULL, NULL, NULL, &f);
    DEBUG_YJOBS   yLOG_value   ("open"      , rc);
@@ -463,7 +463,7 @@ yjobs_world__export     (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return  rce;
    }
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WWRITE ] = 'Õ';
+   yENV_score_mark ("WWRITE"   , 'Õ');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -494,23 +494,29 @@ yjobs_world__foreach    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    int         l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(score)--------------------------*/
-   g_acts_score  [G_SCORE_WAUDIT ] = G_SCORE_FAIL;
    /*---(mute)---------------------------*/
    switch (a_mode) {
-   case CASE_LIST :   yURG_all_mute ();   break;
+   case CASE_LIST :
+      yENV_score_mark ("WLIST"    , G_SCORE_FAIL);
+      yURG_all_mute ();
+      break;
+   default        :
+      yENV_score_mark ("WAUDIT"   , G_SCORE_FAIL);
+      break;
    }
    /*---(audit world file)---------------*/
    yURG_msg ('>', "audit existance and security of world file...");
    /*---(audit world file)---------------*/
+   yENV_score_mark ("WSECURE"  , G_SCORE_FAIL);
    rc = yENV_audit_reg ('-', 'n', a_hdir, a_world, "root", "root", "f_tight");
    DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "world file is not secure/appropriate");
+      yjobs_ends_failure (a_mode, "", "world file is not secure/appropriate");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
    yURG_msg ('-', "success, world file exists and security is appropriate");
+   yENV_score_mark ("WSECURE"  , 's');
    /*---(import)-------------------------*/
    yURG_msg ('>', "import the world file...");
    rc = yjobs_world__import (a_runas, a_mode, a_hdir, a_world);
@@ -571,10 +577,14 @@ yjobs_world__foreach    (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    }
    /*---(mute)---------------------------*/
    switch (a_mode) {
-   case CASE_LIST :   yURG_all_mute ();   break;
+   case CASE_LIST :
+      yURG_all_mute ();
+      if (rc_final == RC_POSITIVE)   yENV_score_mark ("WLIST"    , '=');
+      break;
+   default        :
+      if (rc_final == RC_POSITIVE)   yENV_score_mark ("WAUDIT"   , 'a');
+      break;
    }
-   /*---(score)--------------------------*/
-   if (rc_final == RC_POSITIVE)   g_acts_score  [G_SCORE_WAUDIT ] = 'a';
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return rc_final;
@@ -606,22 +616,22 @@ yjobs_world__prepare    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    /*---(audit world file)---------------*/
    yURG_msg ('>', "audit existance and security of world file...");
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WAUDIT ] = G_SCORE_FAIL;
+   yENV_score_mark ("WSECURE"  , G_SCORE_FAIL);
    /*---(audit world file)---------------*/
    rc = yENV_audit_reg ('-', 'n', a_hdir, a_world, "root", "root", "f_tight");
    DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "world file is not secure/appropriate");
+      yjobs_ends_failure (a_mode, "", "world file is not secure/appropriate");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WAUDIT ] = 's';
+   yENV_score_mark ("WSECURE"  , 's');
    yURG_msg ('-', "success, world file exists and security is appropriate");
    /*---(prepare for action)-------------*/
    yURG_msg ('>', "confirm and audit requested entry...");
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WENTRY ] = G_SCORE_FAIL;
+   yENV_score_mark ("WENTRY"   , G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_entry"   , a_entry);
    --rce;  if (a_entry == NULL) {
@@ -661,13 +671,13 @@ yjobs_world__prepare    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    rc = yENV_audit (x_type, '-', 'n', x_dir, x_file, "-", "-", "-", -1, -1, '-', "");
    DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "entry is not secure/appropriate");
+      yjobs_ends_failure (a_mode, "", "entry is not secure/appropriate");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
    /*---(mark)---------------------------*/
-   if (x_type == YENV_DIR)   g_acts_score  [G_SCORE_WENTRY ] = 'd';
-   else                      g_acts_score  [G_SCORE_WENTRY ] = 'f';
+   if (x_type == YENV_DIR)   yENV_score_mark ("WENTRY"   , 'd');
+   else                      yENV_score_mark ("WENTRY"   , 'f');
    yURG_msg ('-', "success, entry exists and is appropriate");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -685,11 +695,13 @@ yjobs_world_register    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    int         l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(mark)---------------------------*/
+   yENV_score_mark ("LREG"     , G_SCORE_FAIL);
    /*---(audit world file)---------------*/
    rc = yjobs_world__prepare (a_runas, a_mode, a_entry, a_hdir, a_world);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "entry is not secure/appropriate");
+      yjobs_ends_failure (a_mode, "", "entry is not secure/appropriate");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
@@ -705,12 +717,10 @@ yjobs_world_register    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    rc = yjobs_world__by_path (a_entry, &x_world);
    if (x_world != NULL) {
       yURG_err ('w', "entry already exists in registry, nothing to do");
-      g_acts_score  [G_SCORE_WUPDATE] = 'D';
+      yENV_score_mark ("LREG"     , 'D');
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
-   /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WUPDATE] = G_SCORE_FAIL;
    /*---(add new one)--------------------*/
    rc = yjobs_world__add    (a_entry);
    --rce;  if (rc < 0) {
@@ -719,7 +729,7 @@ yjobs_world_register    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
       return rce;
    }
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WUPDATE] = 'r';
+   yENV_score_mark ("LREG"     , 'r');
    yURG_msg ('-', "entry is NEW to registry, and added successfully");
    /*---(export)-------------------------*/
    rc = yjobs_world__export     (a_runas, a_mode, a_hdir, a_world);
@@ -746,11 +756,13 @@ yjobs_world_withdraw    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    int         l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(mark)---------------------------*/
+   yENV_score_mark ("LWITH"    , G_SCORE_FAIL);
    /*---(audit world file)---------------*/
    rc = yjobs_world__prepare (a_runas, a_mode, a_entry, a_hdir, a_world);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
-      yjobs_ends_failure (a_mode, "entry is not secure/appropriate");
+      yjobs_ends_failure (a_mode, "", "entry is not secure/appropriate");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return  rce;
    }
@@ -767,12 +779,10 @@ yjobs_world_withdraw    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
    rc = yjobs_world__by_path (a_entry, &x_world);
    if (x_world == NULL) {
       yURG_err ('w', "entry does not exist in registry, nothing to do");
-      g_acts_score  [G_SCORE_WUPDATE] = 'D';
+      yENV_score_mark ("LWITH"    , 'D');
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return RC_ACK;
    }
-   /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WUPDATE] = G_SCORE_FAIL;
    /*---(remove)-------------------------*/
    rc = yjobs_world__remove (a_entry);
    --rce;  if (rc < 0) {
@@ -781,7 +791,7 @@ yjobs_world_withdraw    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
       return rce;
    }
    /*---(mark)---------------------------*/
-   g_acts_score  [G_SCORE_WUPDATE] = 'u';
+   yENV_score_mark ("LWITH"    , 'u');
    yURG_msg ('-', "entry EXISTED in registry, and removed successfully");
    /*---(export)-------------------------*/
    rc = yjobs_world__export (a_runas, a_mode, a_hdir, a_world);

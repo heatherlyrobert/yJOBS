@@ -324,13 +324,13 @@ typedef const  char      cchar;
 /*===[[ BASE USAGE ]]=========================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char*       yJOBS_version           (void);
-char        yJOBS_runas             (cchar *a_name, char *r_runas, ...);
+char        yJOBS_runas             (char a_name [LEN_TERSE], char *r_runas, ...);
 char        yJOBS_noise             (char a_argc, char *a_argv []);
 char        yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas, char *r_mode, char *r_file);
-char        yJOBS_driver            (cchar *a_oneline, void *f_callback);
+char        yJOBS_driver            (char a_oneline [LEN_HUND], void *f_callback);
 char        yJOBS_final             (int a_uid);  /* DEPRICATED */
 char        yJOBS_wrap              (void);
-char        yJOBS_configured        (cchar a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_cname [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL]);
+char        yJOBS_configured        (char a_runas, char *r_unit, char r_name [LEN_TERSE], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_conf [LEN_LABEL], char r_hdir [LEN_DESC], char r_db [LEN_LABEL], char r_world [LEN_LABEL]);
 
 
 
@@ -355,8 +355,8 @@ char        yJOBS_act_check         (cchar a_runas, cchar a_act, cchar *a_onelin
 /*> char        yJOBS_act_remove        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);   <*/
 char        yJOBS_act_extract       (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_name);
 /*---(security)-------------*/
-char        yJOBS_security          (void);
-char        yJOBS_fix               (void);
+/*> char        yJOBS_security          (void);                                       <*/
+/*> char        yJOBS_fix               (void);                                       <*/
 /*---(review)---------------*/
 char        yJOBS_act_review        (cchar a_runas, cchar a_act, cchar *a_oneline, cchar *a_muser, int a_muid, cchar *a_regex, void *a_assimilate);
 /*---(done)-----------------*/

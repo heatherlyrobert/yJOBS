@@ -23,74 +23,203 @@
  */
 
 
-char    g_acts_empty    [LEN_HUND]  = "··  SEá····  DBá······  LOá···  WOá·······  CEá·······  ACá···  BEá·······  ··";
-char    g_acts_full     [LEN_HUND]  = "hl  SEáafcd  DBásaÔ#óÕ  LOálÖò  WOásaeÔ=rÕ  CEáamÖr×=x  ACágnd  BEásaEUBDR  fy";
-
 char    g_acts_score    [LEN_HUND]  = "                                                                        ";
 
 char    g_fullacts      [LEN_DESC]  = "hl aÔÕ lcÖ òmr #=ó WRf BRP UD ×we fF";
 
-static char (*s_assimilate) (cchar a_runas, cchar a_loc, cchar *a_file, char *r_user, char *r_desc);
-
-static struct {
-   char        s_pos;
-   char        s_section;
-   uchar       s_valid     [LEN_TERSE];
-   char        s_desc      [LEN_DESC];
-} s_scores [LEN_HUND] = {
-
-   {  0, G_SCORE_PREPARE   , "°h-·"    , "printing of the title lines"      },
-   {  1, G_SCORE_PREPARE   , "°l·"     , "default location lookup"          },
-
-   {  7, G_SCORE_SECURE    , "°a-·"    , "general security audit"           },
-   {  8, G_SCORE_SECURE    , "°fF-·"   , "adding fix to the audit"          },
-   {  9, G_SCORE_SECURE    , "°cF-·"   , "configuration dir security"       },
-   { 10, G_SCORE_SECURE    , "°dF-·"   , "central data dir security"        },
-
-   { 16, G_SCORE_DATABASE  , "°s--·"   , "database security"                }, /* s) secure, a) audited content, -) skipped */
-   { 17, G_SCORE_DATABASE  , "°a--·"   , "database contents audit"          },
-   { 18, G_SCORE_DATABASE  , "°Ô-·"    , "read database"                    },
-   { 19, G_SCORE_DATABASE  , "°#·"     , "database statistics"              },
-   { 20, G_SCORE_DATABASE  , "°ó·"     , "database reporting"               },
-   { 21, G_SCORE_DATABASE  , "°Õ-·"    , "write database"                   },
-
-   { 27, G_SCORE_LOCAL     , "°dl·"    , "audit local file/directory"       },
-   { 28, G_SCORE_LOCAL     , "°Ö·"     , "pull/read local file"             },
-   { 29, G_SCORE_LOCAL     , "°ò·"     , "local report"                     },
-
-   { 35, G_SCORE_WORLD     , "°s-·"    , "world file security"              }, /* s) secure, a) audited content, -) skipped    */
-   { 36, G_SCORE_WORLD     , "°a-·"    , "world contents audit"             },
-   { 37, G_SCORE_WORLD     , "°fd-·"   , "requested entry check"            }, /* f) file, d) directory, -) skipped */
-   { 38, G_SCORE_WORLD     , "°Ô-·"    , "read/import world file"           },
-   { 39, G_SCORE_WORLD     , "°=-·"    , "reporting"                        },
-   { 40, G_SCORE_WORLD     , "°ruD-·"  , "register or withdraw"             }, /* r) register, u) withdraw, D) duplicate, -) skipped */
-   { 41, G_SCORE_WORLD     , "°Õ-·"    , "write/export world file"          },
-
-   { 47, G_SCORE_CENTRAL   , "°a-·"    , "file contents audit"              },
-   { 48, G_SCORE_CENTRAL   , "°m-·"    , "move local to central"            },
-   { 49, G_SCORE_CENTRAL   , "°Ö-·"    , "pull/load central config"         },
-   { 50, G_SCORE_CENTRAL   , "°rR-·"   , "read all central files"           },
-   { 51, G_SCORE_CENTRAL   , "°x-·"    , "clear specific data from db"      },
-   { 52, G_SCORE_CENTRAL   , "°=·"     , "list central files"               },
-   { 53, G_SCORE_CENTRAL   , "°X-·"    , "remove central file"              },
-
-   { 59, G_SCORE_ACTION    , "°g·"     , "gather local files"               },
-   { 60, G_SCORE_ACTION    , "°n·"     , "normal/strict mode"               },
-   { 61, G_SCORE_ACTION    , "°d·"     , "daemon/prickly mode"              },
-
-   { 67, G_SCORE_BSECURE   , "°s-·"    , "backend security"                 },
-   { 68, G_SCORE_BAUDIT    , "°a-·"    , "audit of backend"                 },
-   { 69, G_SCORE_BACKEND   , "°E-·"    , "extract a central file"           },
-   { 70, G_SCORE_BACKEND   , "°U-·"    , "upload a central file"            },
-   { 71, G_SCORE_BACKEND   , "°B-·"    , "backup a central file"            },
-   { 72, G_SCORE_BACKEND   , "°D-·"    , "download a central file"          },
-   { 73, G_SCORE_BACKEND   , "°R-·"    , "restore a central file"           },
-
-   { 76, G_SCORE_JUDGE     , "°f-·"    , "print footer on output"           },
-   { 77, G_SCORE_JUDGE     , "°y!·"    , "final judgement"                  },
-
-   { -1, -1                , ""        , "end-of-entries"                   },
+const static tENV_SCORE s_scores [LEN_FULL] = {
+   /*===[[ PREPARE ]]=======================================================*/
+   { "HEá "     , ' ' ,  0  , "HEAD"     , ""                                 , ""                                                                                },
+   { "RUNAS"    , '·' , 'e' , "runas"    , "host_program calling yjobs"       , "e) eos       k) khronos   p) polymnia   ..."                                     },
+   { "ENV"      , '·' , 'u' , "env"      , "run-time environment"             , "·) normal    d) debug     u) unit-test"                                          },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "MODE"     , '·' , 'v' , "mode"     , "yjobs action requested"           , "v) verify    g) gather    d) daemon     ..."                                     },
+   { "NOISE"    , '·' , '!' , "noise"    , "verbosity of feedback"            , "-) silent    c) confirm   !) verbose"                                            },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "ONE"      , '·' , 'o' , "onelin"   , "runas oneline desc"               , "°) failed    o) given"                                                           },
+   { "CALL"     , '·' , '&' , "callbk"   , "yjobs file provided"              , "°) null      c) given"                                                           },
+   { "FILE"     , '·' , 'f' , "file"     , "yjobs file provided"              , "-) n/a       f) required"                                                        },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "RUSER"    , '·' , 'u' , "ruser"    , "run-time user data"               , "°) failed    u) gathered"                                                        },
+   { "HEADER"   , '·' , 'h' , "header"   , "printing of the title lines"      , "°) failed    -) skipped   h) header"                                             },
+   { "LOCS"     , '·' , 'l' , "locs"     , "default location lookup"          , "°) failed    l) locs"                                                            },
+   { "CWD"      , '·' , '¤' , "cwd"      , "current working directory"        , "°) failed    ¤) cwd"                                                             },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ PREPARE ]]=======================================================*/
+   { "SEá "     , ' ' ,  0  , "SEC"      , ""                                 , ""                                                                                },
+   { "SSECURE"  , '·' , 's' , "secure"   , "general security"                 , ""                                                                                },
+   { "SFIX"     , '·' , 'f' , "fix"      , "adding fix to the audit"          , ""                                                                                },
+   { "SAUDIT"   , '·' , 'a' , "audit"    , "general audit"                    , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ LOCAL ]]=========================================================*/
+   { "LOá "     , ' ' ,  0  , "LOCAL"    , ""                                 , ""                                                                                },
+   { "LTYPE"    , '·' , 'd' , "type"     , "type of entry"                    , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "LSECURE"  , '·' , 's' , "secure"   , "security on file/directory"       , ""                                                                                },
+   { "LAUDIT"   , '·' , 'a' , "audit"    , "audit local file by pulling"      , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "LPULL"    , '·' , 'Ö' , "pull"     , "pull file in"                     , ""                                                                                },
+   { "LREPORT"  , '·' , 'ò' , "report"   , "local report"                     , ""                                                                                },
+   { "LMOVE"    , '·' , 'm' , "move"     , "move local to central"            , ""                                                                                },
+   { "LREG"     , '·' , 'r' , "regist"   , "register in world"                , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "LWITH"    , '·' , 'w' , "withdr"   , "withdraw from world"              , ""                                                                                },
+   { "LREMOVE"  , '·' , 'x' , "remove"   , "remove central file"              , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ CONFIG ]]========================================================*/
+   { "CFá "     , ' ' ,  0  , "CONF"     , ""                                 , ""                                                                                },
+   { "FSTYLE"   , '·' , 'e' , "style"    , "config location type"             , "e) etc       s) spool"                                                           },
+   { "FCOUNT"   , '·' , '1' , "count"    , "count of config files"            , "1) single    *) multiple"                                                        },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "FDSEC"    , '·' , 's' , "secure"   , "configuration dir security"       , ""                                                                                },
+   { "FDFIX"    , '·' , 'f' , "dfix"     , "configuration dir fix"            , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "FFSEC"    , '·' , 's' , "secure"   , "configuration files secure"       , ""                                                                                },
+   { "FFFIX"    , '·' , 'f' , "fix"      , "configuration files fix"          , ""                                                                                },
+   { "FAUDIT"   , '·' , 'a' , "audit"    , "configuration files audit"        , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "FONLY"    , '·' , 'Ö' , "only"     , "pull/load central file"           , ""                                                                                },
+   { "FEVERY"   , '·' , 'e' , "every"    , "pull/load all central files"      , ""                                                                                },
+   { "FPURGE"   , '·' , 'p' , "purge"    , "do not retain data after pull"    , ""                                                                                },
+   { "FLIST"    , '·' , '=' , "list"     , "list central files"               , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ CENTRAL ]]=======================================================*/
+   { "CDá "     , ' ' ,  0  , "CEN"      , ""                                 , ""                                                                                },
+   { "CSECURE"  , '·' , 's' , "secure"   , "central data dir security"        , ""                                                                                },
+   { "CFIX"     , '·' , 'f' , "fix"      , "configuration dir fix"            , ""                                                                                },
+   { "CAUDIT"   , '·' , 'a' , "audit"    , "file contents audit"              , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ DATABASE ]]======================================================*/
+   { "DBá "     , ' ' ,  0  , "DATABASE" , ""                                 , ""                                                                                },
+   { "DSECURE"  , '·' , 's' , "secure"   , "database security"                , "°) non-exist s) secure"                                                          },
+   { "DFIX"     , '·' , 'f' , "fix"      , "database fix"                     , "°) couldn't  -) n/a       f) fixed"                                                           },
+   { "DAUDIT"   , '·' , 'a' , "audit"    , "database contents audit"          , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "DREAD"    , '·' , 'Ô' , "read"     , "read database"                    , "°) failed    Ô) read"                                                            },
+   { "DPURGE"   , '·' , 'p' , "purge"    , "do not retain data after read"    , "°) failed    p) purge"                                                           },
+   { "DSTATS"   , '·' , '#' , "stats"    , "database statistics"              , "°) failed    #) passed"                                                          },
+   { "DREPORT"  , '·' , 'ó' , "report"   , "database reporting"               , "°) failed    ó) passed"                                                          },
+   { "DCLEAR"   , '·' , 'x' , "clear"    , "clear specific data"              , "°) failed    x) clear"                                                           },
+   { "DWRITE"   , '·' , 'Õ' , "write"    , "write database"                   , "°) failed    a) audit     Õ) written"                                            },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ WORLD ]]=========================================================*/
+   { "WOá "     , ' ' ,  0  , "WORLD"    , ""                                 , ""                                                                                },
+   { "WSECURE"  , '·' , 's' , "secure"   , "world file security"              }, /* s) secure, a) audited content, -) skipped    , ""                                                                                */
+   { "WFIX"     , '·' , 'f' , "fix"      , "world file fix"                   , ""                                                                                },
+   { "WAUDIT"   , '·' , 'a' , "audit"    , "world contents audit"             , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "WENTRY"   , '·' , 'e' , "entry"    , "requested entry check"            }, /* f) file, d) directory, -) skipped , ""                                                                                */
+   { "WREAD"    , '·' , 'Ô' , "read"     , "read/import world file"           , ""                                                                                },
+   { "WLIST"    , '·' , '=' , "list"     , "reporting on world file"          , ""                                                                                },
+   { "WWRITE"   , '·' , 'Õ' , "write"    , "write/export world file"          , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ ACTION ]]========================================================*/
+   { "ACá "     , ' ' ,  0  , "ACT"      , ""                                 , ""                                                                                },
+   { "GATHER"   , '·' , 'g' , "gather"   , "gather local files"               , ""                                                                                },
+   { "NORMAL"   , '·' , 'n' , "normal"   , "normal/strict mode"               , ""                                                                                },
+   { "DAEMON"   , '·' , 'd' , "daemon"   , "daemon/prickly mode"              , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ BACKEND ]]=======================================================*/
+   { "BEá "     , ' ' ,  0  , "BACKEND"  , ""                                 , ""                                                                                },
+   { "BSECURE"  , '·' , 's' , "secure"   , "backend security"                 , ""                                                                                },
+   { "BFIX"     , '·' , 'f' , "fix"      , "backend fix"                      , ""                                                                                },
+   { "BAUDIT"   , '·' , 'a' , "audit"    , "audit of backend"                 , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "EXTRACT"  , '·' , 'E' , "extrct"   , "extract a central file"           , ""                                                                                },
+   { "UPLOAD"   , '·' , 'U' , "upload"   , "upload a central file"            , ""                                                                                },
+   { "BACKUP"   , '·' , 'B' , "backup"   , "backup a central file"            , ""                                                                                },
+   { "DOWNLOAD" , '·' , 'D' , "dwload"   , "download a central file"          , ""                                                                                },
+   { "RESTORE"  , '·' , 'R' , "restor"   , "restore a central file"           , ""                                                                                },
+   { "   "      , ' ' ,  3  , ""         , ""                                 , ""                                                                                },
+   /*===[[ JUDGEMENT ]]=====================================================*/
+   { "JDá "     , ' ' ,  0  , "³"        , ""                                 , ""                                                                                },
+   { "FOOTER"   , '·' , 'f' , "footer"   , "print footer on output"           , ""                                                                                },
+   { " "        , ' ' ,  1  , ""         , ""                                 , ""                                                                                },
+   { "JUDGE"    , ' ' , 'Ï' , "judge"    , "final judgement"                  , ""                                                                                },
+   /*===[[ END-OF-LIST ]]===================================================*/
+   { "end-list" , '·' , '·' , ""         , "end-of-entries"                   , ""                                                                                },
+   /*===[[ DONE ]]==========================================================*/
 };
+
+
+/*> static struct {                                                                                                                                                     <* 
+ *>    char        s_pos;                                                                                                                                               <* 
+ *>    char        s_label     [LEN_TERSE];                                                                                                                             <* 
+ *>    char        s_sample;                                                                                                                                            <* 
+ *>    uchar       s_valid     [LEN_TERSE];                                                                                                                             <* 
+ *>    char        s_print     [LEN_LABEL];                                                                                                                             <* 
+ *>    char        s_desc      [LEN_DESC];                                                                                                                              <* 
+ *> } s_scores [LEN_HUND] = {                                                                                                                                           <* 
+ *>    /+===[[ PREPARE ]]=======================================================+/                                                                                      <* 
+ *>    {  0, "HEADER"          , 'h' , "°h-·"    , "header"          , "printing of the title lines"      },                                                            <* 
+ *>    {  0, "LOCS"            , 'l' , "°l·"     , "locs"            , "default location lookup"          },                                                            <* 
+ *>    {  0, "CWD"             , '¤' , "°¤·"     , "cwd"             , "current working directory"        },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ PREPARE ]]=======================================================+/                                                                                      <* 
+ *>    {  0, "SEá"             ,  0  , ""        , "SECURE-"         , ""                                 },                                                            <* 
+ *>    {  0, "SAUDIT"          , 'a' , "°a-·"    , "audit"           , "general security audit"           },                                                            <* 
+ *>    {  0, "SFIX"            , 'f' , "°fF-·"   , "fix"             , "adding fix to the audit"          },                                                            <* 
+ *>    {  0, "SCONF"           , 'c' , "°cF-·"   , "conf"            , "configuration dir security"       },                                                            <* 
+ *>    {  0, "SDATA"           , 'd' , "°dF-·"   , "data"            , "central data dir security"        },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ DATABASE ]]======================================================+/                                                                                      <* 
+ *>    {  0, "DBá"             ,  0  , ""        , "DATABASE---"       ""                                 },                                                            <* 
+ *>    {  0, "DSECURE"         , 's' , "°s--·"   , "secure"          , "database security"                }, /+ s) secure, a) audited content, -) skipped +/            <* 
+ *>    {  0, "DAUDIT"          , 'a' , "°a--·"   , "audit"           , "database contents audit"          },                                                            <* 
+ *>    {  0, "DREAD"           , 'Ô' , "°Ô-·"    , "read"            , "read database"                    },                                                            <* 
+ *>    {  0, "DSTATS"          , '#' , "°#·"     , "stats"           , "database statistics"              },                                                            <* 
+ *>    {  0, "DREPORT"         , 'ó' , "°ó·"     , "report"          , "database reporting"               },                                                            <* 
+ *>    {  0, "DWRITE"          , 'Õ' , "°Õ-·"    , "write"           , "write database"                   },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ LOCAL ]]=========================================================+/                                                                                      <* 
+ *>    {  0, "LOá"             ,  0  , ""        , "LOCAL"           , ""                                 },                                                            <* 
+ *>    {  0, "LSECURE"         , 'd' , "°dl·"    , "secure"          , "security on file/directory"       },                                                            <* 
+ *>    {  0, "LAUDIT"          , 'Ö' , "°Ö·"     , "audit"           , "audit local file by pulling"      },                                                            <* 
+ *>    {  0, "LREPORT"         , 'ò' , "°ò·"     , "report"          , "local report"                     },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ WORLD ]]=========================================================+/                                                                                      <* 
+ *>    {  0, "WOá"             ,  0  , ""        , "WORLD--------"   , ""                                 },                                                            <* 
+ *>    {  0, "WSECURE"         , 's' , "°s-·"    , "secure"          , "world file security"              }, /+ s) secure, a) audited content, -) skipped    +/         <* 
+ *>    {  0, "WAUDIT"          , 'a' , "°a-·"    , "audit"           , "world contents audit"             },                                                            <* 
+ *>    {  0, "WENTRY"          , 'e' , "°fd-·"   , "entry"           , "requested entry check"            }, /+ f) file, d) directory, -) skipped +/                    <* 
+ *>    {  0, "WREAD"           , 'Ô' , "°Ô-·"    , "read"            , "read/import world file"           },                                                            <* 
+ *>    {  0, "WLIST"           , '=' , "°=-·"    , "list"            , "reporting"                        },                                                            <* 
+ *>    {  0, "WUPDATE"         , 'r' , "°ruD-·"  , "update"          , "register or withdraw"             }, /+ r) register, u) withdraw, D) duplicate, -) skipped +/   <* 
+ *>    {  0, "WWRITE"          , 'Õ' , "°Õ-·"    , "write"           , "write/export world file"          },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ CENTRAL ]]=======================================================+/                                                                                      <* 
+ *>    {  0, "CEá"             ,  0  , ""        , "CENTRAL------"   , ""                                 },                                                            <* 
+ *>    {  0, "CAUDIT"          , 'a' , "°a-·"    , "audit"           , "file contents audit"              },                                                            <* 
+ *>    {  0, "CMOVE"           , 'm' , "°m-·"    , "move"            , "move local to central"            },                                                            <* 
+ *>    {  0, "CPULL"           , 'Ö' , "°Ö-·"    , "pull"            , "pull/load central config"         },                                                            <* 
+ *>    {  0, "CREAD"           , 'r' , "°rR-·"   , "read"            , "read all central files"           },                                                            <* 
+ *>    {  0, "CCLEAR"          , 'x' , "°x-·"    , "clear"           , "clear specific data from db"      },                                                            <* 
+ *>    {  0, "CLIST"           , '=' , "°=·"     , "list"            , "list central files"               },                                                            <* 
+ *>    {  0, "CREMOVE"         , 'X' , "°X-·"    , "remove"          , "remove central file"              },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ ACTION ]]========================================================+/                                                                                      <* 
+ *>    {  0, "ACá"             ,  0  , ""        , "ACTS-"           , ""                                 },                                                            <* 
+ *>    {  0, "GATHER"          , 'g' , "°g·"     , "gather"          , "gather local files"               },                                                            <* 
+ *>    {  0, "NORMAL"          , 'n' , "°n·"     , "normal"          , "normal/strict mode"               },                                                            <* 
+ *>    {  0, "DAEMON"          , 'd' , "°d·"     , "daemon"          , "daemon/prickly mode"              },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ BACKEND ]]=======================================================+/                                                                                      <* 
+ *>    {  0, "BEá"             ,  0  , ""        , "BACKEND------"   , ""                                 },                                                            <* 
+ *>    {  0, "BSECURE"         , 's' , "°s-·"    , "secure"          , "backend security"                 },                                                            <* 
+ *>    {  0, "BAUDIT"          , 'a' , "°a-·"    , "audit"           , "audit of backend"                 },                                                            <* 
+ *>    {  0, "EXTRACT"         , 'E' , "°E-·"    , "extrct"          , "extract a central file"           },                                                            <* 
+ *>    {  0, "UPLOAD"          , 'U' , "°U-·"    , "upload"          , "upload a central file"            },                                                            <* 
+ *>    {  0, "BACKUP"          , 'B' , "°B-·"    , "backup"          , "backup a central file"            },                                                            <* 
+ *>    {  0, "DOWNLOAD"        , 'D' , "°D-·"    , "dwload"          , "download a central file"          },                                                            <* 
+ *>    {  0, "RESTORE"         , 'R' , "°R-·"    , "restor"          , "restore a central file"           },                                                            <* 
+ *>    {  0, "  "              ,  1  , ""        , ""                , ""                                 },                                                            <* 
+ *>    /+===[[ JUDGEMENT ]]=====================================================+/                                                                                      <* 
+ *>    {  0, "FOOTER"          , 'f' , "°f-·"    , "footer"          , "print footer on output"           },                                                            <* 
+ *>    {  0, "JUDGE"           , 'y' , "°y!·"    , "judge"           , "final judgement"                  },                                                            <* 
+ *>    /+===[[ END-OF-LIST ]]===================================================+/                                                                                      <* 
+ *>    { -1, "end-of-list"     , '·' , ""        , ""                , "end-of-entries"                   },                                                            <* 
+ *>    /+===[[ DONE ]]==========================================================+/                                                                                      <* 
+ *> };                                                                                                                                                                  <*/
 
 
 
@@ -100,75 +229,16 @@ static struct {
 static void      o___SCORE_________o (void) {;};
 
 char
-yjobs_ends_clear        (void)
+yjobs_ends_init         (void)
 {
-   DEBUG_YJOBS  yLOG_senter  (__FUNCTION__);
-   ystrlcpy (g_acts_score, g_acts_empty, LEN_HUND);
-   DEBUG_YJOBS  yLOG_sexit   (__FUNCTION__);
+   char          rce       =  -10;
+   char          rc        =    0;
+   rc = yENV_score_init  (s_scores);
+   --rce;  if (rc < 0)  return rce;
+   rc = yENV_score_clear ();
+   --rce;  if (rc < 0)  return rce;
    return 0;
 }
-
-char
-yjobs_ends_score        (char a_section, char a_offset, uchar a_result)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        x_pos       =   -1;
-   char        x_check     =   -1;
-   int         i           =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS  yLOG_value   ("a_section" , a_section);
-   --rce;  if (a_section < 0 || a_section >= LEN_HUND - 10) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_value   ("a_offset"  , a_offset);
-   --rce;  if (a_offset  < 0 || a_offset  >= 10) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(position)-----------------------*/
-   x_check = a_section + a_offset;
-   DEBUG_YJOBS  yLOG_value   ("x_check"   , x_check);
-   --rce;  if (x_check   < 0 || x_check   >= LEN_HUND) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   for (i = 0; i < LEN_HUND; ++i) {
-      if (s_scores [i].s_section == -1)         break;
-      if (s_scores [i].s_section != a_section)  continue;
-      if (s_scores [i].s_pos     != x_check)    continue;
-      x_pos = s_scores [i].s_pos;
-      break;
-   }
-   DEBUG_YJOBS  yLOG_value   ("x_pos"     , x_pos);
-   --rce;  if (x_pos     <  0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(character)----------------------*/
-   DEBUG_YJOBS  yLOG_value   ("a_result"  , a_result);
-   --rce;  if (a_result  < 32) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_info    ("s_valid"   , s_scores [i].s_valid);
-   if (strchr (s_scores [i].s_valid, (uchar) a_result) == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS  yLOG_char    ("a_result"  , a_result);
-   /*---(update)-------------------------*/
-   DEBUG_YJOBS  yLOG_info    ("before"    , g_acts_score);
-   g_acts_score [x_pos] = a_result;
-   DEBUG_YJOBS  yLOG_info    ("after"     , g_acts_score);
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
 
 
 /*====================------------------------------------====================*/
@@ -177,36 +247,42 @@ yjobs_ends_score        (char a_section, char a_offset, uchar a_result)
 static void      o___HEADER________o (void) {;};
 
 char
-yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
+yjobs_ends__titles      (char a_runas, char a_mode, char a_oneline [LEN_HUND])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  0, G_SCORE_FAIL);
+   yENV_score_mark ("HEADER"   , G_SCORE_FAIL);
+   yENV_score_mark ("NOISE"    , G_SCORE_SKIP);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
+      yjobs_ends_failure (a_mode, "", "called with NULL mode");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
    --rce;  if (strchr (g_allmode , a_mode) == NULL) {
+      yjobs_ends_failure (a_mode, "", "called with an invalid mode");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_verbose" , g_verbose);
    if (strchr (g_verbose , a_mode) == NULL) {
-      yjobs_ends_score (G_SCORE_PREPARE,  0, G_SCORE_SKIP);
+      yENV_score_mark ("HEADER"   , G_SCORE_SKIP);
+      if (strchr (g_confirm , a_mode) != NULL) yENV_score_mark ("NOISE"    , 'c');
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
+   yENV_score_mark ("NOISE"    , '!');
    /*---(pre-header)---------------------*/
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline == NULL || a_oneline [0] == '\0') {
+      yjobs_ends_failure (a_mode, "", "called with NULL/empty oneline");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -244,88 +320,104 @@ yjobs__ends_titles      (char a_mode, char a_oneline [LEN_HUND])
    case CASE_STRICT   :  yURG_msg (':', "  option --vstrict   : verbosely launch in strict normal/non-daemon mode");      break;
 
    default            :
-      DEBUG_YJOBS   yLOG_note    ("mode is illegal or not-recognized");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+                         yjobs_ends_failure (a_mode, "", "called with an unrecognized mode");
+                         DEBUG_YJOBS   yLOG_note    ("mode is illegal or not-recognized");
+                         DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+                         return rce;
    }
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(update score)-------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  0, 'h');
+   yENV_score_mark ("HEADER"   , 'h');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 1;
 }
 
 char
-yjobs__ends_locations   (char a_runas, char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL])
+yjobs_ends__locations   (char a_runas, char a_mode, char r_cdir [LEN_DESC], char r_conf [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   char        x_cdir      [LEN_PATH]  = "";
-   char        x_hdir      [LEN_PATH]  = "";
+   char        x_cdir      [LEN_DESC]  = "";
+   char        x_conf      [LEN_LABEL] = "";
+   char        x_hdir      [LEN_DESC]  = "";
    char        x_world     [LEN_LABEL] = "";
    char        x_db        [LEN_LABEL] = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  1, G_SCORE_FAIL);
-   if (r_cdir  != NULL)  ystrlcpy (r_cdir , ""     , LEN_PATH);
-   if (r_hdir  != NULL)  ystrlcpy (r_hdir , ""     , LEN_PATH);
+   yENV_score_mark ("LOCS"     , G_SCORE_FAIL);
+   if (r_cdir  != NULL)  ystrlcpy (r_cdir , ""     , LEN_DESC);
+   if (r_conf  != NULL)  ystrlcpy (r_conf , ""     , LEN_LABEL);
+   if (r_hdir  != NULL)  ystrlcpy (r_hdir , ""     , LEN_DESC);
    if (r_world != NULL)  ystrlcpy (r_world, ""     , LEN_LABEL);
    if (r_db    != NULL)  ystrlcpy (r_db   , ""     , LEN_LABEL);
    /*---(get location data)--------------*/
-   rc = yjobs_who_location (a_runas, x_cdir, x_hdir, x_world, NULL, x_db);
+   rc = yJOBS_configured   (a_runas, NULL, NULL, NULL, x_cdir, x_conf, x_hdir, x_db, x_world);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "", "can not retrieve location information for runas");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
+   DEBUG_YJOBS   yLOG_info    ("x_conf"    , x_conf);
    DEBUG_YJOBS   yLOG_info    ("x_hdir"    , x_hdir);
    DEBUG_YJOBS   yLOG_info    ("x_world"   , x_world);
    DEBUG_YJOBS   yLOG_info    ("x_db"      , x_db);
    /*---(save-back)----------------------*/
-   if (r_cdir  != NULL)  ystrlcpy (r_cdir , x_cdir , LEN_PATH);
-   if (r_hdir  != NULL)  ystrlcpy (r_hdir , x_hdir , LEN_PATH);
+   if (r_cdir  != NULL)  ystrlcpy (r_cdir , x_cdir , LEN_DESC);
+   if (r_conf  != NULL)  ystrlcpy (r_conf , x_conf , LEN_LABEL);
+   if (r_hdir  != NULL)  ystrlcpy (r_hdir , x_hdir , LEN_DESC);
    if (r_world != NULL)  ystrlcpy (r_world, x_world, LEN_LABEL);
    if (r_db    != NULL)  ystrlcpy (r_db   , x_db   , LEN_LABEL);
    /*---(update score)-------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  1, 'l');
+   yENV_score_mark ("LOCS"     , 'l');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
-yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_full [LEN_PATH])
+yjobs_ends__cwd         (char a_runas, char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_PATH], char r_cwd [LEN_PATH], char r_dir [LEN_PATH], char r_file [LEN_PATH], char r_full [LEN_PATH])
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
    char        rce         =  -10;
    char        x_cwd       [LEN_PATH]  = "";
+   char        x_dir       [LEN_PATH]  = "";
+   char        x_file      [LEN_PATH]  = "";
+   char        x_full      [LEN_PATH]  = "";
    char       *p           = NULL;
    char        l           =    0;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(score)--------------------------*/
+   yENV_score_mark ("CWD"      , G_SCORE_FAIL);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  1, G_SCORE_FAIL);
    if (r_cwd   != NULL)  ystrlcpy (r_cwd  , ""     , LEN_PATH);
+   if (r_dir   != NULL)  ystrlcpy (r_dir  , ""     , LEN_PATH);
+   if (r_file  != NULL)  ystrlcpy (r_file , ""     , LEN_PATH);
    if (r_full  != NULL)  ystrlcpy (r_full , ""     , LEN_PATH);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("a_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
+      yjobs_ends_failure (a_mode, "", "called with NULL mode");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
    --rce;  if (strchr (g_allmode , a_mode) == NULL) {
+      yjobs_ends_failure (a_mode, "", "called with an invalid mode");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
    --rce;  if (a_file    == NULL) {
+      yjobs_ends_failure (a_mode, "", "called with a NULL file name");
       DEBUG_YJOBS   yLOG_note    ("a_file is null (FATAL)");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -335,69 +427,159 @@ yjobs__ends_cwd         (char a_mode, char a_file [LEN_PATH], char a_cdir [LEN_P
    }
    DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
    DEBUG_YJOBS  yLOG_point   ("a_cdir"    , a_cdir);
-   /*> --rce;  if (a_cdir    == NULL) {                                               <* 
-    *>    DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <* 
-    *>    return rce;                                                                 <* 
-    *> }                                                                              <* 
-    *> DEBUG_YJOBS  yLOG_info    ("a_cdir"    , a_cdir);                              <*/
    /*---(get current working dir)--------*/
    p = getcwd (x_cwd, LEN_PATH);
    DEBUG_YJOBS   yLOG_point   ("getcwd"    , p);
    --rce;  if (p == NULL) {
+      yjobs_ends_failure (a_mode, "", "system call getcwd failed");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("x_cwd"     , x_cwd);
+   /*---(test split)---------------------*/
+   rc = yENV_name_split (a_file, NULL, x_dir, x_file);
+   DEBUG_YJOBS   yLOG_value   ("split"     , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "", "file name could not be split");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return  rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("x_dir"     , x_dir);
+   DEBUG_YJOBS   yLOG_info    ("x_file"    , x_file);
+   /*---(directory)----------------------*/
+   if (strcmp (x_dir, "") == 0) {
+      switch (a_mode) {
+      case CASE_VERIFY   : case CASE_LOCALRPT : case CASE_REGISTER :
+      case CASE_UPDATE   : case CASE_INSTALL  : case CASE_WITHDRAW :
+         ystrlcpy (x_dir, x_cwd, LEN_PATH);
+         break;
+      case CASE_CHECK    : case CASE_ONLY     : case CASE_REMOVE   :
+      case CASE_EXTRACT  :
+      default :
+         ystrlcpy (x_dir, a_cdir, LEN_PATH);
+         break;
+      }
+      l = strlen (x_dir);
+      if (x_dir [l - 1] != '/')  ystrlcat (x_dir, "/", LEN_PATH);
+   }
+   DEBUG_YJOBS   yLOG_info    ("x_dir"     , x_dir);
+   DEBUG_YJOBS   yLOG_info    ("x_file"    , x_file);
+   /*---(full)---------------------------*/
+   rc = yENV_name_full (x_dir, x_file, NULL, x_full);
+   DEBUG_YJOBS   yLOG_value   ("full"      , rc);
+   --rce;  if (rc < 0) {
+      yjobs_ends_failure (a_mode, "", "file name could not be joined");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return  rce;
+   }
+   DEBUG_YJOBS   yLOG_info    ("x_full"    , x_full);
    /*---(save-back)----------------------*/
-   if (r_cwd   != NULL) {
-      ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
-   }
-   if (r_full  != NULL) {
-      if      (a_file [0] == '/')      snprintf (r_full , LEN_PATH, "%s"   , a_file);
-      else if (strchr (g_local  , a_mode) != NULL) {
-         l = strlen (x_cwd);
-         if (x_cwd  [l - 1] == '/')    snprintf (r_full , LEN_PATH, "%s%s" , x_cwd , a_file);
-         else                          snprintf (r_full , LEN_PATH, "%s/%s", x_cwd , a_file);
-      }
-      else if (strchr (g_central, a_mode) != NULL) {
-         l = strlen (a_cdir);
-         if (a_cdir [l - 1] == '/')    snprintf (r_full , LEN_PATH, "%s%s" , a_cdir, a_file);
-         else                          snprintf (r_full , LEN_PATH, "%s/%s", a_cdir, a_file);
-      }
-   }
-   DEBUG_YJOBS   yLOG_info    ("r_full"    , r_full);
-   /*---(update score)-------------------*/
-   yjobs_ends_score (G_SCORE_PREPARE,  1, 'l');
+   if (r_cwd   != NULL)   ystrlcpy (r_cwd  , x_cwd  , LEN_PATH);
+   if (r_dir   != NULL)   ystrlcpy (r_dir  , x_dir  , LEN_PATH);
+   if (r_file  != NULL)   ystrlcpy (r_file , x_file , LEN_PATH);
+   if (r_full  != NULL)   ystrlcpy (r_full , x_full , LEN_PATH);
+   /*---(score)--------------------------*/
+   yENV_score_mark ("CWD"      , '¤');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
-yjobs_ends_header       (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], char r_cdir [LEN_DESC], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_full [LEN_PATH])
+yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback, int *r_ruid, char r_ruser [LEN_USER], char r_cdir [LEN_DESC], char r_conf [LEN_LABEL], char r_hdir [LEN_DESC], char r_world [LEN_LABEL], char r_db [LEN_LABEL], char r_cwd [LEN_PATH], char r_dir [LEN_PATH], char r_file [LEN_PATH], char r_full [LEN_PATH])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   char        rc          =    0;
+   int         rc          =    0;
+   char        x_error     [LEN_HUND]  = "";
    /*---(header)-------------------------*/
-   DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
-   DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_ruid  != NULL)  *r_ruid  = -1;
+   if (r_ruser != NULL)  strcpy (r_ruser, "");
+   if (r_cdir  != NULL)  strcpy (r_cdir , "");
+   if (r_conf  != NULL)  strcpy (r_conf , "");
+   if (r_hdir  != NULL)  strcpy (r_hdir , "");
+   if (r_world != NULL)  strcpy (r_world, "");
+   if (r_db    != NULL)  strcpy (r_db   , "");
+   if (r_cwd   != NULL)  strcpy (r_cwd  , "");
+   if (r_dir   != NULL)  strcpy (r_dir  , "");
+   if (r_file  != NULL)  strcpy (r_file , "");
+   if (r_full  != NULL)  strcpy (r_full , "");
+   /*---(defense - runas)----------------*/
+   DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
+   DEBUG_YJOBS   yLOG_info    ("g_valid"   , g_valid);
+   --rce;  if (a_runas == 0 || strchr (g_valid, a_runas)  == NULL) {
+      yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
+      yENV_score_mark ("ENV"      , '·');
+      sprintf (x_error, "runas (%c) not recognized or valid", ychrvisible (a_runas));
+      yjobs_ends_failure (a_mode, "", x_error);
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(defense - mode)-----------------*/
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   DEBUG_YJOBS   yLOG_info    ("g_allmode" , g_allmode);
+   --rce;  if (a_mode  == 0 || strchr (g_allmode, a_mode) == NULL) {
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+      sprintf (x_error, "mode (%c) not recognized or valid", ychrvisible (a_mode));
+      yjobs_ends_failure (a_mode, "", x_error);
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(defense - oneline)--------------*/
+   DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
+   --rce;  if (a_oneline == NULL || a_oneline [0] == '\0') {
+      yENV_score_mark ("ONE"      , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "descriptive \"oneline\" string is NULL or empty");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS  yLOG_info    ("a_oneline" , a_oneline);
+   /*---(defense - callback)-------------*/
+   DEBUG_YJOBS  yLOG_point   ("f_callback", f_callback);
+   --rce;  if (f_callback == NULL) {
+      yENV_score_mark ("CALL"     , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "host program callback function is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(defense - file)-----------------*/
+   DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
+   --rce;  if (a_file    == NULL) {
+      yENV_score_mark ("FILE"     , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "local file/directory is NULL");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS  yLOG_info    ("a_file"    , a_file);
+   /*---(security)-----------------------*/
+   rc = yEXEC_whoami          (NULL, NULL, r_ruid, NULL, NULL, r_ruser, 'n', NULL, NULL, NULL);
+   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
+   --rce;  if (rc < 0) {
+      yENV_score_mark ("RUSER"    , G_SCORE_FAIL);
+      yjobs_ends_failure (a_mode, "", "could not identify current user (yEXEC_whoami)");
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   yENV_score_mark ("RUSER"    , 'u');
    /*---(titles)-------------------------*/
-   rc = yjobs__ends_titles (a_mode, a_oneline);
+   rc = yjobs_ends__titles (a_runas, a_mode, a_oneline);
    DEBUG_YJOBS   yLOG_value   ("titles"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(get central files)--------------*/
-   rc = yjobs__ends_locations (a_runas, r_cdir, r_hdir, r_world, r_db);
+   rc = yjobs_ends__locations (a_runas, a_mode, r_cdir, r_conf, r_hdir, r_world, r_db);
    DEBUG_YJOBS   yLOG_value   ("locations" , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(get current working dir)--------*/
-   rc = yjobs__ends_cwd       (a_mode, a_file, r_cdir, r_cwd, r_full);
+   rc = yjobs_ends__cwd       (a_runas, a_mode, a_file, r_cdir, r_cwd, r_dir, r_file, r_full);
    DEBUG_YJOBS   yLOG_value   ("cwd"       , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -405,7 +587,7 @@ yjobs_ends_header       (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 
@@ -425,8 +607,8 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (a_func);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_JUDGE,  0, G_SCORE_FAIL);
-   yjobs_ends_score (G_SCORE_JUDGE,  1, '!');
+   yENV_score_mark ("FOOTER"   , G_SCORE_FAIL);
+   yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
@@ -441,11 +623,11 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    }
    DEBUG_YJOBS  yLOG_info    ("a_prefix"  , a_prefix);
    /*---(pre-score)----------------------*/
-   yjobs_ends_score (G_SCORE_JUDGE,  1, 'y');
+   yENV_score_mark ("JUDGE"    , 'Ï');
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_silent"  , g_silent);
    if (strchr (g_silent  , a_mode) != NULL) {
-      yjobs_ends_score (G_SCORE_JUDGE,  0, G_SCORE_SKIP);
+      yENV_score_mark ("FOOTER"   , G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (a_func);
       return 0;
    }
@@ -480,7 +662,7 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(score)--------------------------*/
-   yjobs_ends_score (G_SCORE_JUDGE,  0, 'f');
+   yENV_score_mark ("FOOTER"   , 'f');
    if (strcmp (a_prefix, "WARNING") == 0)  rc = 1;
    DEBUG_YJOBS  yLOG_value   ("rc"        , rc);
    /*---(complete)-----------------------*/
@@ -494,53 +676,61 @@ char yjobs_ends_repaired     (char a_mode) { return yjobs_ends__footer (__FUNCTI
 char yjobs_ends_warning      (char a_mode) { return yjobs_ends__footer (__FUNCTION__, a_mode, "WARNING" , BOLD_YEL); }
 
 char
-yjobs_ends_failure      (char a_mode, char a_hint [LEN_HUND])
+yjobs_ends_failure      (char a_mode, char a_message [LEN_HUND], char a_final [LEN_HUND])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   yjobs_ends_score (G_SCORE_JUDGE,  0, G_SCORE_FAIL);
-   yjobs_ends_score (G_SCORE_JUDGE,  1, '!');
+   yENV_score_mark ("FOOTER"   , G_SCORE_FAIL);
+   yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
-      /*> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <*/
-      /*> return rce;                                                                 <*/
       a_mode = ACT_CVERIFY;
    }
    DEBUG_YJOBS  yLOG_char    ("m_mode"    , a_mode);
    DEBUG_YJOBS  yLOG_info    ("g_allmode" , g_allmode);
    --rce;  if (strchr (g_allmode , a_mode) == NULL) {
-      /*> DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                             <*/
-      /*> return rce;                                                                 <*/
       a_mode = ACT_CVERIFY;
    }
-   DEBUG_YJOBS  yLOG_point   ("a_hint"    , a_hint);
-   --rce;  if (a_hint == NULL) {
+   DEBUG_YJOBS  yLOG_point   ("a_message" , a_message);
+   --rce;  if (a_message == NULL) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YJOBS  yLOG_info    ("a_hint"    , a_hint);
+   DEBUG_YJOBS  yLOG_info    ("a_message" , a_message);
+   DEBUG_YJOBS  yLOG_point   ("a_final"   , a_final);
+   --rce;  if (a_final == NULL) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YJOBS  yLOG_info    ("a_final"   , a_final);
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_silent"  , g_silent);
    if (strchr (g_silent  , a_mode) != NULL) {
-      yjobs_ends_score (G_SCORE_JUDGE,  0, G_SCORE_SKIP);
+      yENV_score_mark ("FOOTER"   , G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
+   /*---(message)------------------------*/
+   if (strcmp (a_message, "") != 0)    yURG_err ('f', a_message);
    /*---(prepare)------------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_live ();
    if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (' ', "");
    /*---(actual footer)------------------*/
-   if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (':', "%sFAILED, %s, the reasons are shown above%s"      , BOLD_ERR, a_hint, BOLD_OFF);
-   else                                       yURG_msg (':', "%sFAILED, %s, run verbosely to identify reasons%s", BOLD_ERR, a_hint, BOLD_OFF);
+   if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg (':', "%sFAILED, %s, the reasons are shown above%s"      , BOLD_ERR, a_final, BOLD_OFF);
+   else                                       yURG_msg (':', "%sFAILED, %s, run verbosely to identify reasons%s", BOLD_ERR, a_final, BOLD_OFF);
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(score)--------------------------*/
-   yjobs_ends_score (G_SCORE_JUDGE,  0, 'f');
+   yENV_score_mark ("FOOTER"   , 'f');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
+
+
+
+

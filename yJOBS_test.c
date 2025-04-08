@@ -18,36 +18,57 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    char        x_out       [LEN_HUND]  = "";
    char        n           =    0;
    char        f           =  '?';
+   char        x_base      =  '-';
    /*---(clear all)----------------------*/
    yJOBS_reset (NULL, NULL, NULL);
-   yjobs_ends_clear ();
-   /*---(defense)------------------------*/
+   yENV_score_clear ();
+   /*---(runas)--------------------------*/
    --rce;  if (a_runas == 0)  return rce;
    ystrlcpy (x_out, yjobs_iam  (a_runas), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown") == 0)  return rce;
+   myJOBS.m_runas = a_runas;
+   yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
+   yENV_score_mark ("ENV"      , '·');
+   yjobs_args_data (myJOBS.m_runas, NULL, &x_base, NULL, NULL, NULL);
+   if (x_base > 0 && x_base != '-')  {
+      yENV_score_mark ("RUNAS"    , x_base);
+      if (strchr (YSTR_UPPER, a_runas) != NULL)  yENV_score_mark ("ENV"      , 'u');
+   }
+   /*---(masking)------------------------*/
+   yjobs_runas_masking (a_runas);
+   /*---(mode)---------------------------*/
    --rce;  if (a_mode  == 0)  return rce;
    ystrlcpy (x_out, yjobs_mode (a_mode ), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown (unknown)") == 0)  return rce;
-   n = yjobs_args_offset (a_mode);
-   --rce;  if (n < 0)  return rce;
-   f = yjobs_who_action (a_runas, n);
-   --rce;  if (f == '¢')  return rce;
-   --rce;  if (f == '·')  return rce;
-   --rce;  if (f == 'F' && a_file == NULL)  return rce;
-   --rce;  if (f == 'F' && strcmp (a_file, "") == 0)  return rce;
-   /*---(set majors)---------------------*/
-   myJOBS.m_runas = a_runas;
    myJOBS.m_mode  = a_mode;
-   myJOBS.m_flag  = f;
+   yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+   yENV_score_mark ("NOISE"    , '·');
+   yjobs_args_data (a_mode, NULL, &x_base, NULL, NULL, NULL);
+   if (x_base > 0 && x_base != '-')   yENV_score_mark ("MODE"     , x_base);
    /*---(set verbosity)------------------*/
    yURG_msg_tmp  (); 
    yURG_msg_mute (); 
    yURG_err_tmp  (); 
    yURG_err_mute (); 
+   yENV_score_mark ("NOISE"    , '-');
+   if (yJOBS_ifconfirm ()) {
+      if (x_base > 0 && x_base != '-')  yENV_score_mark ("NOISE"    , 'c');
+   }
    if (yJOBS_ifverbose ()) {
+      if (x_base > 0 && x_base != '-')  yENV_score_mark ("NOISE"    , '!');
       yURG_msg_live ();
       yURG_err_live ();
    }
+   /*---(file)---------------------------*/
+   n = yjobs_args_offset (a_mode);
+   --rce;  if (n < 0)  return rce;
+   f = yjobs_who_action (a_runas, n);
+   yENV_score_mark ("FILE"     , f);
+   --rce;  if (f == '¢')  return rce;
+   --rce;  if (f == '·')  return rce;
+   --rce;  if (f == 'F' && a_file == NULL)  return rce;
+   --rce;  if (f == 'F' && strcmp (a_file, "") == 0)  return rce;
+   myJOBS.m_flag  = f;
    /*---(set file)-----------------------*/
    yjobs_who_location      (a_runas, myJOBS.m_dir, NULL, NULL, NULL, NULL);
    if (f == 'F' && a_file != NULL) {
@@ -178,7 +199,7 @@ yJOBS_rmdirs            (void)
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(remove all)---------------------*/
    for (i = 0;  i < MAX_WHO; ++i) {
-      rc = yjobs_who_by_index (i, x_cdir, x_hdir, NULL, NULL);
+      rc = yjobs_who_by_index (i, x_cdir, NULL, x_hdir, NULL, NULL);
       DEBUG_YJOBS   yLOG_complex ("index"     , "%2d å%sæ å%sæ", i, x_cdir, x_hdir);
       if (rc < 0)  break;
       if (strcmp (x_cdir , "") != 0)  yjobs__unit_rmdir_one (x_cdir);
@@ -209,7 +230,7 @@ yJOBS_mkdirs            (void)
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(create all)---------------------*/
    for (i = 0;  i < MAX_WHO; ++i) {
-      rc = yjobs_who_by_index (i, x_cdir, x_hdir, NULL, NULL);
+      rc = yjobs_who_by_index (i, x_cdir, NULL, x_hdir, NULL, NULL);
       DEBUG_YJOBS   yLOG_complex ("index"     , "%2d å%sæ å%sæ", i, x_cdir, x_hdir);
       if (rc < 0)  break;
       yjobs__unit_mkdir_one (x_cdir);
@@ -260,31 +281,17 @@ char
 yjobs_callback          (cchar a_req, cchar *a_data)
 {
    switch (a_req) {
-   case YJOBS_READ      :
-      yURG_msg ('>', "host-based reading of the database (read)...");
+   case YJOBS_READ      : case YJOBS_STATS     : case YJOBS_REPORT    : case YJOBS_PURGE     : case YJOBS_WRITE     :
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
-      /*> g_fullacts  [ 4] = 'Ô';                                                     <*/
-      return RC_POSITIVE;
-      break;
-   case YJOBS_STATS     :
-      /*> g_fullacts  [15] = '#';                                                     <*/
-      return RC_POSITIVE;
-      break;
-   case YJOBS_WRITE     :
-      yURG_msg ('>', "host-based writing of the database (write)...");
-      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
-      /*> g_fullacts  [ 5] = 'Õ';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_PULL      :
       if (a_data == NULL)  return -1;
-      yURG_msg ('>', "host-based verification of a source/configuration file (pull)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       g_fullacts  [ 9] = 'Ö';
       return RC_POSITIVE;
       break;
    case ACT_REGISTER    :
-      yURG_msg ('>', "testing-stub to register project in world file...");
       yURG_msg ('-', "skipping, over-riding detail for testing purposes");
       return RC_POSITIVE;
       break;
@@ -307,22 +314,11 @@ yjobs_callback          (cchar a_req, cchar *a_data)
       break;
    case YJOBS_LOCALRPT  :
       if (a_data == NULL)  return -1;
-      yURG_msg ('>', "host-based report of locally collected data (localrpt)...");
       yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
-      return RC_POSITIVE;
-      break;
-   case YJOBS_REPORT    :
-      /*> g_fullacts  [17] = 'ó';                                                     <*/
       return RC_POSITIVE;
       break;
    case YJOBS_EXTRACT   :
       /*> g_fullacts  [32] = 'e';                                                     <*/
-      return RC_POSITIVE;
-      break;
-   case YJOBS_PURGE     :
-      /*> g_fullacts  [25] = 'P';                                                     <*/
-      yURG_msg ('>', "host-based purging all contents (purge)...");
-      yURG_msg ('-', "skipping, host-based action (must string-test downstream)");
       return RC_POSITIVE;
       break;
    default           :
@@ -339,6 +335,7 @@ yjobs__unit_quiet       (void)
    yURG_msg_none ();
    yjobs_runas ("khronos", NULL);
    yJOBS_rmdirs ();
+   yjobs_ends_init ();
    return 0;
 }
 
@@ -356,6 +353,7 @@ yjobs__unit_loud        (void)
    yjobs_runas ("khronos", NULL);
    yJOBS_rmdirs ();
    DEBUG_YJOBS  yLOG_info     ("yJOBS"     , yJOBS_version   ());
+   yjobs_ends_init ();
    return 0;
 }
 

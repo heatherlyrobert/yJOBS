@@ -26,6 +26,8 @@ PREP          include the prototype headers                                    
    global     create global/shared variable        - - - - - - - - - - - - -   static char u_dir_arachne    [LEN_HUND]  = "/home/system/arachne.spider_visualization";
    global     create global/shared variable        - - - - - - - - - - - - -   static char u_one_eos        [LEN_HUND]  = "eos-rhododactylos (rosy-fingered dawn) flexible job execution framework";
    global     create global/shared variable        - - - - - - - - - - - - -   static char u_dir_eos        [LEN_HUND]  = "/home/system/eos.goddess_of_dawn_and_startup";
+   global     create global/shared variable        - - - - - - - - - - - - -   static void *u_call          = yjobs_callback;                                                                                                                                                                                     
+
 
 
 #23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
@@ -41,5 +43,18 @@ GLOBAL   -Z-  clean-up and verify testing directory                            
      exec     ... verify files are gone            yENV_exists                 "/tmp/spool"                                                                                          c_equal     '-'                                                                                                  
      exec     ... remove temp output               yENV_rm                     "/tmp/console.txt"                                                                                    c_equal     '-'                                                                                                  
      exec     ... remove temp output               yENV_rm                     "/tmp/errors.txt"                                                                                     c_equal     '-'                                                                                                  
+
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+GLOBAL   -A-  reset between runs                                                  0s  reset           yENV_score_clear                                                             ((01.---))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+
+   COND       reset between runs                                                 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((01.001))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     reset message output                 yURG_all_tmp                                                                                                                      i_any       1                                                                                                    
+     exec     turn on messages                     yURG_all_live                                                                                                                     i_any       1                                                                                                    
+     exec     clear score                          yENV_score_clear                                                                                                                  i_equal     0                                                                                                    
+     get      ... check score                      yENV_score                                                                                                                        w_equal     åHEá ·· ·· ··· ····   SEá ···   LOá · ·· ···· ··   CFá ·· ·· ··· ····   CDá ···   DBá ··· ······   WOá ··· ····   ACá ···   BEá ··· ·····   JDá ·  æ 
 
 

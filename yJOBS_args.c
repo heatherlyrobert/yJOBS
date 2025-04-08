@@ -183,12 +183,12 @@ static const tOPTS   s_opts [MAX_OPTS] = {
    { 'o' , "remove"   , "røR", "unregister and clear from central location"   ,  27,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', '·', '·',   'y', 'y', 'y', 'y',   YJOBS_CENTRAL  , "" },
    { 'o' , "extract"  , "eìE", "extract a central file to local copy"         ,  28,   'y', '·', '·', '·',   '·', '·', '·', '·', '·', 'y', '·',   '·', '·', '·', '·',   YJOBS_CENTRAL  , "" },
    /*---(execution)---------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk  kep    wit  clr  rem  wdb    file-loc----- */
-   { 'g' , "gather"   , "gêG", "execute system-wide data gather"              ,  30,   'y', '·', '·', '·',   'y', '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "if host uses world file (like polymnia), calls successive pulls (ACT_PULL) for world each entry.  if not (like helios), calls gather (ACT_GATHER) once." },
-   { 'g' , "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31,   'y', '·', '·', '·',   'y', '·', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "gather"   , "gêG", "execute system-wide data gather"              ,  30,   'y', '·', '·', '·',   'y', 'y', '·', '·', '·', '·', '·',   '·', '·', '·', 'y',   YJOBS_NEITHER  , "if host uses world file (like polymnia), calls successive pulls (ACT_PULL) for world each entry.  if not (like helios), calls gather (ACT_GATHER) once." },
+   { 'g' , "daemon"   , "dëD", "execute specific file in daemon-mode"         ,  31,   'y', '·', '·', '·',   '·', '·', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
    { 'g' , "prickly"  , "p÷P", "execute specific file in prickly daemon-mode" ,  32,   'y', '·', '·', '·',   'y', 'y', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "normal"   , "nôN", "execute specific file in normal-mode"         ,  33,   'y', '·', '·', '·',   'y', '·', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "normal"   , "nôN", "execute specific file in normal-mode"         ,  33,   'y', '·', '·', '·',   '·', '·', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
    { 'g' , "strict"   , "sùS", "execute specific file in strict normal-mode"  ,  34,   'y', '·', '·', '·',   'y', 'y', 'y', '·', 'y', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
-   { 'g' , "reload"   , "hîH", "send signal to reload daemon"                 ,  35,   'y', '·', '·', '·',   'y', '·', 'y', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
+   { 'g' , "reload"   , "hîH", "send signal to reload daemon"                 ,  35,   'y', '·', '·', '·',   '·', '·', 'y', '·', '·', '·', 'y',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
    /*---(unit testing)------------------------                                  seq    rdb  upd  ins  reg    sec  aud  pul  rpt  run  chk  kep    wit  clr  rem  wdb    file-loc----- */
    { 'u' , "testing"  , "j··", "change to test directories"                   ,  37,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
    { 'u' , "norun"    , "-··", "daemons only load data"                       ,   0,   '·', '·', '·', '·',   '·', '·', '·', '·', '·', '·', '·',   '·', '·', '·', '·',   YJOBS_NEITHER  , "" },
@@ -558,11 +558,13 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
    DEBUG_YJOBS  yLOG_value   ("len"       , strlen (a_arg));
    --rce;  if (strlen (a_arg) <= 4) {
       yURG_err ('F', "option å%sæ too short, must be > 4 chars", a_arg);
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
    --rce;  if (strncmp (a_arg, "--", 2) != 0) {
       yURG_err ('F', "option å%sæ must start with the prefix å--æ", a_arg);
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
@@ -577,7 +579,7 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
 }
 
 char
-yjobs_args_offset       (char a_mode)
+yjobs_args_data         (char a_mode, char *r_cat, char *r_base, char r_name [LEN_LABEL], char r_desc [LEN_DESC],char *r_off)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -588,23 +590,57 @@ yjobs_args_offset       (char a_mode)
    int         n           =   -1;
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_cat  != NULL)  *r_cat  = -1;
+   if (r_base != NULL)  *r_base = '-';
+   if (r_name != NULL)  strlcpy (r_name, "", LEN_LABEL);
+   if (r_desc != NULL)  strlcpy (r_desc, "", LEN_DESC);
+   if (r_off  != NULL)  *r_off  = -1;
    /*---(find action)--------------------*/
    for (i = 0; i < MAX_OPTS; ++i) {
       p = s_opts [i].o_levels;
       if (p [0] == '\0')  break;
       l = strlen (p);
       DEBUG_YJOBS  yLOG_complex ("loop"      , "%2d, %2då%sæ", i, l, p);
-      if      (l > 0 && p [0] != '·' && p [0] == a_mode)  n = s_opts [i].o_offset;
-      else if (l > 1 && p [1] != '·' && p [1] == a_mode)  n = s_opts [i].o_offset;
-      else if (l > 2 && p [2] != '·' && p [2] == a_mode)  n = s_opts [i].o_offset;
+      if      (l > 0 && p [0] != '·' && p [0] == a_mode)  n = i;
+      else if (l > 1 && p [1] != '·' && p [1] == a_mode)  n = i;
+      else if (l > 2 && p [2] != '·' && p [2] == a_mode)  n = i;
       if (n >= 0) {
          DEBUG_YJOBS  yLOG_value   ("FOUND"     , n);
          break;
       }
    }
+   /*---(trouble)------------------------*/
+   DEBUG_YJOBS  yLOG_value   ("n"         , n);
+   --rce;  if (n < 0) {
+      DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
+      return rce;
+   }
+   /*---(save-back)----------------------*/
+   if (r_cat  != NULL)  *r_cat  = s_opts [n].o_cat;
+   if (r_base != NULL)  *r_base = p [0];
+   if (r_name != NULL)  strlcpy (r_name, s_opts [n].o_option, LEN_LABEL);
+   if (r_desc != NULL)  strlcpy (r_desc, s_opts [n].o_desc  , LEN_DESC);
+   if (r_off  != NULL)  *r_off  = s_opts [n].o_offset;
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return n;
+}
+
+char
+yjobs_args_offset       (char a_mode)
+{
+   char        x_off       =   -1;
+   yjobs_args_data (a_mode, NULL, NULL, NULL, NULL, &x_off);
+   return x_off;
+}
+
+char
+yjobs_args_cat          (char a_mode)
+{
+   char        x_cat       =   -1;
+   yjobs_args_data (a_mode, &x_cat, NULL, NULL, NULL, NULL);
+   return x_cat;
 }
 
 char
@@ -736,6 +772,9 @@ yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise)
    DEBUG_YJOBS  yLOG_char    ("c"         , c);
    --rce;  if (c == '·') {
       yURG_err ('F', "action å%sæ, (%c) not allowed", a_arg, a_arg [2]);
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return '·';
    }
@@ -769,12 +808,18 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    int         j           =    0;
    char       *p           = NULL;
    char        x_act       =  '·';
+   char        x_base      =  '·';
    char        n           =   -1;
    char        f           =  '·';
    char        x_file      [LEN_DESC]  = "";
    char        x_noise     =  '·';
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
+   /*---(scoring)------------------------*/
+   if (myJOBS.m_mode == YJOBS_NEITHER) {
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+   }
    /*---(short-cuts)------------------*/
    if (strcmp (a_arg, "--verbose") == 0) {
       DEBUG_YJOBS  yLOG_note    ("explicit --verbose option");
@@ -822,9 +867,16 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       DEBUG_YJOBS  yLOG_note    ("turn on err and msg live");
       yURG_msg_live ();
       yURG_err_live ();
+   } else {
+      yURG_msg_mute ();
+      yURG_err_mute ();
    }
    --rce;  if (myJOBS.m_mode != '-') {
+      if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -832,7 +884,10 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    f = yjobs_who_action (myJOBS.m_runas, n);
    DEBUG_YJOBS  yLOG_char    ("f"         , f);
    --rce;  if (f == '?') {
+      if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "runas (%c) not found in g_whos database", myJOBS.m_runas);
+      yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -840,6 +895,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       rce = rc;
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ not allowed for runas (%c)", a_arg, myJOBS.m_runas);
+      yENV_score_mark ("MODE"     , G_SCORE_FAIL);
+      yENV_score_mark ("NOISE"    , '·');
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_note    ("not allowed");
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return -1;
@@ -848,6 +906,15 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    myJOBS.m_mode = x_act;
    myJOBS.m_flag = f;
    if (r_mode != NULL)  *r_mode = x_act;
+   /*---(scoring)------------------------*/
+   yjobs_args_data (x_act, NULL, &x_base, NULL, NULL, NULL);
+   if (x_base > 0) {
+      yENV_score_mark ("MODE"     , x_base);
+      yENV_score_mark ("NOISE"    , '-');
+      if (yJOBS_ifconfirm ())  yENV_score_mark ("NOISE"    , 'c');
+      if (yJOBS_ifverbose ())  yENV_score_mark ("NOISE"    , '!');
+   }
+   yENV_score_mark ("FILE"     , f);
    /*---(handle simple option)-----------*/
    if (f == '-') {
       DEBUG_YJOBS  yLOG_note    ("simple actions");
@@ -864,8 +931,11 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    DEBUG_YJOBS  yLOG_note    ("complex actions");
    /*---(handle file flag)---------------*/
    --rce;  if (f != 'F') {
+      if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ not configured correctly", a_arg);
-      yjobs_args__clearmode (r_runas, r_mode, r_file);
+      yENV_score_mark ("FILE"     , G_SCORE_FAIL);
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
+      /*> yjobs_args__clearmode (r_runas, r_mode, r_file);                            <*/
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -876,8 +946,10 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       IF_CONFIRM  yURG_err_live ();
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ requires a file name as an argument", a_arg);
+      yENV_score_mark ("FILE"     , G_SCORE_FAIL);
+      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
       IF_CONFIRM  yURG_err_mute ();
-      yjobs_args__clearmode (r_runas, r_mode, r_file);
+      /*> yjobs_args__clearmode (r_runas, r_mode, r_file);                            <*/
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return -2;
    }
