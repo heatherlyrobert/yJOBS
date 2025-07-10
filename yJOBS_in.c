@@ -31,8 +31,8 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
-   char        x_prefix    [LEN_LABEL] = "";
-   char        x_suffix    [LEN_LABEL] = "";
+   char        x_prefix    [LEN_TERSE] = "";
+   char        x_suffix    [LEN_TERSE] = "";
    char        x_full      [LEN_PATH]  = "";
    char        x_fuid      =   -1;
    char       *x_fatal     = "file/dir security is problematic";
@@ -41,8 +41,8 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    DEBUG_YJOBS   yLOG_complex ("a_args"    , "%c %c", a_runas, a_mode);
    /*---(score)--------------------------*/
    yURG_msg ('>', "local file/dir verification and security check (VERIFY)...");
-   yENV_score_mark ("LTYPE"    , G_SCORE_FAIL);
-   yENV_score_mark ("LSECURE"  , G_SCORE_FAIL);
+   ySCORE_mark ("LTYPE"    , G_SCORE_FAIL);
+   ySCORE_mark ("LSECURE"  , G_SCORE_FAIL);
    /*---(default)------------------------*/
    if (r_fuser  != NULL)  strcpy (r_fuser , "");
    /*---(defense)------------------------*/
@@ -63,7 +63,7 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    /*---(directory)----------------------*/
    --rce;  if (strcmp (a_file, "") == 0) {
       DEBUG_YJOBS   yLOG_note    ("directory given");
-      yENV_score_mark ("LTYPE"    , 'd');
+      ySCORE_mark ("LTYPE"    , 'd');
       /*---(filter)----------------------*/
       DEBUG_YJOBS   yLOG_info    ("IAM_DIRS"  , IAM_DIRS);
       if (strchr (IAM_DIRS, a_runas) == NULL) {
@@ -72,7 +72,7 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
          return rce;
       }
       /*---(verify)----------------------*/
-      rc = yENV_audit_localdir (a_dir, x_full, &x_fuid, r_fuser);
+      rc = yAUDIT_localdir (a_dir, x_full, &x_fuid, r_fuser);
       DEBUG_YJOBS   yLOG_value   ("localdir"  , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "", x_fatal);
@@ -84,7 +84,7 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    /*---(file)---------------------------*/
    else {
       DEBUG_YJOBS   yLOG_note    ("file given");
-      yENV_score_mark ("LTYPE"    , 'r');
+      ySCORE_mark ("LTYPE"    , 'r');
       /*---(filter)----------------------*/
       DEBUG_YJOBS   yLOG_info    ("IAM_FILES" , IAM_FILES);
       if (strchr (IAM_FILES, a_runas) == NULL) {
@@ -103,7 +103,7 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
       DEBUG_YJOBS   yLOG_info    ("x_prefix"  , x_prefix);
       DEBUG_YJOBS   yLOG_info    ("x_suffix"  , x_suffix);
       /*---(verify)----------------------*/
-      rc = yENV_audit_local (a_dir, a_file, x_prefix, x_suffix, x_full, &x_fuid, r_fuser);
+      rc = yAUDIT_local (a_dir, a_file, x_prefix, x_suffix, x_full, &x_fuid, r_fuser);
       DEBUG_YJOBS   yLOG_value   ("local"     , rc);
       if (rc < 0) {
          yjobs_ends_failure (a_mode, "", x_fatal);
@@ -113,7 +113,7 @@ yjobs_in__secure        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
       /*---(done)------------------------*/
    }
    /*---(score)--------------------------*/
-   yENV_score_mark ("LSECURE"  , 's');
+   ySCORE_mark ("LSECURE"  , 's');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(save key data)------------------*/
    yURG_msg ('-', "success, local file/dir exists and security is acceptable");
@@ -140,8 +140,8 @@ yjobs_in__pull          (char a_runas, char a_mode, void *f_callback, char a_ful
    if (yJOBS_iffix ())    x_audit = 'y';
    /*---(score)--------------------------*/
    yURG_msg ('>', "read source/configuration file into environment (PULL)...");
-   if (x_audit == 'y')  yENV_score_mark ("LAUDIT"   , G_SCORE_FAIL);
-   else                 yENV_score_mark ("LPULL"    , G_SCORE_FAIL);
+   if (x_audit == 'y')  ySCORE_mark ("LAUDIT"   , G_SCORE_FAIL);
+   else                 ySCORE_mark ("LPULL"    , G_SCORE_FAIL);
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(check call-back)----------------*/
    DEBUG_YJOBS   yLOG_point   ("callback"  , f_callback);
@@ -161,8 +161,8 @@ yjobs_in__pull          (char a_runas, char a_mode, void *f_callback, char a_ful
    }
    DEBUG_YJOBS   yLOG_value   ("rc_flag"   , rc_flag);
    /*---(score)--------------------------*/
-   if (x_audit == 'y')  yENV_score_mark ("LAUDIT"   , 'a');
-   else                 yENV_score_mark ("LPULL"    , 'Ö');
+   if (x_audit == 'y')  ySCORE_mark ("LAUDIT"   , 'a');
+   else                 ySCORE_mark ("LPULL"    , 'Ö');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(check for audit)----------------*/
    if (x_audit == 'y') {
@@ -196,7 +196,7 @@ yjobs_in__report        (char a_runas, char a_mode, void *f_callback, char a_ful
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(score)--------------------------*/
    yURG_msg ('>', "create report from locally collected data (LOCALRPT)...");
-   yENV_score_mark ("LREPORT"  , G_SCORE_FAIL);
+   ySCORE_mark ("LREPORT"  , G_SCORE_FAIL);
    /*---(default)------------------------*/
    DEBUG_YJOBS   yLOG_value   ("pre-score" , rc);
    /*---(check call-back)----------------*/
@@ -216,7 +216,7 @@ yjobs_in__report        (char a_runas, char a_mode, void *f_callback, char a_ful
       return rce;
    }
    /*---(score)--------------------------*/
-   yENV_score_mark ("LREPORT"  , 'ò');
+   ySCORE_mark ("LREPORT"  , 'ò');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -228,7 +228,7 @@ yjobs_in__name          (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
-   char        x_cpre      [LEN_LABEL] = "";
+   char        x_cpre      [LEN_TERSE] = "";
    char       *p           = NULL;
    char        x_new       [LEN_PATH]  = "";
    /*---(header)-------------------------*/
@@ -299,7 +299,7 @@ yjobs_in__intake        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(score)------------------------------*/
    yURG_msg ('>', "install file in configuration directory (MOVE)...");
-   yENV_score_mark ("LMOVE"    , G_SCORE_FAIL);
+   ySCORE_mark ("LMOVE"    , G_SCORE_FAIL);
    yURG_msg ('-', "local file name %2då%sæ", strlen (a_file), a_file);
    /*---(get central info)-------------------*/
    rc = yjobs_in__name (a_runas, a_mode, a_file, a_fuser, a_conf, x_new);
@@ -344,7 +344,7 @@ yjobs_in__intake        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    rc = chmod (x_full, 0600);
    DEBUG_YJOBS   yLOG_value   ("chmod"     , rc);
    /*---(confirmmation)----------------------*/
-   rc = yENV_audit_reg (YENV_FIX, YENV_STANDARD, a_cdir, x_new, "root", "root", "f_tight");
+   rc = yAUDIT_reg (YENV_FIX, YENV_STANDARD, a_cdir, x_new, "root", "root", "f_tight");
    DEBUG_YJOBS   yLOG_value   ("exists"    , rc);
    --rce;  if (rc < 0) {
       sprintf (x_msg, "file could not be confirmed in configuration location (%3d)", rc);
@@ -354,7 +354,7 @@ yjobs_in__intake        (char a_runas, char a_mode, char a_dir [LEN_PATH], char 
    }
    /*---(summary)----------------------------*/
    yURG_msg ('-', "success, file confirmed as moved to configuration directory");
-   yENV_score_mark ("LMOVE"    , 'm');
+   ySCORE_mark ("LMOVE"    , 'm');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -383,7 +383,7 @@ yjobs_in__register      (char a_runas, char a_mode, char a_file [LEN_PATH], char
          DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
          DEBUG_YJOBS   yLOG_note    ("host program requested register specifcally, but does not use world file");
          yURG_msg ('>', "register file/dir in world file (REGISTER)...");
-         yENV_score_mark ("LREG"     , G_SCORE_FAIL);
+         ySCORE_mark ("LREG"     , G_SCORE_FAIL);
          yjobs_ends_failure (a_mode, "requested register, but host does not use world file", x_fatal);
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
@@ -398,7 +398,7 @@ yjobs_in__register      (char a_runas, char a_mode, char a_file [LEN_PATH], char
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    /*---(scoring)------------------------*/
    yURG_msg ('>', "register file/dir in world file (REGISTER)...");
-   yENV_score_mark ("LREG"     , G_SCORE_FAIL);
+   ySCORE_mark ("LREG"     , G_SCORE_FAIL);
    /*---(call)---------------------------*/
    DEBUG_YJOBS   yLOG_point   ("f_testcall", f_testcall);
    if (f_testcall != NULL) {  /* special testing outlet */
@@ -416,7 +416,7 @@ yjobs_in__register      (char a_runas, char a_mode, char a_file [LEN_PATH], char
       return rce;
    }
    /*---(scoring)------------------------*/
-   yENV_score_mark ("LREG"     , 'r');
+   ySCORE_mark ("LREG"     , 'r');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
@@ -440,8 +440,11 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    char        x_cdir      [LEN_PATH]  = "";
    char        x_conf      [LEN_LABEL] = "";
    char        x_hdir      [LEN_PATH]  = "";
-   char        x_world     [LEN_LABEL] = "";
    char        x_db        [LEN_LABEL] = "";
+   char        x_world     [LEN_LABEL] = "";
+   char        x_lpre      [LEN_TERSE] = "";
+   char        x_cpre      [LEN_TERSE] = "";
+   char        x_suf       [LEN_TERSE] = "";
    char        x_cwd       [LEN_PATH]  = "";
    char        x_dir       [LEN_PATH]  = "";
    char        x_file      [LEN_PATH]  = "";
@@ -450,7 +453,7 @@ yjobs_in_full           (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, x_cdir, x_conf, x_hdir, x_world, x_db, x_cwd, x_dir, x_file, x_full);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, x_cdir, x_conf, x_hdir, x_db, x_world, x_lpre, x_cpre, x_suf, x_cwd, x_dir, x_file, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

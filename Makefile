@@ -8,7 +8,7 @@ NAME_BASE  = yJOBS
 # additional standard and outside libraries
 LIB_STD    = -lm
 # all heatherly libraries used, debug versions whenever available
-LIB_MINE   = -lySTR_debug -lyREGEX_debug -lyEXEC_debug -lySORT_debug -lyENV_debug
+LIB_MINE   = -lySTR_debug -lyREGEX_debug -lyEXEC_debug -lySORT_debug -lyENV_debug -lyAUDIT_debug -lySCORE_debug
 # all heatherly libraries used only in unit tests
 LIB_MYUNIT = -lyENV_debug
 # directory for production code, no trailing slash

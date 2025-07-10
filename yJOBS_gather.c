@@ -37,7 +37,7 @@ yjobs_gather_full       (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, &x_ruid, x_ruser, f_callback, x_cdir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, x_full);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, &x_ruid, x_ruser, f_callback, x_cdir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("header"    , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -120,7 +120,7 @@ yjobs_world_full        (cchar a_runas, cchar a_mode, cchar a_oneline [LEN_HUND]
    }
    x_callback = f_callback;
    /*---(show header)--------------------*/
-   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, NULL, NULL, NULL, x_world, x_db, x_cwd, NULL, NULL, NULL);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, NULL, NULL, NULL, NULL, NULL, x_db, x_world, NULL, NULL, NULL, x_cwd, NULL, NULL, NULL);
    DEBUG_YJOBS   yLOG_value   ("location"  , rc);
    if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

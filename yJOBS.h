@@ -1,4 +1,3 @@
-/*===[[ HEADER GUARD ]]=======================================================*/
 #ifndef YJOBS_hguard
 #define YJOBS_hguard loaded
 
@@ -376,15 +375,20 @@ char        yJOBS_ifvalid           (void);
 char        yJOBS_ifunit            (void);
 char        yJOBS_ifetc             (void);
 /*---(verbosity checkers)---*/
+char        yJOBS_ifallmode         (void);
 char        yJOBS_ifsilent          (void);
 char        yJOBS_ifconfirm         (void);
 char        yJOBS_ifverbose         (void);
+/*---(support)--------------*/
+char        yJOBS_ifhelp            (void);
+char        yJOBS_ifversion         (void);
 /*---(incomming checkers)---*/
 char        yJOBS_ifverify          (void);
 char        yJOBS_iflocalrpt        (void);
 char        yJOBS_ifregister        (void);
 char        yJOBS_ifconfirm         (void);
 char        yJOBS_ifinstall         (void);
+char        yJOBS_ifupdate          (void);
 /*---(central checkers)-----*/
 char        yJOBS_ifstats           (void);
 char        yJOBS_iflist            (void);

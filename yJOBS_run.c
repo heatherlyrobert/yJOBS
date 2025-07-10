@@ -2,25 +2,25 @@
 #include   "yJOBS.h"
 #include   "yJOBS_priv.h"
 
-char
-yjobs_run__pull_all     (char a_runas, char a_mode, void *f_callback)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(full all files)------------------------*/
-   rc = yjobs_dir_review (a_runas, a_mode, f_callback, YENV_NONE, YENV_NONE);
-   DEBUG_YJOBS   yLOG_value   ("files"     , rc);
-   --rce;  if (rc <  0) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return RC_POSITIVE;
-}
+/*> char                                                                                                                                                          <* 
+ *> yjobs_run__pull_all     (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], int a_ruid, char a_ruser [LEN_USER], void *f_callback)   <* 
+ *> {                                                                                                                                                             <* 
+ *>    /+---(locals)-----------+-----+-----+-+/                                                                                                                   <* 
+ *>    char        rce         =  -10;                                                                                                                            <* 
+ *>    char        rc          =    0;                                                                                                                            <* 
+ *>    /+---(header)-------------------------+/                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);                                                                                                                 <* 
+ *>    /+---(full all files)------------------------+/                                                                                                            <* 
+ *>    rc = yjobs_dir_all_pull (a_runas, a_mode, a_cdir, a_conf, a_ruid, a_ruser, f_callback);                                                                    <* 
+ *>    DEBUG_YJOBS   yLOG_value   ("files"     , rc);                                                                                                             <* 
+ *>    --rce;  if (rc <  0) {                                                                                                                                     <* 
+ *>       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);                                                                                                         <* 
+ *>       return rce;                                                                                                                                             <* 
+ *>    }                                                                                                                                                          <* 
+ *>    /+---(complete)-----------------------+/                                                                                                                   <* 
+ *>    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);                                                                                                                 <* 
+ *>    return RC_POSITIVE;                                                                                                                                        <* 
+ *> }                                                                                                                                                             <*/
 
 char
 yjobs_run_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], char a_file [LEN_PATH], void *f_callback)
@@ -33,9 +33,12 @@ yjobs_run_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    int         x_ruid      =   -1;
    char        x_ruser     [LEN_USER]  = "";
    char        x_cdir      [LEN_DESC]  = "";
+   char        x_conf      [LEN_LABEL] = "";
    char        x_hdir      [LEN_PATH]  = "";
-   char        x_world     [LEN_LABEL] = "";
    char        x_db        [LEN_LABEL] = "";
+   char        x_world     [LEN_LABEL] = "";
+   char        x_cpre      [LEN_TERSE] = "";
+   char        x_suf       [LEN_TERSE] = "";
    char        x_cwd       [LEN_PATH]  = "";
    char        x_dir       [LEN_PATH]  = "";
    char        x_file      [LEN_PATH]  = "";
@@ -48,7 +51,7 @@ yjobs_run_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, &x_ruid, x_ruser, x_cdir, NULL, x_hdir, x_world, x_db, x_cwd, x_dir, x_file, x_full);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, &x_ruid, x_ruser, x_cdir, x_conf, x_hdir, x_db, x_world, NULL, x_cpre, x_suf, x_cwd, x_dir, x_file, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -88,8 +91,8 @@ yjobs_run_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    else if (rc < 0)         rc_final = RC_FATAL;
    DEBUG_YJOBS   yLOG_value   ("rc_final"  , rc_final);
    /*---(read database)------------------*/
-   rc = yjobs_run__pull_all  (a_runas, a_mode, f_callback);
-   DEBUG_YJOBS   yLOG_value   ("readdb"    , rc);
+   rc = yjobs_dir_all_pull (a_runas, a_mode, x_cdir, x_conf, x_ruid, x_ruser, f_callback);
+   DEBUG_YJOBS   yLOG_value   ("pull_all"  , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;

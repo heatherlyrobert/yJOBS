@@ -115,7 +115,7 @@ yjobs_who_init          (void)
 }
 
 char
-yjobs_who__base         (char a_runas, char *r_base, char *r_unit, char r_name [LEN_TERSE], char r_inst [LEN_LABEL], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_conf [LEN_LABEL], char r_hdir [LEN_DESC], char r_db [LEN_LABEL], char r_world [LEN_LABEL], char *r_update, char *r_local, char *r_central, char r_lpre [LEN_LABEL], char r_cpre [LEN_LABEL], char r_lsuf [LEN_LABEL])
+yjobs_who__base         (char a_runas, char *r_base, char *r_unit, char r_name [LEN_TERSE], char r_inst [LEN_LABEL], char r_desc [LEN_DESC], char r_cdir [LEN_DESC], char r_conf [LEN_LABEL], char r_hdir [LEN_DESC], char r_db [LEN_LABEL], char r_world [LEN_LABEL], char *r_update, char *r_local, char *r_central, char r_lpre [LEN_TERSE], char r_cpre [LEN_TERSE], char r_lsuf [LEN_TERSE])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -134,9 +134,9 @@ yjobs_who__base         (char a_runas, char *r_base, char *r_unit, char r_name [
    if (r_update  != NULL)  *r_update  = '·';
    if (r_local   != NULL)  *r_local   = '·';
    if (r_central != NULL)  *r_central = '·';
-   if (r_lpre    != NULL)  ystrlcpy (r_lpre , "", LEN_LABEL);
-   if (r_cpre    != NULL)  ystrlcpy (r_cpre , "", LEN_LABEL);
-   if (r_lsuf    != NULL)  ystrlcpy (r_lsuf , "", LEN_LABEL);
+   if (r_lpre    != NULL)  ystrlcpy (r_lpre , "", LEN_TERSE);
+   if (r_cpre    != NULL)  ystrlcpy (r_cpre , "", LEN_TERSE);
+   if (r_lsuf    != NULL)  ystrlcpy (r_lsuf , "", LEN_TERSE);
    /*---(walk data)----------------------*/
    for (i = 0; i < MAX_WHO; ++i) {
       /*---(filter)----------------------*/
@@ -164,9 +164,9 @@ yjobs_who__base         (char a_runas, char *r_base, char *r_unit, char r_name [
       if (r_update  != NULL)  *r_update  = g_whos [i].w_update;
       if (r_local   != NULL)  *r_local   = g_whos [i].w_local;
       if (r_central != NULL)  *r_central = g_whos [i].w_central;
-      if (r_lpre    != NULL)  ystrlcpy (r_lpre , g_whos [i].w_lpre , LEN_LABEL);
-      if (r_cpre    != NULL)  ystrlcpy (r_cpre , g_whos [i].w_cpre , LEN_LABEL);
-      if (r_lsuf    != NULL)  ystrlcpy (r_lsuf , g_whos [i].w_lsuf , LEN_LABEL);
+      if (r_lpre    != NULL)  ystrlcpy (r_lpre , g_whos [i].w_lpre , LEN_TERSE);
+      if (r_cpre    != NULL)  ystrlcpy (r_cpre , g_whos [i].w_cpre , LEN_TERSE);
+      if (r_lsuf    != NULL)  ystrlcpy (r_lsuf , g_whos [i].w_lsuf , LEN_TERSE);
       /*---(done)------------------------*/
       return 0;
    }
@@ -175,7 +175,7 @@ yjobs_who__base         (char a_runas, char *r_base, char *r_unit, char r_name [
 }
 
 char
-yjobs_who_naming        (char a_runas, char *r_local, char *r_central, char r_lpre [LEN_LABEL], char r_cpre [LEN_LABEL], char r_lsuf [LEN_LABEL], char r_conf [LEN_LABEL])
+yjobs_who_naming        (char a_runas, char *r_local, char *r_central, char r_lpre [LEN_TERSE], char r_cpre [LEN_TERSE], char r_lsuf [LEN_TERSE], char r_conf [LEN_LABEL])
 {
    return yjobs_who__base (a_runas, NULL, NULL, NULL, NULL, NULL, NULL, r_conf, NULL, NULL, NULL, NULL, r_local, r_central, r_lpre, r_cpre, r_lsuf);
 }
@@ -249,7 +249,7 @@ yjobs_who_by_action     (char a_runas, char a_mode, char a_label [LEN_TERSE])
    rc = yjobs_who_action (a_runas, n);
    if (rc == '-')  rc = a_mode;
    if (rc == '·')  rc = '-';
-   yENV_score_mark (a_label, rc);
+   ySCORE_mark (a_label, rc);
    if (rc == '-')  return 1;
    return 0;
 }
@@ -292,9 +292,9 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(scoring)------------------------*/
-   yjobs_ends_init ();
-   yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
-   yENV_score_mark ("ENV"      , '·');
+   yjobs_yscore_init ();
+   ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
+   ySCORE_mark ("ENV"      , '·');
    /*---(default)------------------------*/
    myJOBS.m_runas   = IAM_DEFAULT;
    if (r_runas != NULL)  *r_runas = IAM_DEFAULT;
@@ -309,7 +309,7 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
    DEBUG_YJOBS  yLOG_point   ("a_name"    , a_name);
    --rce;  if (a_name == NULL) {
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
-      yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
       return rce;
    }
    DEBUG_YJOBS  yLOG_info    ("a_name"    , a_name);
@@ -317,7 +317,7 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
    --rce;  for (i = 0; i < MAX_WHO; ++i) {
       if (g_whos [i].w_abbr == 0) {
          DEBUG_YJOBS  yLOG_note    ("runas entry never found");
-         yENV_score_mark ("JUDGE"    , G_SCORE_FAIL);
+         ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
          DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
@@ -346,7 +346,7 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
          DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].w_name, g_whos [i].w_abbr, g_whos [i].w_unit);
          myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("debug"     , myJOBS.m_runas);
-         yENV_score_mark ("ENV"      , 'd');
+         ySCORE_mark ("ENV"      , 'd');
          break;
       }
       /*---(qualified)-------------------*/
@@ -354,7 +354,7 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
          DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].w_name, g_whos [i].w_abbr, g_whos [i].w_unit);
          myJOBS.m_runas = g_whos [i].w_abbr;
          DEBUG_YJOBS  yLOG_char    ("qualified" , myJOBS.m_runas);
-         yENV_score_mark ("ENV"      , 'd');
+         ySCORE_mark ("ENV"      , 'd');
          break;
       }
       /*---(unittest)--------------------*/
@@ -362,14 +362,14 @@ yjobs_runas             (char a_name [LEN_TERSE], char *r_runas)
          DEBUG_YJOBS  yLOG_complex ("found"     , "%s, normal=%c, unittest=%c", g_whos [i].w_name, g_whos [i].w_abbr, g_whos [i].w_unit);
          myJOBS.m_runas = g_whos [i].w_unit;
          DEBUG_YJOBS  yLOG_char    ("unittest"  , myJOBS.m_runas);
-         yENV_score_mark ("ENV"      , 'u');
+         ySCORE_mark ("ENV"      , 'u');
          break;
       }
       /*---(done)------------------------*/
    }
    /*---(score)--------------------------*/
    yjobs_args_data (myJOBS.m_runas, NULL, &x_base, NULL, NULL, NULL);
-   if (x_base != '-')  yENV_score_mark ("RUNAS"    , x_base);
+   if (x_base != '-')  ySCORE_mark ("RUNAS"    , x_base);
    yjobs_runas_masking (myJOBS.m_runas);
    /*---(save-back)----------------------*/
    if (r_runas != NULL)  *r_runas = myJOBS.m_runas;
@@ -392,22 +392,22 @@ yjobs_runas_masking         (char a_runas)
    char        c           =   0;
    /*---(masking)------------------------*/
    rc = yjobs_who_location (a_runas, x_cdir, x_conf, x_hdir, x_db, x_world);
-   if      (strcmp  (x_cdir , "") == 0)         yENV_score_mask ("CFá ", "FLIST");
+   if      (strcmp  (x_cdir , "") == 0)         ySCORE_mask ("CDá ", "FLIST");
    else {
-      if (strstr (x_cdir , "/etc/") != NULL)    yENV_score_mark ("FSTYLE"  , 'e');
-      else                                      yENV_score_mark ("FSTYLE"  , 's');
-      if      (strcmp (x_conf, "") == 0)        yENV_score_mark ("FCOUNT"  , '*');
-      else                                      yENV_score_mark ("FCOUNT"  , '1');
+      if (strstr (x_cdir , "/etc/") != NULL)    ySCORE_mark ("FSTYLE"  , 'e');
+      else                                      ySCORE_mark ("FSTYLE"  , 's');
+      if      (strcmp (x_conf, "") == 0)        ySCORE_mark ("FCOUNT"  , '*');
+      else                                      ySCORE_mark ("FCOUNT"  , '1');
    }
-   if (strcmp (x_hdir , "") == 0)   yENV_score_mask ("CDá ", "CAUDIT");
-   if (strcmp (x_world, "") == 0)   yENV_score_mask ("WOá ", "WWRITE");
-   if (strcmp (x_db   , "") == 0)   yENV_score_mask ("DBá ", "DWRITE");
+   if (strcmp (x_hdir , "") == 0)   ySCORE_mask ("HDá ", "CAUDIT");
+   if (strcmp (x_world, "") == 0)   ySCORE_mask ("WOá ", "WWRITE");
+   if (strcmp (x_db   , "") == 0)   ySCORE_mask ("DBá ", "DWRITE");
    /*---(actions)------------------------*/
    c = 0;
    c += yjobs_who_by_action (a_runas, 'g', "GATHER");
    c += yjobs_who_by_action (a_runas, 'n', "NORMAL");
    c += yjobs_who_by_action (a_runas, 'd', "DAEMON");
-   if (c == 3)  yENV_score_mask ("ACá ", "DAEMON");
+   if (c == 3)  ySCORE_mask ("ACá ", "DAEMON");
    /*---(backend)------------------------*/
    c = 0;
    c += yjobs_who_by_action (a_runas, 'e', "EXTRACT");
@@ -415,7 +415,7 @@ yjobs_runas_masking         (char a_runas)
    c += yjobs_who_by_action (a_runas, 'k', "BACKUP");
    c += yjobs_who_by_action (a_runas, 'z', "DOWNLOAD");
    c += yjobs_who_by_action (a_runas, 't', "RESTORE");
-   if (c == 5)  yENV_score_mask ("BEá ", "RESTORE");
+   if (c == 5)  ySCORE_mask ("BEá ", "RESTORE");
    /*---(complete)-----------------------*/
    DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
    return 0;

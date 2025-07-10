@@ -10,7 +10,7 @@
 static void      o___LIST____________________o (void) {;};
 
 char
-yjobs_dir_list          (char a_type, char a_path [LEN_PATH], char r_list [LEN_MASS])
+yjobs_dir__sorted       (char a_type, char a_path [LEN_PATH], char r_list [LEN_MASS])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -173,17 +173,17 @@ yjobs_dir__secure       (char a_label [LEN_LABEL], char a_dir [LEN_DESC], char a
    l = strlen (x_dir);
    DEBUG_YJOBS   yLOG_complex ("executing" , "%2då%sæ", l, x_dir);
    rc = 0;
-   if      (strcmp (x_dir, "/etc"      ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/var"      ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/var/lib"  ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/var/spool") == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/home"     ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/tmp"      ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "f_nodel"  );
-   else if (strcmp (x_dir, "/tmp/etc"  ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/tmp/lib"  ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/tmp/spool") == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else if (strcmp (x_dir, "/tmp/home" ) == 0)  rc = yENV_audit_centraldir (a_fix, x_dir, "d_normal" );
-   else                                         rc = yENV_audit_centraldir (a_fix, x_dir, "d_tight"  );
+   if      (strcmp (x_dir, "/etc"      ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/var"      ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/var/lib"  ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/var/spool") == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/home"     ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/tmp"      ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "f_nodel"  );
+   else if (strcmp (x_dir, "/tmp/etc"  ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/tmp/lib"  ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/tmp/spool") == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else if (strcmp (x_dir, "/tmp/home" ) == 0)  rc = yAUDIT_centraldir (a_fix, x_dir, "d_normal" );
+   else                                         rc = yAUDIT_centraldir (a_fix, x_dir, "d_tight"  );
    /*---(handle trouble)-----------------*/
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -232,8 +232,8 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    }
    DEBUG_YJOBS   yLOG_info    ("a_label"   , a_label);
    /*---(score)--------------------------*/
-   --rce; if (strncmp (a_label, "conf", 4) == 0)  { x_use = 'c'; yENV_score_mark ("FDSEC"    , '°'); if (x_fix == 'F')  yENV_score_mark ("FDFIX"    , '°'); }
-   else   if (strncmp (a_label, "cent", 4) == 0)  { x_use = 'd'; yENV_score_mark ("CSECURE"  , '°'); if (x_fix == 'F')  yENV_score_mark ("CFIX"     , '°'); }
+   --rce; if (strncmp (a_label, "conf", 4) == 0)  { x_use = 'c'; }
+   else   if (strncmp (a_label, "cent", 4) == 0)  { x_use = 'd'; }
    else {
       DEBUG_YJOBS   yLOG_note    ("can not interpret a_label");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -243,6 +243,8 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_dir"     , a_dir);
    --rce;  if (a_dir  == NULL) {
+      if      (x_use == 'c') {  ySCORE_mark ("FDSEC"    , '°'); }
+      else if (x_use == 'd') {  ySCORE_mark ("CSECURE"  , '°'); }
       yURG_msg ('>', "auditing %s directory...", a_label);
       yURG_err ('f', "%s directory is NULL", a_label);
       snprintf (t, LEN_HUND, "%s directory is not secure/proper", a_label);
@@ -253,8 +255,6 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    /*---(no directory given)-------------*/
    DEBUG_YJOBS   yLOG_info    ("a_dir"     , a_dir);
    if (strcmp (a_dir, "")  == 0) {
-      if      (x_use == 'c') {  yENV_score_mark ("FDSEC"    , '-'); if (x_fix == 'F')  yENV_score_mark ("FDFIX"    , '-');  }
-      else if (x_use == 'd') {  yENV_score_mark ("CSECURE"  , '-'); if (x_fix == 'F')  yENV_score_mark ("CFIX"     , '-');  }
       yURG_msg ('>', "auditing %s directory...", a_label);
       snprintf (t, LEN_HUND, "skipping, not configured for %s directory", a_label);
       yURG_msg ('-', t);
@@ -262,6 +262,8 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
       return RC_ACK;
    }
    /*---(score)---------------------------------*/
+   --rce; if (x_use == 'c')  { ySCORE_mark ("FDSEC"    , '°'); if (x_fix == 'F')  ySCORE_mark ("FDFIX"    , '°'); }
+   else   if (x_use == 'd')  { ySCORE_mark ("CSECURE"  , '°'); if (x_fix == 'F')  ySCORE_mark ("CFIX"     , '°'); }
    if (r_use  != NULL)  *r_use  = 'y';
    /*---(call audit)----------------------------*/
    rc = yjobs_dir__secure (a_label, a_dir, x_fix);
@@ -274,16 +276,16 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    }
    /*---(score)---------------------------------*/
    if        (x_use == 'c') {
-      yENV_score_mark ("FDSEC"    , 's');
+      ySCORE_mark ("FDSEC"    , 's');
       if (x_fix != '-') {
-         if (rc == RC_REPAIR)  yENV_score_mark ("FDFIX"    , 'f');
-         else                  yENV_score_mark ("FDFIX"    , '-');  /* nothing to do */
+         if (rc == RC_REPAIR)  ySCORE_mark ("FDFIX"    , 'f');
+         else                  ySCORE_mark ("FDFIX"    , '-');  /* nothing to do */
       }
    } else if (x_use == 'd') {
-      yENV_score_mark ("CSECURE"  , 's');
+      ySCORE_mark ("CSECURE"  , 's');
       if (x_fix != '-') {
-         if (rc == RC_REPAIR)  yENV_score_mark ("CFIX"     , 'f');
-         else                  yENV_score_mark ("CFIX"     , '-');  /* nothing to do */
+         if (rc == RC_REPAIR)  ySCORE_mark ("CFIX"     , 'f');
+         else                  ySCORE_mark ("CFIX"     , '-');  /* nothing to do */
       }
    }
    if (r_good != NULL)  *r_good = 'y';
@@ -319,7 +321,7 @@ yjobs__dir_filter       (char a_name [LEN_HUND], char a_prefix [LEN_TERSE], int 
    /*---(just up/cur dirs)---------------*/
    if      (strcmp (a_name, "." ) == 0 || strcmp (a_name, "..") == 0) {
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return 0;
+      return RC_ACK;
    }
    /*---(name quality)-------------------*/
    l = strlen (a_name);
@@ -340,16 +342,16 @@ yjobs__dir_filter       (char a_name [LEN_HUND], char a_prefix [LEN_TERSE], int 
    if (a_muid != 0) {
       if (strncmp (a_name, a_prefix, strlen (a_prefix)) != 0) {
          DEBUG_YJOBS  yLOG_exit    (__FUNCTION__);
-         return 0;
+         return RC_ACK;
       }
    }
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-   return 1;
+   return RC_POSITIVE;
 }
 
 char
-yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], char a_cname [LEN_LABEL], char a_user [LEN_USER], int a_uid, void *f_callback)
+yjobs__dir_multi        (char a_runas, char a_mode, char a_reason, char a_cdir [LEN_DESC], char a_prefix [LEN_TERSE],  char a_suffix [LEN_TERSE], int a_ruid, char a_ruser [LEN_USER], void *f_callback, char c_fail)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -358,7 +360,7 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    char       *q           = ",";  
    char       *r           = NULL;
    int         rc_final    =    0;
-   char        x_prefix    [LEN_USER]  = "";
+   char        x_filter    [LEN_USER]  = "";
    int         x_all       =    0;
    int         x_total     =    0;
    int         x_count     =    0;
@@ -368,45 +370,20 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    char        x_list      [LEN_MASS]  = "";
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YJOBS   yLOG_point   ("a_config"  , a_config);
-   --rce;  if (a_config == NULL || a_config [0] == '\0') {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_info    ("a_config"  , a_config);
-   DEBUG_YJOBS   yLOG_point   ("a_cname"   , a_cname);
-   --rce;  if (a_cname  == NULL) {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_info    ("a_cname"   , a_cname);
-   DEBUG_YJOBS   yLOG_point   ("a_user"    , a_user);
-   --rce;  if (a_user   == NULL || a_user [0] == '\0') {
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YJOBS   yLOG_info    ("a_user"    , a_user);
-   /*---(quick-out)----------------------*/
-   --rce;  if (a_cname [0] != '\0') {
-      DEBUG_YJOBS   yLOG_note    ("configuation file specified, use single");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
    /*---(gather)-------------------------*/
-   rc = yjobs_dir_list (YENV_REG, a_config, x_list);
+   rc = yjobs_dir__sorted (YENV_REG, a_cdir, x_list);
    DEBUG_YJOBS   yLOG_point   ("list"      , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(prepare)------------------------*/
-   sprintf (x_prefix, "%s.", a_user);
-   DEBUG_YJOBS   yLOG_info    ("x_prefix"  , x_prefix);
-   if (strcmp ("root", a_user) == 0) {
+   sprintf (x_filter, "%s.", a_ruser);
+   DEBUG_YJOBS   yLOG_info    ("x_filter"  , x_filter);
+   if (strcmp ("root", a_ruser) == 0) {
       yURG_msg ('-', "file filtering will see everything (root)");
    } else {
-      yURG_msg ('-', "file filtering prefix is å%sæ", x_prefix);
+      yURG_msg ('-', "file filtering prefix is å%sæ", x_filter);
    }
    /*---(walk files)---------------------*/
    DEBUG_YJOBS   yLOG_note    ("walk through directory files");
@@ -415,19 +392,9 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
    while (p != NULL) {
       /*---(header)-----------------------------*/
       DEBUG_YJOBS   yLOG_info    ("file"      , p);
-      /*---(ignore-standards)-------------------*/
-      if (p [0] == '.') {
-         switch (p [1]) {
-         case '.'  : case '\0' :
-            p = strtok_r (NULL, q, &r);
-            DEBUG_YJOBS   yLOG_point   ("p"         , p);
-            continue;
-            break;
-         }
-      }
       ++x_all;
       /*---(simple filtering)-------------------*/
-      rc = yjobs__dir_filter (p, x_prefix, a_uid);
+      rc = yjobs__dir_filter (p, x_filter, a_ruid);
       DEBUG_YJOBS   yLOG_value   ("filter"    , rc);
       if (rc != 0)  ++x_total;
       if (rc <= 0) {
@@ -436,7 +403,8 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
          DEBUG_YJOBS   yLOG_point   ("p"         , p);
          continue;
       }
-      rc = yjobs__share_single   (a_runas, a_mode, a_config, p, a_user, a_uid, f_callback);
+      /*---(handle)-----------------------------*/
+      rc = yjobs_file_review (a_runas, a_mode, a_reason, ++x_count, a_cdir, p, a_prefix, a_suffix, f_callback, c_fail);
       DEBUG_YJOBS   yLOG_value   ("single"    , rc);
       if (rc < 0) rc = RC_FATAL;
       switch (rc) {
@@ -447,7 +415,6 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       case RC_WARNING  : ++x_warns;  break;
       case RC_FATAL    : ++x_error;  break;
       }
-      ++x_count;
       DEBUG_YJOBS   yLOG_complex ("counts"    , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
       /*---(next)------------------------*/
       p = strtok_r (NULL, q, &r);
@@ -455,7 +422,11 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
       /*---(done)------------------------*/
    }
    /*---(summary)------------------------*/
-   yURG_msg ('>', "summary of central file review...");
+   switch (a_reason) {
+   case  's' :  yURG_msg ('>', "summary of central files security review...");   break;
+   case  'p' :  yURG_msg ('>', "summary of central files pulling data...");      break;
+   case  'a' :  yURG_msg ('>', "summary of central files content audit...");     break;
+   }
    DEBUG_YJOBS   yLOG_complex ("FINAL"     , "%d all  , %d total, %d count, %d pass , %d warns, %d error", x_all, x_total, x_count, x_pass, x_warns, x_error);
    if      (x_all   == 0)  { yURG_msg ('-', "empty, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);           ; rc_final = RC_POSITIVE; }
    else if (x_count == 0)  { yURG_msg ('-', "nothing to see, all %d, total %d, count %d, pass  %d, warns %d, error %d", x_all, x_total, x_count, x_pass, x_warns, x_error);  ; rc_final = RC_POSITIVE; }
@@ -476,51 +447,45 @@ yjobs__dir_multi        (char a_runas, char a_mode, char a_config [LEN_DESC], ch
 }
 
 char         /*--> review central files --------------------------------------*/
-yjobs_dir_review        (char a_runas, char a_mode, void *f_callback, char c_flag, char c_fail)
+yjobs_dir_full          (char a_runas, char a_mode, char a_reason, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], char a_prefix [LEN_TERSE], char a_suffix [LEN_TERSE], int a_ruid, char a_ruser [LEN_USER], void *f_callback, char c_fail)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    int         rc          =    0;
    int         rc_final    =    0;
-   char        x_user      [LEN_USER]  = "";
-   int         x_uid       =    0;
-   char        x_cdir      [LEN_PATH]  = "";
-   char        x_conf      [LEN_DESC]  = "";
+   char        x_msg       [LEN_HUND]  = "";
+   char       *x_fatal     = "file review handled bad file/data";
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
-   /*---(header)-------------------------*/
-   yURG_msg ('>', "configuration central file review...");
-   /*---(running as)---------------------*/
-   rc = yEXEC_whoami          (NULL, NULL, &x_uid, NULL, NULL, x_user, 'n', NULL, NULL, NULL);
-   DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
-   --rce;  if (rc < 0) {
-      yURG_err ('f', "could not identify current user (yEXEC_whoami)");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+   /*---(prepare)------------------------*/
+   DEBUG_YJOBS   yLOG_char    ("a_reason"  , a_reason);
+   --rce;  switch (a_reason) {
+   case '=' :  break;
+   case 's' :  yURG_msg ('>', "central configuration files security review...");   break;
+   case 'p' :  yURG_msg ('>', "central configuration files pulling all data...");  break;
+   case 'a' :  yURG_msg ('>', "central configuration files content audit...");     break;
+   default  :
+               sprintf (x_msg, "reason code (%d/%c) is illegal å=spaæ", a_reason, a_reason);
+               yjobs_ends_failure (a_mode, x_msg, x_fatal);
+               DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+               return rce;
    }
-   yURG_msg ('-', "currently running as å%sæ (%d)", x_user, x_uid);
-   /*---(directory)-----------------------------*/
-   rc = yjobs_who_location (a_runas, x_cdir, x_conf, NULL, NULL, NULL);
-   DEBUG_YJOBS   yLOG_value   ("location"  , rc);
-   --rce;  if (rc <  0) {
-      yURG_err ('f', "could not identify configuration directory");
-      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   yURG_msg ('-', "configuration directory is å%sæ", x_cdir);
-   DEBUG_YJOBS   yLOG_info    ("x_cdir"    , x_cdir);
-   yURG_msg ('-', "configuration file name is å%sæ", x_conf);
-   DEBUG_YJOBS   yLOG_info    ("x_conf"    , x_conf);
    /*---(handle zero)---------------------------*/
-   if (strcmp (x_cdir, "") == 0) {
-      yURG_msg ('-', "skipping, zero configuration for application");
+   if (strcmp (a_cdir, "") == 0) {
+      yURG_msg ('-', "skipping, zero configuration (etc or spool) for application");
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
-      return 0;
+      return RC_ACK;
    }
+   /*---(running as)---------------------*/
+   yURG_msg ('-', "currently running as å%sæ (%d)", a_ruser, a_ruid);
+   yURG_msg ('-', "configuration directory is å%sæ", a_cdir);
+   DEBUG_YJOBS   yLOG_info    ("a_cdir"    , a_cdir);
+   DEBUG_YJOBS   yLOG_info    ("a_conf"    , a_conf);
    /*---(handle file)---------------------------*/
-   --rce;  if (strcmp (x_conf, "") != 0) {
-      yURG_msg ('-', "single-file configuration set-up");
-      rc = yjobs__share_single   (a_runas, a_mode, x_cdir, x_conf, x_user, x_uid, f_callback);
+   --rce;  if (a_conf != NULL && strcmp (a_conf, "") != 0) {
+      yURG_msg ('-', "single-file (etc) configuration set-up");
+      yURG_msg ('-', "configuration file name is å%sæ", a_conf);
+      rc = yjobs_file_review (a_runas, a_mode, a_reason, 1, a_cdir, a_conf, a_prefix, a_suffix, f_callback, c_fail);
       DEBUG_YJOBS   yLOG_value   ("single"    , rc);
       if (rc < 0)  {
          if (c_fail == 'y') {
@@ -533,8 +498,8 @@ yjobs_dir_review        (char a_runas, char a_mode, void *f_callback, char c_fla
    }
    /*---(multiple files)------------------------*/
    else {
-      yURG_msg ('-', "multiple-file configuration set-up");
-      rc = yjobs__dir_multi (a_runas, a_mode, x_cdir, x_conf, x_user, x_uid, f_callback);
+      yURG_msg ('-', "multiple-file (spool) configuration set-up");
+      rc = yjobs__dir_multi (a_runas, a_mode, a_reason, a_cdir, a_prefix, a_suffix, a_ruid, a_ruser, f_callback, c_fail);
       DEBUG_YJOBS   yLOG_value   ("multiple"  , rc);
       if (rc < 0)  {
          if (c_fail == 'y') {
@@ -553,6 +518,93 @@ yjobs_dir_review        (char a_runas, char a_mode, void *f_callback, char c_fla
    return rc_final;
 }
 
+char yjobs_dir_all_list   (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], int a_ruid, char a_ruser [LEN_USER])     { return yjobs_dir_full (a_runas, a_mode, '=', a_cdir, a_conf, "", "", a_ruid, a_ruser, NULL, '-'); }
+
+char
+yjobs_dir_all_pull  (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], int a_ruid, char a_ruser [LEN_USER], void *f_callback) 
+{ 
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (g_act_pul, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (g_act_pul);
+      DEBUG_YJOBS   yLOG_snote   ("pulling data not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return RC_ACK;
+   }
+   /*---(call)---------------------------*/
+   return yjobs_dir_full (a_runas, a_mode, 'p', a_cdir, a_conf, "", "", a_ruid, a_ruser, f_callback, 'y');
+}
+
+char
+yjobs_dir_all_secure (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], char a_prefix [LEN_TERSE], char a_suffix [LEN_TERSE], int a_ruid, char a_ruser [LEN_USER]) 
+{
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (g_act_sec, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (g_act_sec);
+      DEBUG_YJOBS   yLOG_snote   ("securing environment not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return RC_ACK;
+   }
+   /*---(call)---------------------------*/
+   return yjobs_dir_full (a_runas, a_mode, 's', a_cdir, a_conf, a_prefix, a_suffix, a_ruid, a_ruser, NULL, '-');
+}
+
+char
+yjobs_dir_all_audit     (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_conf [LEN_LABEL], int a_ruid, char a_ruser [LEN_USER], void *f_callback)
+{
+   /*---(quick-out)----------------------*/
+   if (a_mode == 0 || strchr (g_act_aud, a_mode) == NULL) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_sint    (a_mode);
+      DEBUG_YJOBS   yLOG_snote   (g_act_aud);
+      DEBUG_YJOBS   yLOG_snote   ("auditing configuration content not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return RC_ACK;
+   }
+   /*---(call)---------------------------*/
+   return yjobs_dir_full (a_runas, a_mode, 'a', a_cdir, a_conf, "", "", a_ruid, a_ruser, f_callback, '-');
+}
+
+char
+yjobs_dir_one_check     (char a_runas, char a_mode, char a_cdir [LEN_DESC], char a_file [LEN_PATH], char a_cpre [LEN_TERSE], char a_suf [LEN_TERSE], int a_ruid, char a_ruser [LEN_USER], void *f_callback)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         rc          =    0;
+   char      (*x_callback)   (char a_req, char a_full [LEN_PATH]);
+   /*---(quick-out)----------------------*/
+   if (a_mode != ACT_CHECK) {
+      DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
+      DEBUG_YJOBS   yLOG_schar   (a_mode);
+      DEBUG_YJOBS   yLOG_schar   (ACT_CHECK);
+      DEBUG_YJOBS   yLOG_snote   ("checking one file not requested");
+      DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
+      return RC_ACK;
+   }
+   /*---(header)-------------------------*/
+   DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
+   /*---(check security)-----------------*/
+   rc = yjobs_dir_all_secure (a_runas, a_mode, a_cdir, a_file, a_cpre, a_suf, a_ruid, a_ruser);
+   DEBUG_YJOBS   yLOG_value   ("check_sec" , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check security)-----------------*/
+   rc = yjobs_dir_all_audit  (a_runas, a_mode, a_cdir, a_file, a_ruid, a_ruser, f_callback);
+   DEBUG_YJOBS   yLOG_value   ("check_aud" , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
+}
 
 
 

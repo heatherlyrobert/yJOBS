@@ -21,18 +21,18 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    char        x_base      =  '-';
    /*---(clear all)----------------------*/
    yJOBS_reset (NULL, NULL, NULL);
-   yENV_score_clear ();
+   ySCORE_clear ();
    /*---(runas)--------------------------*/
    --rce;  if (a_runas == 0)  return rce;
    ystrlcpy (x_out, yjobs_iam  (a_runas), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown") == 0)  return rce;
    myJOBS.m_runas = a_runas;
-   yENV_score_mark ("RUNAS"    , G_SCORE_FAIL);
-   yENV_score_mark ("ENV"      , '·');
+   ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
+   ySCORE_mark ("ENV"      , '·');
    yjobs_args_data (myJOBS.m_runas, NULL, &x_base, NULL, NULL, NULL);
    if (x_base > 0 && x_base != '-')  {
-      yENV_score_mark ("RUNAS"    , x_base);
-      if (strchr (YSTR_UPPER, a_runas) != NULL)  yENV_score_mark ("ENV"      , 'u');
+      ySCORE_mark ("RUNAS"    , x_base);
+      if (strchr (YSTR_UPPER, a_runas) != NULL)  ySCORE_mark ("ENV"      , 'u');
    }
    /*---(masking)------------------------*/
    yjobs_runas_masking (a_runas);
@@ -41,21 +41,21 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    ystrlcpy (x_out, yjobs_mode (a_mode ), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown (unknown)") == 0)  return rce;
    myJOBS.m_mode  = a_mode;
-   yENV_score_mark ("MODE"     , G_SCORE_FAIL);
-   yENV_score_mark ("NOISE"    , '·');
+   ySCORE_mark ("MODE"     , G_SCORE_FAIL);
+   ySCORE_mark ("NOISE"    , '·');
    yjobs_args_data (a_mode, NULL, &x_base, NULL, NULL, NULL);
-   if (x_base > 0 && x_base != '-')   yENV_score_mark ("MODE"     , x_base);
+   if (x_base > 0 && x_base != '-')   ySCORE_mark ("MODE"     , x_base);
    /*---(set verbosity)------------------*/
    yURG_msg_tmp  (); 
    yURG_msg_mute (); 
    yURG_err_tmp  (); 
    yURG_err_mute (); 
-   yENV_score_mark ("NOISE"    , '-');
+   ySCORE_mark ("NOISE"    , '-');
    if (yJOBS_ifconfirm ()) {
-      if (x_base > 0 && x_base != '-')  yENV_score_mark ("NOISE"    , 'c');
+      if (x_base > 0 && x_base != '-')  ySCORE_mark ("NOISE"    , 'c');
    }
    if (yJOBS_ifverbose ()) {
-      if (x_base > 0 && x_base != '-')  yENV_score_mark ("NOISE"    , '!');
+      if (x_base > 0 && x_base != '-')  ySCORE_mark ("NOISE"    , '!');
       yURG_msg_live ();
       yURG_err_live ();
    }
@@ -63,7 +63,7 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    n = yjobs_args_offset (a_mode);
    --rce;  if (n < 0)  return rce;
    f = yjobs_who_action (a_runas, n);
-   yENV_score_mark ("FILE"     , f);
+   ySCORE_mark ("FILE"     , f);
    --rce;  if (f == '¢')  return rce;
    --rce;  if (f == '·')  return rce;
    --rce;  if (f == 'F' && a_file == NULL)  return rce;
@@ -111,7 +111,7 @@ yjobs__unit_rmdir_one   (char *a_dir)
       return 0;
    }
    /*---(head execute)-------------------*/
-   yENV_rmdir_and_files (x_dir);
+   yENV_rmdir_fully (x_dir);
    /*---(peal next layer)----------------*/
    ystrlcpy (r_dir, x_dir, LEN_DESC);
    p = strrchr (r_dir, '/');
@@ -206,14 +206,14 @@ yJOBS_rmdirs            (void)
       if (strcmp (x_hdir , "") != 0)  yjobs__unit_rmdir_one (x_hdir);
    }
    /*---(user accounts)------------------*/
-   yENV_rmdir_and_files ("/tmp/root"                 );
-   yENV_rmdir_and_files ("/tmp/home/member/c_quani"  );
-   yENV_rmdir_and_files ("/tmp/home/member"          );
-   yENV_rmdir_and_files ("/tmp/home/machine"         );
-   yENV_rmdir_and_files ("/tmp/home/monkey"          );
-   yENV_rmdir_and_files ("/tmp/home"                 );
-   yENV_rmdir_and_files ("/tmp/spool"                );
-   yENV_rmdir_and_files ("/tmp/lib"                  );
+   yENV_rmdir_fully ("/tmp/root"                 );
+   yENV_rmdir_fully ("/tmp/home/member/c_quani"  );
+   yENV_rmdir_fully ("/tmp/home/member"          );
+   yENV_rmdir_fully ("/tmp/home/machine"         );
+   yENV_rmdir_fully ("/tmp/home/monkey"          );
+   yENV_rmdir_fully ("/tmp/home"                 );
+   yENV_rmdir_fully ("/tmp/spool"                );
+   yENV_rmdir_fully ("/tmp/lib"                  );
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -335,7 +335,7 @@ yjobs__unit_quiet       (void)
    yURG_msg_none ();
    yjobs_runas ("khronos", NULL);
    yJOBS_rmdirs ();
-   yjobs_ends_init ();
+   yjobs_yscore_init ();
    return 0;
 }
 
@@ -353,7 +353,7 @@ yjobs__unit_loud        (void)
    yjobs_runas ("khronos", NULL);
    yJOBS_rmdirs ();
    DEBUG_YJOBS  yLOG_info     ("yJOBS"     , yJOBS_version   ());
-   yjobs_ends_init ();
+   yjobs_yscore_init ();
    return 0;
 }
 

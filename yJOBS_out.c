@@ -276,7 +276,7 @@ yjobs_out_full          (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(header)-------------------------*/
    DEBUG_YJOBS   yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
-   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, &x_ruid, x_ruser, x_cdir, NULL, x_hdir, x_world, x_db, NULL, NULL, NULL, x_full);
+   rc = yjobs_ends_prepare (a_runas, a_mode, a_oneline, a_file, f_callback, &x_ruid, x_ruser, x_cdir, NULL, x_hdir, x_db, x_world, NULL, NULL, NULL, NULL, NULL, NULL, x_full);
    DEBUG_YJOBS   yLOG_value   ("prepare"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);

@@ -697,7 +697,7 @@ yjobs_act__prepare      (cchar a_runas, cchar a_act, cchar a_oneline [LEN_HUND],
    }
    yURG_msg ('-', "regex compiled successfully");
    /*---(get directory)------------------*/
-   rc = yjobs_central_dirs  (a_runas, a_act, NULL, "n/a", r_dir, NULL);
+   /*> rc = yjobs_central_dirs  (a_runas, a_act, NULL, "n/a", r_dir, NULL);           <*/
    DEBUG_YJOBS   yLOG_info    ("r_dir"     , r_dir);
    --rce;  if (rc < 0) {
       yURG_err ('f', "central dirs location identification failed");
