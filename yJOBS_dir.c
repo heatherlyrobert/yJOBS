@@ -243,8 +243,8 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_dir"     , a_dir);
    --rce;  if (a_dir  == NULL) {
-      if      (x_use == 'c') {  ySCORE_mark ("FDSEC"    , '°'); }
-      else if (x_use == 'd') {  ySCORE_mark ("CSECURE"  , '°'); }
+      if      (x_use == 'c') {  ySCORE_mark (myJOBS.m_yscore, "FDSEC"    , '°'); }
+      else if (x_use == 'd') {  ySCORE_mark (myJOBS.m_yscore, "CSECURE"  , '°'); }
       yURG_msg ('>', "auditing %s directory...", a_label);
       yURG_err ('f', "%s directory is NULL", a_label);
       snprintf (t, LEN_HUND, "%s directory is not secure/proper", a_label);
@@ -262,8 +262,8 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
       return RC_ACK;
    }
    /*---(score)---------------------------------*/
-   --rce; if (x_use == 'c')  { ySCORE_mark ("FDSEC"    , '°'); if (x_fix == 'F')  ySCORE_mark ("FDFIX"    , '°'); }
-   else   if (x_use == 'd')  { ySCORE_mark ("CSECURE"  , '°'); if (x_fix == 'F')  ySCORE_mark ("CFIX"     , '°'); }
+   --rce; if (x_use == 'c')  { ySCORE_mark (myJOBS.m_yscore, "FDSEC"    , '°'); if (x_fix == 'F')  ySCORE_mark (myJOBS.m_yscore, "FDFIX"    , '°'); }
+   else   if (x_use == 'd')  { ySCORE_mark (myJOBS.m_yscore, "CSECURE"  , '°'); if (x_fix == 'F')  ySCORE_mark (myJOBS.m_yscore, "CFIX"     , '°'); }
    if (r_use  != NULL)  *r_use  = 'y';
    /*---(call audit)----------------------------*/
    rc = yjobs_dir__secure (a_label, a_dir, x_fix);
@@ -276,16 +276,16 @@ yjobs_dir_secure        (char a_runas, char a_mode, char a_label [LEN_LABEL], ch
    }
    /*---(score)---------------------------------*/
    if        (x_use == 'c') {
-      ySCORE_mark ("FDSEC"    , 's');
+      ySCORE_mark (myJOBS.m_yscore, "FDSEC"    , 's');
       if (x_fix != '-') {
-         if (rc == RC_REPAIR)  ySCORE_mark ("FDFIX"    , 'f');
-         else                  ySCORE_mark ("FDFIX"    , '-');  /* nothing to do */
+         if (rc == RC_REPAIR)  ySCORE_mark (myJOBS.m_yscore, "FDFIX"    , 'f');
+         else                  ySCORE_mark (myJOBS.m_yscore, "FDFIX"    , '-');  /* nothing to do */
       }
    } else if (x_use == 'd') {
-      ySCORE_mark ("CSECURE"  , 's');
+      ySCORE_mark (myJOBS.m_yscore, "CSECURE"  , 's');
       if (x_fix != '-') {
-         if (rc == RC_REPAIR)  ySCORE_mark ("CFIX"     , 'f');
-         else                  ySCORE_mark ("CFIX"     , '-');  /* nothing to do */
+         if (rc == RC_REPAIR)  ySCORE_mark (myJOBS.m_yscore, "CFIX"     , 'f');
+         else                  ySCORE_mark (myJOBS.m_yscore, "CFIX"     , '-');  /* nothing to do */
       }
    }
    if (r_good != NULL)  *r_good = 'y';

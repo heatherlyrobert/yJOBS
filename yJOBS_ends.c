@@ -42,8 +42,8 @@ yjobs_ends__titles      (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   ySCORE_mark ("HEADER"   , G_SCORE_FAIL);
-   ySCORE_mark ("NOISE"    , G_SCORE_SKIP);
+   ySCORE_mark (myJOBS.m_yscore, "HEADER"   , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "NOISE"    , G_SCORE_SKIP);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
@@ -61,12 +61,12 @@ yjobs_ends__titles      (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_verbose" , g_verbose);
    if (strchr (g_verbose , a_mode) == NULL) {
-      ySCORE_mark ("HEADER"   , G_SCORE_SKIP);
-      if (strchr (g_confirm , a_mode) != NULL) ySCORE_mark ("NOISE"    , 'c');
+      ySCORE_mark (myJOBS.m_yscore, "HEADER"   , G_SCORE_SKIP);
+      if (strchr (g_confirm , a_mode) != NULL) ySCORE_mark (myJOBS.m_yscore, "NOISE"    , 'c');
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
-   ySCORE_mark ("NOISE"    , '!');
+   ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '!');
    /*---(pre-header)---------------------*/
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline == NULL || a_oneline [0] == '\0') {
@@ -116,7 +116,7 @@ yjobs_ends__titles      (char a_runas, char a_mode, char a_oneline [LEN_HUND])
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(update score)-------------------*/
-   ySCORE_mark ("HEADER"   , 'h');
+   ySCORE_mark (myJOBS.m_yscore, "HEADER"   , 'h');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 1;
@@ -136,7 +136,7 @@ yjobs_ends__locations   (char a_runas, char a_mode, char r_cdir [LEN_DESC], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   ySCORE_mark ("LOCS"     , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "LOCS"     , G_SCORE_FAIL);
    if (r_cdir  != NULL)  ystrlcpy (r_cdir , ""     , LEN_DESC);
    if (r_conf  != NULL)  ystrlcpy (r_conf , ""     , LEN_LABEL);
    if (r_hdir  != NULL)  ystrlcpy (r_hdir , ""     , LEN_DESC);
@@ -162,7 +162,7 @@ yjobs_ends__locations   (char a_runas, char a_mode, char r_cdir [LEN_DESC], char
    if (r_world != NULL)  ystrlcpy (r_world, x_world, LEN_LABEL);
    if (r_db    != NULL)  ystrlcpy (r_db   , x_db   , LEN_LABEL);
    /*---(update score)-------------------*/
-   ySCORE_mark ("LOCS"     , 'l');
+   ySCORE_mark (myJOBS.m_yscore, "LOCS"     , 'l');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -183,7 +183,7 @@ yjobs_ends__cwd         (char a_runas, char a_mode, char a_file [LEN_PATH], char
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(score)--------------------------*/
-   ySCORE_mark ("CWD"      , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "CWD"      , G_SCORE_FAIL);
    /*---(default)------------------------*/
    if (r_cwd   != NULL)  ystrlcpy (r_cwd  , ""     , LEN_PATH);
    if (r_dir   != NULL)  ystrlcpy (r_dir  , ""     , LEN_PATH);
@@ -267,7 +267,7 @@ yjobs_ends__cwd         (char a_runas, char a_mode, char a_file [LEN_PATH], char
    if (r_file  != NULL)   ystrlcpy (r_file , x_file , LEN_PATH);
    if (r_full  != NULL)   ystrlcpy (r_full , x_full , LEN_PATH);
    /*---(score)--------------------------*/
-   ySCORE_mark ("CWD"      , '¤');
+   ySCORE_mark (myJOBS.m_yscore, "CWD"      , '¤');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -302,8 +302,8 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    DEBUG_YJOBS   yLOG_char    ("a_runas"   , a_runas);
    DEBUG_YJOBS   yLOG_info    ("g_valid"   , g_valid);
    --rce;  if (a_runas == 0 || strchr (g_valid, a_runas)  == NULL) {
-      ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
-      ySCORE_mark ("ENV"      , '·');
+      ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "ENV"      , '·');
       sprintf (x_msg, "runas (%d/%c) not recognized or valid", a_runas, ychrvisible (a_runas));
       yjobs_ends_failure (a_mode, x_msg, x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -313,8 +313,8 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    DEBUG_YJOBS   yLOG_char    ("a_mode"    , a_mode);
    DEBUG_YJOBS   yLOG_info    ("g_allmode" , g_allmode);
    --rce;  if (a_mode  == 0 || strchr (g_allmode, a_mode) == NULL) {
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
       sprintf (x_msg, "mode (%d/%c) not recognized or valid", a_mode, ychrvisible (a_mode));
       yjobs_ends_failure (a_mode, x_msg, x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
@@ -323,7 +323,7 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(defense - oneline)--------------*/
    DEBUG_YJOBS  yLOG_point   ("a_oneline" , a_oneline);
    --rce;  if (a_oneline == NULL || a_oneline [0] == '\0') {
-      ySCORE_mark ("ONE"      , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "ONE"      , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "descriptive oneline string is NULL/empty", x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -332,7 +332,7 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(defense - file)-----------------*/
    DEBUG_YJOBS  yLOG_point   ("a_file"    , a_file);
    --rce;  if (a_file    == NULL) {
-      ySCORE_mark ("FILE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "FILE"     , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "requested file/directory is NULL", x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -341,7 +341,7 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    /*---(defense - callback)-------------*/
    DEBUG_YJOBS  yLOG_point   ("f_callback", f_callback);
    --rce;  if (f_callback == NULL) {
-      ySCORE_mark ("CALL"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "CALL"     , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "host program callback function is NULL", x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -350,12 +350,12 @@ yjobs_ends_prepare      (char a_runas, char a_mode, char a_oneline [LEN_HUND], c
    rc = yENV_whoami           (NULL, NULL, r_ruid, NULL, NULL, r_ruser, 'n', NULL, NULL, NULL);
    DEBUG_YJOBS  yLOG_value   ("whoami"    , rc);
    --rce;  if (rc < 0) {
-      ySCORE_mark ("RUSER"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "RUSER"    , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "could not identify current user (yENV_whoami)", x_fatal);
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   ySCORE_mark ("RUSER"    , 'u');
+   ySCORE_mark (myJOBS.m_yscore, "RUSER"    , 'u');
    /*---(titles)-------------------------*/
    rc = yjobs_ends__titles (a_runas, a_mode, a_oneline);
    DEBUG_YJOBS   yLOG_value   ("titles"    , rc);
@@ -407,8 +407,8 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (a_func);
    /*---(default)------------------------*/
-   ySCORE_mark ("FOOTER"   , G_SCORE_FAIL);
-   ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
@@ -423,11 +423,11 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    }
    DEBUG_YJOBS  yLOG_info    ("a_prefix"  , a_prefix);
    /*---(pre-score)----------------------*/
-   ySCORE_mark ("JUDGE"    , 'Ï');
+   ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , 'Ï');
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_silent"  , g_silent);
    if (strchr (g_silent  , a_mode) != NULL) {
-      ySCORE_mark ("FOOTER"   , G_SCORE_SKIP);
+      ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (a_func);
       return 0;
    }
@@ -462,7 +462,7 @@ yjobs_ends__footer      (char a_func [LEN_TITLE], char a_mode, char a_prefix [LE
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(score)--------------------------*/
-   ySCORE_mark ("FOOTER"   , 'f');
+   ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , 'f');
    if (strcmp (a_prefix, "WARNING") == 0)  rc = 1;
    DEBUG_YJOBS  yLOG_value   ("rc"        , rc);
    /*---(complete)-----------------------*/
@@ -483,8 +483,8 @@ yjobs_ends_failure      (char a_mode, char a_message [LEN_HUND], char a_final [L
    /*---(header)-------------------------*/
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   ySCORE_mark ("FOOTER"   , G_SCORE_FAIL);
-   ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS  yLOG_value   ("m_mode"    , a_mode);
    --rce;  if (a_mode    == 0) {
@@ -510,7 +510,7 @@ yjobs_ends_failure      (char a_mode, char a_message [LEN_HUND], char a_final [L
    /*---(quick-out)----------------------*/
    DEBUG_YJOBS  yLOG_info    ("g_silent"  , g_silent);
    if (strchr (g_silent  , a_mode) != NULL) {
-      ySCORE_mark ("FOOTER"   , G_SCORE_SKIP);
+      ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , G_SCORE_SKIP);
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
@@ -525,7 +525,7 @@ yjobs_ends_failure      (char a_mode, char a_message [LEN_HUND], char a_final [L
    /*---(clean-up)-----------------------*/
    if (strchr (g_confirm , a_mode)  != NULL)  yURG_msg_mute ();
    /*---(score)--------------------------*/
-   ySCORE_mark ("FOOTER"   , 'f');
+   ySCORE_mark (myJOBS.m_yscore, "FOOTER"   , 'f');
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
    return 0;

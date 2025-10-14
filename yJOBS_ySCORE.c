@@ -3,6 +3,7 @@
 #include   "yJOBS_priv.h"
 
 
+
 /*>    {  0, "HEADER"          , 'h' , "°h-·"    , "header"          , "printing of the title lines"      },                                                            <* 
  *>    {  0, "LOCS"            , 'l' , "°l·"     , "locs"            , "default location lookup"          },                                                            <* 
  *>    {  0, "CWD"             , '¤' , "°¤·"     , "cwd"             , "current working directory"        },                                                            <* 
@@ -35,11 +36,11 @@
  *>    { "   "      , ' ' ,  3  , ""         , ""                                 , ""          , ""                                                                                },    <* 
  *>                                                                                                                                                                                       <*/
 
-const tSCORE_TABLE s_scores [LEN_FULL] = {
+const tSCORE_TABLE g_scores [LEN_FULL] = {
    /*===[[ PREPARE ]]=======================================================*/
    { "HEá "     , ' ' ,  0  , "HEAD"     , ""                                 , ""               ,  ""                                                                                },
    { "RUNAS"    , '·' , 'e' , "runas"    , "host_program calling yjobs"       , ""               ,  "e) eos       k) khronos   p) polymnia   ..."                                     },
-   { "ENV"      , '·' , 'u' , "env"      , "run-time environment"             , ""               ,  "·) normal    d) debug     u) unit-test"                                          },
+   { "ENV"      , '·' , 'u' , "env"      , "run-time environment"             , "nbu"            ,  "·) normal    d) debug     u) unit-test"                                          },
    { " "        , ' ' ,  1  , ""         , ""                                 , ""               ,  ""                                                                                },
    { "MODE"     , '·' , 'v' , "mode"     , "yjobs action requested"           , ""               ,  "v) verify    g) gather    d) daemon     ..."                                     },
    { "NOISE"    , '·' , '!' , "noise"    , "verbosity of feedback"            , ""               ,  "-) silent    c) confirm   !) verbose"                                            },
@@ -156,7 +157,17 @@ yjobs_yscore_init       (void)
 {
    char          rce       =  -10;
    char          rc        =    0;
-   rc = ySCORE_init  (s_scores, '-');
+   rc = ySCORE_init  (g_scores, '-', &(myJOBS.m_yscore));
+   --rce;  if (rc < 0)  return rce;
+   return 0;
+}
+
+char
+yjobs_yscore_wrap       (void)
+{
+   char          rce       =  -10;
+   char          rc        =    0;
+   rc = ySCORE_wrap  (&(myJOBS.m_yscore));
    --rce;  if (rc < 0)  return rce;
    return 0;
 }

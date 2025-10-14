@@ -558,13 +558,13 @@ yjobs_args__prepare     (int *b_pos, char *a_arg, char *a_next, char *r_runas, c
    DEBUG_YJOBS  yLOG_value   ("len"       , strlen (a_arg));
    --rce;  if (strlen (a_arg) <= 4) {
       yURG_err ('F', "option å%sæ too short, must be > 4 chars", a_arg);
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
    --rce;  if (strncmp (a_arg, "--", 2) != 0) {
       yURG_err ('F', "option å%sæ must start with the prefix å--æ", a_arg);
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
@@ -772,9 +772,9 @@ yjobs_args__find        (char *a_arg, char *n, char *r_runas, char *r_noise)
    DEBUG_YJOBS  yLOG_char    ("c"         , c);
    --rce;  if (c == '·') {
       yURG_err ('F', "action å%sæ, (%c) not allowed", a_arg, a_arg [2]);
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return '·';
    }
@@ -817,8 +817,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    DEBUG_YJOBS  yLOG_enter   (__FUNCTION__);
    /*---(scoring)------------------------*/
    if (myJOBS.m_mode == YJOBS_NEITHER) {
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
    }
    /*---(short-cuts)------------------*/
    if (strcmp (a_arg, "--verbose") == 0) {
@@ -874,9 +874,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    --rce;  if (myJOBS.m_mode != '-') {
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "run action already set (%c), can not update to å%sæ", myJOBS.m_mode, a_arg);
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -886,8 +886,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    --rce;  if (f == '?') {
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "runas (%c) not found in g_whos database", myJOBS.m_runas);
-      ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -895,9 +895,9 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       rce = rc;
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ not allowed for runas (%c)", a_arg, myJOBS.m_runas);
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       DEBUG_YJOBS  yLOG_note    ("not allowed");
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return -1;
@@ -909,12 +909,12 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    /*---(scoring)------------------------*/
    yjobs_args_data (x_act, NULL, &x_base, NULL, NULL, NULL);
    if (x_base > 0) {
-      ySCORE_mark ("MODE"     , x_base);
-      ySCORE_mark ("NOISE"    , '-');
-      if (yJOBS_ifconfirm ())  ySCORE_mark ("NOISE"    , 'c');
-      if (yJOBS_ifverbose ())  ySCORE_mark ("NOISE"    , '!');
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , x_base);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '-');
+      if (yJOBS_ifconfirm ())  ySCORE_mark (myJOBS.m_yscore, "NOISE"    , 'c');
+      if (yJOBS_ifverbose ())  ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '!');
    }
-   ySCORE_mark ("FILE"     , f);
+   ySCORE_mark (myJOBS.m_yscore, "FILE"     , f);
    /*---(handle simple option)-----------*/
    if (f == '-') {
       DEBUG_YJOBS  yLOG_note    ("simple actions");
@@ -933,8 +933,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
    --rce;  if (f != 'F') {
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ not configured correctly", a_arg);
-      ySCORE_mark ("FILE"     , G_SCORE_FAIL);
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "FILE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       /*> yjobs_args__clearmode (r_runas, r_mode, r_file);                            <*/
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -946,8 +946,8 @@ yJOBS_argument          (int *b_pos, cchar *a_arg, cchar *a_next, char *r_runas,
       IF_CONFIRM  yURG_err_live ();
       if (strchr ("Vc", x_noise) != NULL)  yURG_err_live ();
       yURG_err ('F', "action å%sæ requires a file name as an argument", a_arg);
-      ySCORE_mark ("FILE"     , G_SCORE_FAIL);
-      ySCORE_mark ("JUDGE"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "FILE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "JUDGE"    , G_SCORE_FAIL);
       IF_CONFIRM  yURG_err_mute ();
       /*> yjobs_args__clearmode (r_runas, r_mode, r_file);                            <*/
       DEBUG_YJOBS  yLOG_exitr   (__FUNCTION__, rce);

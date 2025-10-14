@@ -21,18 +21,18 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    char        x_base      =  '-';
    /*---(clear all)----------------------*/
    yJOBS_reset (NULL, NULL, NULL);
-   ySCORE_clear ();
+   ySCORE_clear (myJOBS.m_yscore);
    /*---(runas)--------------------------*/
    --rce;  if (a_runas == 0)  return rce;
    ystrlcpy (x_out, yjobs_iam  (a_runas), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown") == 0)  return rce;
    myJOBS.m_runas = a_runas;
-   ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
-   ySCORE_mark ("ENV"      , '·');
+   ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "ENV"      , '·');
    yjobs_args_data (myJOBS.m_runas, NULL, &x_base, NULL, NULL, NULL);
    if (x_base > 0 && x_base != '-')  {
-      ySCORE_mark ("RUNAS"    , x_base);
-      if (strchr (YSTR_UPPER, a_runas) != NULL)  ySCORE_mark ("ENV"      , 'u');
+      ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , x_base);
+      if (strchr (YSTR_UPPER, a_runas) != NULL)  ySCORE_mark (myJOBS.m_yscore, "ENV"      , 'u');
    }
    /*---(masking)------------------------*/
    yjobs_runas_masking (a_runas);
@@ -41,21 +41,21 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    ystrlcpy (x_out, yjobs_mode (a_mode ), LEN_HUND);
    --rce;  if (strcmp (x_out, "unknown (unknown)") == 0)  return rce;
    myJOBS.m_mode  = a_mode;
-   ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-   ySCORE_mark ("NOISE"    , '·');
+   ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
    yjobs_args_data (a_mode, NULL, &x_base, NULL, NULL, NULL);
-   if (x_base > 0 && x_base != '-')   ySCORE_mark ("MODE"     , x_base);
+   if (x_base > 0 && x_base != '-')   ySCORE_mark (myJOBS.m_yscore, "MODE"     , x_base);
    /*---(set verbosity)------------------*/
    yURG_msg_tmp  (); 
    yURG_msg_mute (); 
    yURG_err_tmp  (); 
    yURG_err_mute (); 
-   ySCORE_mark ("NOISE"    , '-');
+   ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '-');
    if (yJOBS_ifconfirm ()) {
-      if (x_base > 0 && x_base != '-')  ySCORE_mark ("NOISE"    , 'c');
+      if (x_base > 0 && x_base != '-')  ySCORE_mark (myJOBS.m_yscore, "NOISE"    , 'c');
    }
    if (yJOBS_ifverbose ()) {
-      if (x_base > 0 && x_base != '-')  ySCORE_mark ("NOISE"    , '!');
+      if (x_base > 0 && x_base != '-')  ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '!');
       yURG_msg_live ();
       yURG_err_live ();
    }
@@ -63,7 +63,7 @@ yjobs__unit_environ     (char a_runas, char a_mode, char a_file [LEN_DESC])
    n = yjobs_args_offset (a_mode);
    --rce;  if (n < 0)  return rce;
    f = yjobs_who_action (a_runas, n);
-   ySCORE_mark ("FILE"     , f);
+   ySCORE_mark (myJOBS.m_yscore, "FILE"     , f);
    --rce;  if (f == '¢')  return rce;
    --rce;  if (f == '·')  return rce;
    --rce;  if (f == 'F' && a_file == NULL)  return rce;

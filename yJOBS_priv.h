@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.3-, update for myriad changes to upstream"
-#define     P_VERNUM    "1.3c"
-#define     P_VERTXT    "yJOBS_ends passed unit testing"
+#define     P_VERNUM    "1.3d"
+#define     P_VERTXT    "updated all ySCORE related code to new standard, still must execute unit tests"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -142,6 +142,8 @@ struct cLOCAL {
    char      w_full        [LEN_PATH];
    FILE     *w_file;
    int       w_line;
+   /*---(ySCORE)------------*/
+   void     *m_yscore;
    /*---(done)--------------*/
 };
 extern  tLOCAL myJOBS;
@@ -266,6 +268,7 @@ extern char    g_acts_score    [LEN_HUND];
 extern char    g_fullacts      [LEN_DESC];
 
 
+extern tSCORE_TABLE  *g_score;
 
 #define     G_SCORE_FAIL      '°'
 #define     G_SCORE_SKIP      '-'

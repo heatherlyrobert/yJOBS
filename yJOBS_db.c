@@ -21,7 +21,7 @@ yjobs_db__check         (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       strlcpy (x_msg, "configured central data directory name is NULL", LEN_HUND);
       DEBUG_YJOBS   yLOG_snote   (x_msg);
-      ySCORE_mark ("CSECURE"  , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "CSECURE"  , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, x_msg, x_fatal);
       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -30,7 +30,7 @@ yjobs_db__check         (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       strlcpy (x_msg, "configured central database name is NULL", LEN_HUND);
       DEBUG_YJOBS   yLOG_snote   (x_msg);
-      ySCORE_mark ("DSECURE"  , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "DSECURE"  , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, x_msg, x_fatal);
       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -58,7 +58,7 @@ yjobs_db__check         (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       strlcpy (x_msg, "central data directory empty, while configured for central database", LEN_HUND);
       DEBUG_YJOBS   yLOG_snote   (x_msg);
-      ySCORE_mark ("DSECURE"  , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "DSECURE"  , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, x_msg, x_fatal);
       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -68,7 +68,7 @@ yjobs_db__check         (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       strlcpy (x_msg, "host-program callback function is NULL", LEN_HUND);
       DEBUG_YJOBS   yLOG_snote   (x_msg);
-      ySCORE_mark ("CALL"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "CALL"     , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, x_msg, "host-program specific configuration is illegal");
       DEBUG_YJOBS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -120,8 +120,8 @@ yjobs_db_read           (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return RC_ACK;
    }
    /*---(score)--------------------------*/
-   if (x_audit == '-')  ySCORE_mark ("DREAD"    , G_SCORE_FAIL);
-   else                 ySCORE_mark ("DAUDIT"   , G_SCORE_FAIL);
+   if (x_audit == '-')  ySCORE_mark (myJOBS.m_yscore, "DREAD"    , G_SCORE_FAIL);
+   else                 ySCORE_mark (myJOBS.m_yscore, "DAUDIT"   , G_SCORE_FAIL);
    /*---(convert callback----------------*/
    x_callback = f_callback;
    DEBUG_YJOBS   yLOG_point   ("callback"  , x_callback);
@@ -134,8 +134,8 @@ yjobs_db_read           (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return rce;
    }
    /*---(score)--------------------------*/
-   if (x_audit == '-')  ySCORE_mark ("DREAD"    , 'Ô');
-   else                 ySCORE_mark ("DAUDIT"   , 'a');
+   if (x_audit == '-')  ySCORE_mark (myJOBS.m_yscore, "DREAD"    , 'Ô');
+   else                 ySCORE_mark (myJOBS.m_yscore, "DAUDIT"   , 'a');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(check for audit)----------------*/
    if (x_audit == 'y') {
@@ -170,7 +170,7 @@ yjobs_db_write          (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
    if (yJOBS_ifaudit ())  x_audit = 'y';
    if (yJOBS_iffix ())    x_audit = 'y';
    if (x_audit == 'y') {
-      ySCORE_mark ("DWRITE"   , 'a');
+      ySCORE_mark (myJOBS.m_yscore, "DWRITE"   , 'a');
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_snote   ("audit-only, database not to be written");
       DEBUG_YJOBS   yLOG_sexit   (__FUNCTION__);
@@ -191,7 +191,7 @@ yjobs_db_write          (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return RC_ACK;
    }
    /*---(score)--------------------------*/
-   ySCORE_mark ("DWRITE"   , G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, "DWRITE"   , G_SCORE_FAIL);
    /*---(convert callback----------------*/
    x_callback = f_callback;
    DEBUG_YJOBS   yLOG_point   ("callback"  , x_callback);
@@ -204,7 +204,7 @@ yjobs_db_write          (char a_runas, char a_mode, char a_hdir [LEN_DESC], char
       return rce;
    }
    /*---(score)--------------------------*/
-   ySCORE_mark ("DWRITE"   , 'Õ');
+   ySCORE_mark (myJOBS.m_yscore, "DWRITE"   , 'Õ');
    DEBUG_YJOBS   yLOG_value   ("score"     , rc);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

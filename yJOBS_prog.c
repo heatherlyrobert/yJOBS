@@ -43,47 +43,47 @@ yjobs_prog__prepare     (char a_runas, char a_mode, char a_oneline [LEN_HUND], v
    DEBUG_YJOBS   yLOG_complex ("runas"     , "%c  å%sæ", a_runas, g_valid);
    --rce;  if (yJOBS_ifvalid () == 0) {
       DEBUG_YJOBS   yLOG_note    ("runas is not recognized");
-      ySCORE_mark ("RUNAS"    , G_SCORE_FAIL);
-      ySCORE_mark ("ENV"      , '·');
+      ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "ENV"      , '·');
       yjobs_ends_failure (a_mode, "", "runas is not recognized");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   ySCORE_mark ("RUNAS"    , a_runas);
+   ySCORE_mark (myJOBS.m_yscore, "RUNAS"    , a_runas);
    /*---(re-check mode)------------------*/
    DEBUG_YJOBS   yLOG_complex ("mode"      , "%c  å%sæ", a_mode, g_allmode);
    --rce;  if (yJOBS_ifallmode () == 0) {
       DEBUG_YJOBS   yLOG_note    ("mode is not recognized");
-      ySCORE_mark ("MODE"     , G_SCORE_FAIL);
-      ySCORE_mark ("NOISE"    , '·');
+      ySCORE_mark (myJOBS.m_yscore, "MODE"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "NOISE"    , '·');
       yjobs_ends_failure (a_mode, "", "mode is not recognized");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   ySCORE_mark ("MODE"     , a_mode);
+   ySCORE_mark (myJOBS.m_yscore, "MODE"     , a_mode);
    /*---(check oneline)------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_oneline" , a_oneline);
    if (a_oneline == NULL || a_oneline [0] == '\0') {
       DEBUG_YJOBS   yLOG_note    ("oneline can not be NULL/empty");
-      ySCORE_mark ("ONE"      , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "ONE"      , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "", "oneline can not be NULL/empty");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("a_oneline" , a_oneline);
-   ySCORE_mark ("ONE"      , 'o');
+   ySCORE_mark (myJOBS.m_yscore, "ONE"      , 'o');
    ystrlcpy (myJOBS.m_oneline , a_oneline, LEN_HUND);
    /*---(check callback)-----------------*/
    DEBUG_YJOBS   yLOG_point   ("f_callback", f_callback);
    if (f_callback == NULL) {
       DEBUG_YJOBS   yLOG_note    ("callback can not be NULL");
-      ySCORE_mark ("CALL"     , G_SCORE_FAIL);
+      ySCORE_mark (myJOBS.m_yscore, "CALL"     , G_SCORE_FAIL);
       yjobs_ends_failure (a_mode, "", "callback can not be NULL");
       DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YJOBS   yLOG_info    ("a_oneline" , a_oneline);
-   ySCORE_mark ("CALL"     , '&');
+   ySCORE_mark (myJOBS.m_yscore, "CALL"     , '&');
    myJOBS.e_callback   = f_callback;
    /*---(finalize verbosity)-------------*/
    rc = yjobs_final ();

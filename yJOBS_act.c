@@ -4,7 +4,7 @@
 
 
 static char (*s_assimilate) (cchar a_runas, cchar a_loc, cchar *a_name, char *r_user, char *r_desc);
-
+/* test */
 
 
 /*====================------------------------------------====================*/

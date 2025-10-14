@@ -273,7 +273,7 @@ yjobs_file_secure       (char a_runas, char a_mode, char a_title [LEN_LABEL], ch
       return RC_ACK;
    }
    /*---(non-duplication)----------------*/
-   x_secure = ySCORE_value (a_mark);
+   x_secure = ySCORE_value (myJOBS.m_yscore, a_mark);
    if (x_secure == 's') {
       DEBUG_YJOBS   yLOG_senter  (__FUNCTION__);
       DEBUG_YJOBS   yLOG_schar   (a_title);
@@ -291,11 +291,11 @@ yjobs_file_secure       (char a_runas, char a_mode, char a_title [LEN_LABEL], ch
       return RC_ACK;
    }
    /*---(score)--------------------------*/
-   ySCORE_mark (a_mark, G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, a_mark, G_SCORE_FAIL);
    /*---(set fix)-------------------------------*/
    if (strchr (g_fix, a_mode) != NULL)       x_fix = YENV_FIX;
    DEBUG_YJOBS   yLOG_char    ("x_fix"     , x_fix);
-   if (x_fix == YENV_FIX)  ySCORE_mark (a_fix, G_SCORE_SKIP);
+   if (x_fix == YENV_FIX)  ySCORE_mark (myJOBS.m_yscore, a_fix, G_SCORE_SKIP);
    /*---(check file)---------------------*/
    if      (strstr (a_dir, "/etc/")   != NULL)  x_loc = 'c';
    else if (strstr (a_dir, "/spool/") != NULL)  x_loc = 'c';
@@ -309,8 +309,8 @@ yjobs_file_secure       (char a_runas, char a_mode, char a_title [LEN_LABEL], ch
       return  rce;
    }
    /*---(score)--------------------------*/
-   ySCORE_mark (a_mark, 's');
-   if (rc == RC_REPAIR)   ySCORE_mark (a_fix, 'f');
+   ySCORE_mark (myJOBS.m_yscore, a_mark, 's');
+   if (rc == RC_REPAIR)   ySCORE_mark (myJOBS.m_yscore, a_fix, 'f');
    yURG_msg ('-', "success, %s exists and security is appropriate", a_title);
    /*---(complete)-----------------------*/
    DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
@@ -348,13 +348,13 @@ yjobs_file_review       (char a_runas, char a_mode, char a_reason, int a_seq, ch
    case 'p' :  ystrlcpy (x_mark, "FONLY" , LEN_TERSE);  break;
    case 'a' :  ystrlcpy (x_mark, "FAUDIT", LEN_TERSE);  break;
    default  :
-               ySCORE_mark ("FFSEC", G_SCORE_FAIL);
+               ySCORE_mark (myJOBS.m_yscore, "FFSEC", G_SCORE_FAIL);
                sprintf (x_msg, "reason code (%d/%c) is illegal å=spaæ", a_reason, a_reason);
                yjobs_ends_failure (a_mode, x_msg, x_fatal);
                DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
                return rce;
    }
-   ySCORE_mark (x_mark, G_SCORE_FAIL);
+   ySCORE_mark (myJOBS.m_yscore, x_mark, G_SCORE_FAIL);
    /*---(defense)------------------------*/
    DEBUG_YJOBS   yLOG_point   ("a_cdir"    , a_cdir);
    --rce;  if (a_cdir == NULL || a_cdir [0] == '\0') {
@@ -402,7 +402,7 @@ yjobs_file_review       (char a_runas, char a_mode, char a_reason, int a_seq, ch
    /*---(list)---------------------------*/
    --rce;  if (a_reason == '=') {
       DEBUG_YJOBS   yLOG_note    ("handle as list");
-      ySCORE_mark (x_mark, '=');
+      ySCORE_mark (myJOBS.m_yscore, x_mark, '=');
       if (!yJOBS_ifverbose ()) yURG_msg_live ();
       yURG_msg (':', "%s", x_full);
       if (!yJOBS_ifverbose ()) yURG_msg_mute ();
@@ -420,7 +420,7 @@ yjobs_file_review       (char a_runas, char a_mode, char a_reason, int a_seq, ch
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      ySCORE_mark (x_mark, 's');
+      ySCORE_mark (myJOBS.m_yscore, x_mark, 's');
       /*---(complete)-----------------------*/
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);
       return rc;
@@ -438,7 +438,7 @@ yjobs_file_review       (char a_runas, char a_mode, char a_reason, int a_seq, ch
          DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      ySCORE_mark (x_mark, 'Ö');
+      ySCORE_mark (myJOBS.m_yscore, x_mark, 'Ö');
       /*---(check for audit)----------------*/
       if (a_reason == 'a') {
          yURG_msg ('>', "audit-only, purge %s after reading (PURGE)...", x_title);
@@ -450,7 +450,7 @@ yjobs_file_review       (char a_runas, char a_mode, char a_reason, int a_seq, ch
             DEBUG_YJOBS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
-         ySCORE_mark (x_mark, 'a');
+         ySCORE_mark (myJOBS.m_yscore, x_mark, 'a');
       }
       /*---(complete)-----------------------*/
       DEBUG_YJOBS   yLOG_exit    (__FUNCTION__);

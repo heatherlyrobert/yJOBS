@@ -1,4 +1,3 @@
-/*============================----beg-of-source---============================*/
 #include   "yJOBS.h"
 #include   "yJOBS_priv.h"
 
@@ -195,7 +194,7 @@ yjobs__maint_scoring    (char a_runas, char a_mode)
    }
    /*> if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg_mute ();                   <*/
    yjobs_yscore_init ();
-   rc = ySCORE_audit ();
+   rc = ySCORE_audit (myJOBS.m_yscore);
    /*> if (strchr (g_verbose , a_mode)  != NULL)  yURG_msg_live ();                   <*/
    return rc;
 }
