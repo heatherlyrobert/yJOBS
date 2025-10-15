@@ -37,8 +37,8 @@
 
 #define     P_VERMAJOR  "1.--, integrate into eos, heracles, and khronos"
 #define     P_VERMINOR  "1.3-, update for myriad changes to upstream"
-#define     P_VERNUM    "1.3e"
-#define     P_VERTXT    "small updates to clear yJOBS_base, yJOBS_args unit tests"
+#define     P_VERNUM    "1.3f"
+#define     P_VERTXT    "small updates to clear yJOBS_db, yJOBS_dir unit tests"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
