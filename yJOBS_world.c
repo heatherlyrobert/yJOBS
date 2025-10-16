@@ -668,7 +668,7 @@ yjobs_world__prepare    (char a_runas, char a_mode, char a_entry [LEN_PATH], cha
       return  rce;
    }
    /*---(audit entry)--------------------*/
-   rc = yAUDIT_reg ('-', 'n', x_dir, x_file, "-", "-", "-");
+   rc = yAUDIT_base  (x_type, '-', 'n', x_dir, x_file, "-", "-", "-", -1, -1, YENV_NONE, "");
    DEBUG_YJOBS   yLOG_value   ("audit"     , rc);
    --rce;  if (rc < 0) {
       yjobs_ends_failure (a_mode, "", "entry is not secure/appropriate");
